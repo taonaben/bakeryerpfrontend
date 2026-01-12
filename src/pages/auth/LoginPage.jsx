@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { Lock, User, Factory } from 'lucide-react';
-import '../../assets/css/LoginPage.css'; // Importing the separate CSS
+import '../../assets/css/LoginPage.css';
+
+// Mock Data for Simulation
+const MOCK_USERS = [
+    { code: 'adm-001', password: 'password123', name: 'Manager', role: 'Admin' },
+    { code: 'bak-001', password: 'pass123', name: 'Baker', role: 'Production' },
+    { code: 'whs-001', password: 'word123', name: 'Storeman', role: 'Warehouse' }
+];
 
 const LoginPage = ({ onLogin }) => {
     const [empCode, setEmpCode] = useState('');
@@ -10,24 +17,24 @@ const LoginPage = ({ onLogin }) => {
     const handleLogin = (e) => {
         e.preventDefault();
         
-        // Regex for xxx-xxx format (exactly 7 chars including the dash)
+        // 1. Format Validation (xxx-xxx)
         const codeRegex = /^[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}$/;
-        
         if (!codeRegex.test(empCode)) {
             setError("Format error: Employee Code must be 'xxx-xxx'.");
             return;
         }
 
-        if (password.length < 4) {
-            setError("Invalid Password: Too short.");
-            return;
-        }
+        // 2. Credential Verification against Mock Data
+        const user = MOCK_USERS.find(u => u.code === empCode && u.password === password);
 
-        setError("");
-        console.log("Authenticated:", empCode);
-        
-        // This function will be passed from App.js to handle navigation
-        onLogin(); 
+        if (user) {
+            setError("");
+            console.log("Login Successful:", user.name);
+            // Pass the user object back to App.js
+            onLogin(user); 
+        } else {
+            setError("Invalid Employee Code or Password.");
+        }
     };
 
     return (
@@ -47,7 +54,7 @@ const LoginPage = ({ onLogin }) => {
                             <input 
                                 type="text"
                                 className="login-input"
-                                placeholder="e.g., adm-101"
+                                placeholder="e.g., adm-001"
                                 value={empCode}
                                 onChange={(e) => setEmpCode(e.target.value.toLowerCase())}
                                 maxLength={7}
@@ -74,6 +81,11 @@ const LoginPage = ({ onLogin }) => {
                     <button type="submit" className="login-button">
                         Secure Login
                     </button>
+                    
+                    {/* Helper text for your testing convenience */}
+                    <p style={{ fontSize: '10px', color: '#999', marginTop: '15px', textAlign: 'center' }}>
+                        Test Code: adm-001 | Pass: password123
+                    </p>
                 </form>
             </div>
         </div>
