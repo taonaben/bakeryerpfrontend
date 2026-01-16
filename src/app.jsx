@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
+
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginPage from './pages/auth/LoginPage';
 import Dashboard from './pages/dashboard/Dashboard'; 
@@ -34,6 +34,3 @@ function App() {
 
 export default App;
 
-// Note: If you are using React 18, you might eventually move to createRoot, 
-// but keeping this as per your requirement:
-ReactDOM.render(<App />, document.getElementById("root"));
