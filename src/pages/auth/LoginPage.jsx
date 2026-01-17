@@ -1,39 +1,76 @@
 import React, { useState } from 'react';
+import axios from 'axios'; // Ensure you ran 'npm install axios'
 import { Lock, User, Factory } from 'lucide-react';
 import '../../assets/css/LoginPage.css';
 
-// Mock Data for Simulation
-const MOCK_USERS = [
-    { code: 'adm-001', password: 'password123', name: 'Manager', role: 'Admin' },
-    { code: 'bak-001', password: 'pass123', name: 'Baker', role: 'Production' },
-    { code: 'whs-001', password: 'word123', name: 'Storeman', role: 'Warehouse' }
-];
-
 const LoginPage = ({ onLogin }) => {
+    // State hooks for form inputs and UI feedback
     const [empCode, setEmpCode] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e) => {
+    /**
+     * Handles the form submission and API communication
+     */
+    const handleLogin = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError("");
         
-        // 1. Format Validation (xxx-xxx)
+        // 1. Frontend Validation (Format: xxx-xxx)
+        // We check this locally first to save server resources
         const codeRegex = /^[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}$/;
         if (!codeRegex.test(empCode)) {
             setError("Format error: Employee Code must be 'xxx-xxx'.");
+            setIsLoading(false);
             return;
         }
 
-        // 2. Credential Verification against Mock Data
-        const user = MOCK_USERS.find(u => u.code === empCode && u.password === password);
+        try {
+            // 2. API Request to Django Backend
+            // We send the emp_code and password as expected by your LoginSerializer
+            const response = await axios.post('https://bakeryerpbackend.onrender.com/account/login/', {
+                emp_code: empCode,
+                password: password
+            });
 
-        if (user) {
-            setError("");
-            console.log("Login Successful:", user.name);
-            // Pass the user object back to App.js
-            onLogin(user); 
-        } else {
-            setError("Invalid Employee Code or Password.");
+            // 3. Destructure JWT tokens and User data from response
+            const { access, refresh, user } = response.data;
+
+            // 4. Store JWT Tokens in LocalStorage
+            // These will be needed later for authenticated requests to other modules
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
+
+            // 5. Prepare User Object for the Frontend State
+            // Note: Your backend uses 'username' and 'emp_code'. 
+            // We map 'username' to 'name' for our dashboard display.
+            const userData = {
+                name: user.username,
+                emp_code: user.emp_code,
+                role: 'Admin' // Default role; you can update your backend serializer to include 'department' here later
+            };
+
+            console.log("Login Successful for:", userData.name);
+            
+            // Pass user object to App.js to switch view to Dashboard
+            onLogin(userData); 
+
+        } catch (err) {
+            // 6. Detailed Error Handling
+            if (err.response) {
+                // Server responded with an error (e.g., 400 or 401)
+                setError(err.response.data.detail || "Invalid Credentials");
+            } else if (err.request) {
+                // Request was made but no response received (Server down)
+                setError("No response from server. Please try again later.");
+            } else {
+                // Something else went wrong
+                setError("An unexpected error occurred.");
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,6 +84,7 @@ const LoginPage = ({ onLogin }) => {
                 </div>
 
                 <form onSubmit={handleLogin}>
+                    {/* Employee Code Input */}
                     <div className="form-group">
                         <label>Employee Code</label>
                         <div className="input-wrapper">
@@ -54,14 +92,17 @@ const LoginPage = ({ onLogin }) => {
                             <input 
                                 type="text"
                                 className="login-input"
-                                placeholder="e.g., adm-001"
+                                placeholder="e.g., abc-123"
                                 value={empCode}
-                                onChange={(e) => setEmpCode(e.target.value.toLowerCase())}
+                                onChange={(e) => setEmpCode(e.target.value)}
                                 maxLength={7}
+                                required
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
 
+                    {/* Password Input */}
                     <div className="form-group">
                         <label>Password</label>
                         <div className="input-wrapper">
@@ -72,19 +113,26 @@ const LoginPage = ({ onLogin }) => {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                required
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
 
+                    {/* Feedback: Error Messages */}
                     {error && <div className="error-message">{error}</div>}
 
-                    <button type="submit" className="login-button">
-                        Secure Login
+                    {/* Submit Button with Loading State */}
+                    <button 
+                        type="submit" 
+                        className="login-button" 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Verifying..." : "Secure Login"}
                     </button>
                     
-                    {/* Helper text for your testing convenience */}
-                    <p style={{ fontSize: '10px', color: '#999', marginTop: '15px', textAlign: 'center' }}>
-                        Test Code: adm-001 | Pass: password123
+                    <p style={{ fontSize: '11px', color: '#999', marginTop: '20px', textAlign: 'center' }}>
+                        Authorized personnel only. Sessions are monitored.
                     </p>
                 </form>
             </div>
