@@ -44,7 +44,7 @@ const LoginPage = ({ onLogin }) => {
             localStorage.setItem('refreshToken', refresh);
 
             // 5. Prepare User Object for the Frontend State
-            // Note: Your backend uses 'username' and 'emp_code'. 
+            // backend uses 'username' and 'emp_code'. 
             // We map 'username' to 'name' for our dashboard display.
             const userData = {
                 name: user.username,

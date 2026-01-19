@@ -2,14 +2,21 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginPage from './pages/auth/LoginPage';
 import Dashboard from './pages/dashboard/Dashboard'; 
+// IMPORT the new Inventory Page
+import InventoryPage from './pages/inventory/InventoryPage';
 
 /**
  * Main Application Component
- * Handles Global State for Authentication and Session Persistence
+ * Handles Global State for Authentication, Session Persistence, and Navigation
  */
 function App() {
   // Global state to store the authenticated user's profile
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // NAVIGATION STATE: Tracks which module is currently visible
+  // Options: 'dashboard', 'inventory', 'production', etc.
+  const [currentView, setCurrentView] = useState('dashboard');
+
   // State to track if we are currently checking for a saved session
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -37,28 +44,21 @@ function App() {
 
   /**
    * Action: Handle Successful Login
-   * Triggered by LoginPage.jsx after a successful API response
    */
   const handleLoginSuccess = (userData) => {
-    // 1. Update the React State so the UI switches to Dashboard immediately
     setCurrentUser(userData);
-    
-    // 2. Persist the user profile so they stay logged in on refresh
-    // Note: Tokens (access/refresh) are already saved inside LoginPage.jsx
     localStorage.setItem('erp_user', JSON.stringify(userData));
+    // Always start at the dashboard after a fresh login
+    setCurrentView('dashboard');
   };
 
   /**
    * Action: Handle Logout
-   * Clears all session data and returns user to the login screen
    */
   const handleLogout = () => {
-    // 1. Reset React State
     setCurrentUser(null);
-    
-    // 2. Wipe ALL local storage (User Profile + JWT Tokens)
+    setCurrentView('dashboard'); // Reset view for next session
     localStorage.clear(); 
-    
     console.log("User session terminated.");
   };
 
@@ -77,14 +77,31 @@ function App() {
     );
   }
 
-  // SECURE AREA
-  // Once logged in, show the main ERP interface
+  /**
+   * SECURE AREA
+   * This logic toggles between the Dashboard and the specific Modules.
+   * We pass 'setCurrentView' to the Dashboard so its cards can navigate.
+   * We pass a 'back' trigger to Inventory so the user can return to the Dashboard.
+   */
   return (
     <div className="App">
-      <Dashboard 
-        user={currentUser} 
-        onLogout={handleLogout} 
-      />
+      {currentView === 'dashboard' ? (
+        <Dashboard 
+          user={currentUser} 
+          onLogout={handleLogout} 
+          onNavigate={setCurrentView} // Dashboard can now change the view
+        />
+      ) : currentView === 'inventory' ? (
+        <InventoryPage 
+          onBack={() => setCurrentView('dashboard')} // Allows user to return
+        />
+      ) : (
+        /* Fallback if a view isn't built yet */
+        <div style={{padding: '20px'}}>
+           <h2>Module Under Development</h2>
+           <button onClick={() => setCurrentView('dashboard')}>Return to Dashboard</button>
+        </div>
+      )}
     </div>
   );
 }
