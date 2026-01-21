@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Package, Search, Filter, AlertTriangle, 
-    ArrowLeft, Download, Plus, Loader2 
+    ArrowLeft, Download, Plus, Loader2, X 
 } from 'lucide-react';
 import { inventoryService } from '../../services/inventoryService';
 import '/src/assets/css/inventory.css';
@@ -11,6 +11,15 @@ const InventoryPage = ({ onBack }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({
+        batch: '',
+        movement_type: 'IN',
+        quantity: '',
+        reference_number: '',
+        notes: ''
+    });
+    const [submitting, setSubmitting] = useState(false);
 
     // The Warehouse ID from your Render URL
     const CURRENT_WAREHOUSE_ID = "eb33011f-e9b1-4634-976e-ab72f7c02165";
@@ -67,6 +76,27 @@ const InventoryPage = ({ onBack }) => {
         loadData();
     }, []);
 
+    const handleSubmitMovement = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        
+        try {
+            await inventoryService.addStockMovement(CURRENT_WAREHOUSE_ID, formData);
+            setShowModal(false);
+            setFormData({ batch: '', movement_type: 'IN', quantity: '', reference_number: '', notes: '' });
+            // Reload data
+            const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
+            if (data && Array.isArray(data.results)) {
+                setMovements(data.results);
+            }
+        } catch (err) {
+            console.error('Error adding movement:', err);
+            setError('Failed to add movement: ' + (err.response?.data?.detail || err.message));
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     // Filter logic for search bar (searching by reference number or batch)
     const filteredMovements = Array.isArray(movements) ? movements.filter(m => {
         // Safely handle potential null/undefined values
@@ -101,7 +131,9 @@ const InventoryPage = ({ onBack }) => {
                 </div>
                 <div className="header-actions">
                     <button className="btn btn-outline"><Download size={18} /> Export CSV</button>
-                    <button className="btn btn-primary"><Plus size={18} /> Log Movement</button>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={18} /> Log Movement
+                    </button>
                 </div>
             </header>
 
@@ -171,6 +203,85 @@ const InventoryPage = ({ onBack }) => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal for adding new movement */}
+            {showModal && (
+                <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>Log Stock Movement</h3>
+                            <button className="modal-close" onClick={() => setShowModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleSubmitMovement}>
+                            <div className="form-group">
+                                <label>Batch ID</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.batch}
+                                    onChange={(e) => setFormData({...formData, batch: e.target.value})}
+                                    placeholder="e.g., 48866bc2-2d5d-451e-80d3-aa603eed39cf"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Movement Type</label>
+                                <select 
+                                    value={formData.movement_type}
+                                    onChange={(e) => setFormData({...formData, movement_type: e.target.value})}
+                                >
+                                    <option value="IN">IN - Stock Added</option>
+                                    <option value="OUT">OUT - Stock Removed</option>
+                                </select>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Quantity</label>
+                                <input 
+                                    type="number" 
+                                    value={formData.quantity}
+                                    onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+                                    placeholder="e.g., 21"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Reference Number</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.reference_number}
+                                    onChange={(e) => setFormData({...formData, reference_number: e.target.value})}
+                                    placeholder="e.g., ref-002"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Notes (Optional)</label>
+                                <textarea 
+                                    value={formData.notes}
+                                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                                    placeholder="Additional notes..."
+                                    rows="3"
+                                />
+                            </div>
+                            
+                            <div className="modal-actions">
+                                <button type="button" className="btn btn-outline" onClick={() => setShowModal(false)}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                                    {submitting ? 'Adding...' : 'Add Movement'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

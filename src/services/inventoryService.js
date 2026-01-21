@@ -10,6 +10,15 @@ export const inventoryService = {
         return response.data;
     },
 
+    // Add new stock movement
+    addStockMovement: async (warehouseId, movementData) => {
+        const response = await apiClient.post(`/inventory/stock_movements`, {
+            ...movementData,
+            warehouse: warehouseId
+        });
+        return response.data;
+    },
+
     // Optional: If you have an endpoint for current stock balances
     getStockBalances: async (warehouseId) => {
         const response = await apiClient.get(`/inventory/stocks`, {
