@@ -381,3 +381,19 @@
     background: var(--marble-blue);
     color: white;
 }
+.inventory-toolbar {
+    background: var(--white);
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between; /* Pushes search to left, buttons to right */
+    align-items: center;
+    gap: 20px;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 12px; /* Spacing between Filter and Log Movement */
+    align-items: center;
+}
