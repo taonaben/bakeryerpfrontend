@@ -1,4 +1,6 @@
 import React from 'react';
+// 1. Import useNavigate to handle URL-based navigation
+import { useNavigate } from 'react-router-dom';
 import { 
     LayoutDashboard, Package, ClipboardList, 
     ShoppingCart, BarChart3, Truck, Settings, 
@@ -6,7 +8,13 @@ import {
 } from 'lucide-react';
 import '../../assets/css/dashboard.css';
 
-const Dashboard = ({ user, onLogout, onNavigate }) => {
+/**
+ * Dashboard Component
+ * Now uses React Router 'navigate' to ensure the URL stays in the browser bar on refresh.
+ */
+const Dashboard = ({ user, onLogout }) => {
+    // 2. Initialize the navigation hook
+    const navigate = useNavigate();
     
     const canAccess = (moduleName) => {
         const permissions = {
@@ -32,15 +40,20 @@ const Dashboard = ({ user, onLogout, onNavigate }) => {
                     Bakery ERP
                 </div>
                 <nav className="sidebar-nav">
-                    <div className="nav-item active" onClick={() => onNavigate('dashboard')}>
+                    {/* navigate('/') takes the user to the base URL (Dashboard) */}
+                    <div className="nav-item active" onClick={() => navigate('/')}>
                         <LayoutDashboard size={20}/> Dashboard
                     </div>
+
                     {canAccess('Procurement') && <div className="nav-item"><Truck size={20}/> Procurement</div>}
+                    
                     {canAccess('Inventory') && (
-                        <div className="nav-item" onClick={() => onNavigate('inventory')}>
+                        /* navigate('/inventory') updates the browser URL to /inventory */
+                        <div className="nav-item" onClick={() => navigate('/inventory')}>
                             <Package size={20}/> Inventory
                         </div>
                     )}
+
                     {canAccess('Production') && <div className="nav-item"><ClipboardList size={20}/> Production</div>}
                     {canAccess('Sales') && <div className="nav-item"><ShoppingCart size={20}/> Sales & Dist.</div>}
                     {canAccess('Reporting') && <div className="nav-item"><BarChart3 size={20}/> Reports</div>}
@@ -82,7 +95,7 @@ const Dashboard = ({ user, onLogout, onNavigate }) => {
                                 </div>
                                 <TrendingUp size={24} color="#10b981" />
                             </div>
-                            <div className="kpi-stat-card">
+                            <div className="kpi-card">
                                 <div className="kpi-data">
                                     <h4>Inventory Alerts</h4>
                                     <span className="value" style={{ color: '#e74c3c' }}>4 Low Stock</span>
@@ -113,7 +126,8 @@ const Dashboard = ({ user, onLogout, onNavigate }) => {
                                     </div>
                                 )}
                                 {canAccess('Inventory') && (
-                                    <div className="action-card" onClick={() => onNavigate('inventory')}>
+                                    /* Quick Action Card now also uses navigate('/inventory') */
+                                    <div className="action-card" onClick={() => navigate('/inventory')}>
                                         <Package size={28} color="#566d7e" />
                                         <h3>Stock Control</h3>
                                         <p>Monitor raw materials.</p>

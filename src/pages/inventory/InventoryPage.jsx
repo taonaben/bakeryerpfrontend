@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+// 1. Import useNavigate from react-router-dom
+import { useNavigate } from 'react-router-dom';
 import { 
     Package, Search, Filter, AlertTriangle, 
     ArrowLeft, Download, Plus, Loader2, X 
@@ -6,7 +8,14 @@ import {
 import { inventoryService } from '../../services/inventoryService';
 import '/src/assets/css/inventory.css';
 
-const InventoryPage = ({ onBack }) => {
+/**
+ * InventoryPage Component
+ * Now uses React Router for navigation to ensure the view persists on refresh.
+ */
+const InventoryPage = () => {
+    // 2. Initialize the navigate hook
+    const navigate = useNavigate();
+
     const [movements, setMovements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,7 +43,6 @@ const InventoryPage = ({ onBack }) => {
                 const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
                 console.log('API Response:', data);
                 
-                // Handle paginated response - extract results array
                 if (data && Array.isArray(data.results)) {
                     setMovements(data.results);
                 } else if (Array.isArray(data)) {
@@ -46,27 +54,18 @@ const InventoryPage = ({ onBack }) => {
                 }
             } catch (err) {
                 console.error("API Error:", err);
-                
-                // More detailed error handling
                 if (err.response) {
                     const status = err.response.status;
                     const message = err.response.data?.detail || err.response.data?.message || 'Server error';
-                    
-                    if (status === 401) {
-                        setError('Authentication failed. Please login again.');
-                    } else if (status === 403) {
-                        setError('Access denied. You do not have permission to view this data.');
-                    } else if (status === 404) {
-                        setError('Warehouse not found or no data available.');
-                    } else {
-                        setError(`Server error (${status}): ${message}`);
-                    }
+                    if (status === 401) setError('Authentication failed. Please login again.');
+                    else if (status === 403) setError('Access denied.');
+                    else if (status === 404) setError('Warehouse not found.');
+                    else setError(`Server error (${status}): ${message}`);
                 } else if (err.request) {
-                    setError('Cannot connect to server. Please check your internet connection.');
+                    setError('Cannot connect to server. Check connection.');
                 } else {
                     setError('An unexpected error occurred: ' + err.message);
                 }
-                
                 setMovements([]);
             } finally {
                 setLoading(false);
@@ -84,7 +83,6 @@ const InventoryPage = ({ onBack }) => {
             await inventoryService.addStockMovement(CURRENT_WAREHOUSE_ID, formData);
             setShowModal(false);
             setFormData({ batch: '', movement_type: 'IN', quantity: '', reference_number: '', notes: '' });
-            // Reload data
             const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
             if (data && Array.isArray(data.results)) {
                 setMovements(data.results);
@@ -97,13 +95,10 @@ const InventoryPage = ({ onBack }) => {
         }
     };
 
-    // Filter logic for search bar (searching by reference number or batch)
     const filteredMovements = Array.isArray(movements) ? movements.filter(m => {
-        // Safely handle potential null/undefined values
         const refNumber = m?.reference_number?.toLowerCase() || '';
         const batch = m?.batch?.toLowerCase() || '';
         const searchLower = searchTerm.toLowerCase();
-        
         return refNumber.includes(searchLower) || batch.includes(searchLower);
     }) : [];
 
@@ -119,7 +114,8 @@ const InventoryPage = ({ onBack }) => {
     return (
         <div className="inventory-page">
             <nav className="top-nav">
-                <button className="back-link" onClick={onBack}>
+                {/* 3. Use navigate('/') to return to the Dashboard (Home) URL */}
+                <button className="back-link" onClick={() => navigate('/')}>
                     <ArrowLeft size={16} /> Back to Dashboard
                 </button>
             </nav>
@@ -168,7 +164,6 @@ const InventoryPage = ({ onBack }) => {
                     <tbody>
                         {filteredMovements.length > 0 ? (
                             filteredMovements.map(m => {
-                                // Safe data extraction with fallbacks
                                 const date = m?.created_at ? new Date(m.created_at).toLocaleDateString() : 'N/A';
                                 const refNumber = m?.reference_number || 'N/A';
                                 const batch = m?.batch || 'N/A';
@@ -222,7 +217,7 @@ const InventoryPage = ({ onBack }) => {
                                     type="text" 
                                     value={formData.batch}
                                     onChange={(e) => setFormData({...formData, batch: e.target.value})}
-                                    placeholder="e.g., 48866bc2-2d5d-451e-80d3-aa603eed39cf"
+                                    placeholder="e.g., Batch ID"
                                     required
                                 />
                             </div>
@@ -244,7 +239,6 @@ const InventoryPage = ({ onBack }) => {
                                     type="number" 
                                     value={formData.quantity}
                                     onChange={(e) => setFormData({...formData, quantity: e.target.value})}
-                                    placeholder="e.g., 21"
                                     required
                                 />
                             </div>
@@ -255,7 +249,6 @@ const InventoryPage = ({ onBack }) => {
                                     type="text" 
                                     value={formData.reference_number}
                                     onChange={(e) => setFormData({...formData, reference_number: e.target.value})}
-                                    placeholder="e.g., ref-002"
                                     required
                                 />
                             </div>
@@ -265,7 +258,6 @@ const InventoryPage = ({ onBack }) => {
                                 <textarea 
                                     value={formData.notes}
                                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                                    placeholder="Additional notes..."
                                     rows="3"
                                 />
                             </div>
