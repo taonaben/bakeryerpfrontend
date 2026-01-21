@@ -332,3 +332,52 @@
     border-top: 1px solid #e2e8f0;
     margin-top: 20px;
 }
+/* --- TAB NAVIGATION STYLES --- */
+.inventory-tabs {
+    display: flex;
+    gap: 5px;
+    margin: 20px 0;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    margin-bottom: -2px; /* Align with parent border */
+}
+
+.tab-btn:hover {
+    color: var(--marble-blue);
+    background: #f8fafc;
+}
+
+.tab-btn.active {
+    color: var(--marble-blue);
+    border-bottom-color: var(--marble-blue);
+    background: #f1f5f9;
+}
+
+/* Badge for tab counts (optional) */
+.tab-count {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.tab-btn.active .tab-count {
+    background: var(--marble-blue);
+    color: white;
+}
