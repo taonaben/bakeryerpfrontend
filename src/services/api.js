@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'https://bakeryerpbackend.onrender.com',
+    baseURL: 'https://bakeryerpbackend.onrender.com/api/',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

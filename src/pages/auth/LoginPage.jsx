@@ -30,7 +30,7 @@ const LoginPage = ({ onLogin }) => {
         try {
             // 2. API Request to Django Backend
             // We send the emp_code and password as expected by your LoginSerializer
-            const response = await axios.post('https://bakeryerpbackend.onrender.com/account/login/', {
+            const response = await axios.post('https://bakeryerpbackend.onrender.com/account/login', {
                 emp_code: empCode,
                 password: password
             });
@@ -43,7 +43,14 @@ const LoginPage = ({ onLogin }) => {
             localStorage.setItem('accessToken', access);
             localStorage.setItem('refreshToken', refresh);
 
-          
+            // 5. Prepare User Object for the Frontend State
+            // Note: Your backend uses 'username' and 'emp_code'. 
+            // We map 'username' to 'name' for our dashboard display.
+            const userData = {
+                name: user.username,
+                emp_code: user.emp_code,
+                role: 'Admin' // Default role; you can update your backend serializer to include 'department' here later
+            };
 
             console.log("Login Successful for:", userData.name);
             
