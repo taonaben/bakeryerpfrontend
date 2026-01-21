@@ -1,111 +1,125 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Package, Search, Filter, AlertTriangle, 
-    ArrowLeft, Download, Plus, FileText 
+    ArrowLeft, Download, Plus, Loader2 
 } from 'lucide-react';
-import '../../assets/css/inventory.css';
+import { inventoryService } from '../../services/inventoryService';
+import '/src/assets/css/inventory.css';
 
 const InventoryPage = ({ onBack }) => {
+    const [movements, setMovements] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    
-    const inventoryData = [
-        { id: 1, name: "Premium Diced Beef", category: "Raw Material", stock: 45.5, unit: "kg", min_stock: 20, status: "In Stock" },
-        { id: 2, name: "Pastry Flour", category: "Raw Material", stock: 120, unit: "kg", min_stock: 50, status: "In Stock" },
-        { id: 3, name: "Salted Butter", category: "Raw Material", stock: 8.2, unit: "kg", min_stock: 15, status: "Low Stock" },
-        { id: 4, name: "Single Pie Boxes", category: "Packaging", stock: 1500, unit: "units", min_stock: 500, status: "In Stock" },
-        { id: 5, name: "Pork Mince", category: "Raw Material", stock: 0, unit: "kg", min_stock: 10, status: "Out of Stock" },
-    ];
 
-    const filteredItems = inventoryData.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // The Warehouse ID from your Render URL
+    const CURRENT_WAREHOUSE_ID = "eb33011f-e9b1-4634-976e-ab72f7c02165";
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
+                setMovements(data);
+                setError(null);
+            } catch (err) {
+                console.error("API Error:", err);
+                setError("Failed to fetch stock movements from server.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
+    // Filter logic for search bar (searching by product name or batch)
+    const filteredMovements = movements.filter(m =>
+        m.product_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.batch_number?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <Loader2 className="spinner" size={40} />
+                <p>Connecting to Bakery Vault...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="inventory-page">
-            {/* 1. Breadcrumb Navigation */}
             <nav className="top-nav">
                 <button className="back-link" onClick={onBack}>
                     <ArrowLeft size={16} /> Back to Dashboard
                 </button>
             </nav>
 
-            {/* 2. Header Section */}
             <header className="inventory-header">
                 <div className="header-title">
-                    <h1>Inventory Ledger</h1>
-                    <p>Real-time stock monitoring and material tracking</p>
+                    <h1>Stock Movement Ledger</h1>
+                    <p>Warehouse ID: {CURRENT_WAREHOUSE_ID.substring(0, 8)}...</p>
                 </div>
                 <div className="header-actions">
                     <button className="btn btn-outline"><Download size={18} /> Export CSV</button>
-                    <button className="btn btn-primary"><Plus size={18} /> Add New Material</button>
+                    <button className="btn btn-primary"><Plus size={18} /> Log Movement</button>
                 </div>
             </header>
 
-            {/* 3. KPI Cards Section */}
-            <div className="inventory-stats">
-                <div className="stat-card">
-                    <span className="stat-label">Total SKUs</span>
-                    <span className="stat-value">{inventoryData.length}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">Active Categories</span>
-                    <span className="stat-value">2</span>
-                </div>
-                <div className="stat-card" style={{ borderLeft: '4px solid #f59e0b' }}>
-                    <span className="stat-label">Low Stock Alerts</span>
-                    <span className="stat-value">1</span>
-                </div>
-                <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
-                    <span className="stat-label">Critical Shortage</span>
-                    <span className="stat-value">1</span>
-                </div>
-            </div>
+            {error && <div className="error-banner">{error}</div>}
 
-            {/* 4. Filter & Search Toolbar */}
             <div className="inventory-toolbar">
                 <div className="search-container">
                     <Search size={18} className="search-icon" />
                     <input 
                         type="text" 
                         className="search-input"
-                        placeholder="Search by material name or ID..." 
+                        placeholder="Search by product or batch..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="filter-actions">
-                    <button className="btn btn-outline"><Filter size={18} /> Filters</button>
-                </div>
+                <button className="btn btn-outline"><Filter size={18} /> Filters</button>
             </div>
 
-            {/* 5. Main Inventory Table */}
             <div className="table-container">
                 <table className="inventory-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Material Name</th>
-                            <th>Category</th>
-                            <th>Current Stock</th>
-                            <th>Threshold</th>
-                            <th>Inventory Status</th>
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th>Batch</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Notes</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredItems.map(item => (
-                            <tr key={item.id}>
-                                <td style={{ color: '#94a3b8', fontSize: '0.85rem' }}>#{item.id}</td>
-                                <td style={{ fontWeight: '600' }}>{item.name}</td>
-                                <td>{item.category}</td>
-                                <td style={{ fontWeight: '600' }}>{item.stock} {item.unit}</td>
-                                <td>{item.min_stock} {item.unit}</td>
-                                <td>
-                                    <span className={`badge ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                                        {item.status}
-                                    </span>
+                        {filteredMovements.length > 0 ? (
+                            filteredMovements.map(m => (
+                                <tr key={m.id}>
+                                    <td>{new Date(m.created_at).toLocaleDateString()}</td>
+                                    <td style={{ fontWeight: '600' }}>{m.product_name}</td>
+                                    <td><code className="batch-tag">{m.batch_number}</code></td>
+                                    <td>
+                                        <span className={`badge ${m.movement_type.toLowerCase()}`}>
+                                            {m.movement_type}
+                                        </span>
+                                    </td>
+                                    <td style={{ fontWeight: '700', color: m.quantity < 0 ? '#ef4444' : '#10b981' }}>
+                                        {m.quantity} {m.unit}
+                                    </td>
+                                    <td className="text-muted">{m.remarks || '---'}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                                    No movements found for this warehouse.
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>

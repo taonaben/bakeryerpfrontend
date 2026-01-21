@@ -196,3 +196,45 @@
 
 .btn-outline { background: white; color: var(--text-dark); border: 1px solid #e2e8f0; }
 .btn-outline:hover { background: #f8fafc; }
+
+/* Loading State */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    color: var(--marble-blue);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Movement Type Badges */
+.badge.in { background: #d1fae5; color: #065f46; } /* Inbound stock */
+.badge.out { background: #fee2e2; color: #991b1b; } /* Consumption/Sales */
+.badge.transfer { background: #eff6ff; color: #1e40af; } /* Inter-warehouse */
+
+.batch-tag {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+
+.error-banner {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #f87171;
+}

@@ -43,14 +43,7 @@ const LoginPage = ({ onLogin }) => {
             localStorage.setItem('accessToken', access);
             localStorage.setItem('refreshToken', refresh);
 
-            // 5. Prepare User Object for the Frontend State
-            // backend uses 'username' and 'emp_code'. 
-            // We map 'username' to 'name' for our dashboard display.
-            const userData = {
-                name: user.username,
-                emp_code: user.emp_code,
-                role: 'Admin' // Default role; you can update your backend serializer to include 'department' here later
-            };
+          
 
             console.log("Login Successful for:", userData.name);
             
