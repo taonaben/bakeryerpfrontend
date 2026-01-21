@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'https://bakeryerpbackend.onrender.com/api/',
+    baseURL: 'https://bakeryerpbackend.onrender.com',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken"); // or sessionStorage
+    const token = localStorage.getItem("accessToken"); // Match what LoginPage stores
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

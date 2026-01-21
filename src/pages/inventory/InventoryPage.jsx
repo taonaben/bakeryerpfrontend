@@ -19,12 +19,46 @@ const InventoryPage = ({ onBack }) => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
-                setMovements(data);
                 setError(null);
+                console.log('Loading inventory data for warehouse:', CURRENT_WAREHOUSE_ID);
+                
+                const data = await inventoryService.getStockMovements(CURRENT_WAREHOUSE_ID);
+                console.log('API Response:', data);
+                
+                // Handle paginated response - extract results array
+                if (data && Array.isArray(data.results)) {
+                    setMovements(data.results);
+                } else if (Array.isArray(data)) {
+                    setMovements(data);
+                } else {
+                    console.warn('API returned unexpected data format:', data);
+                    setMovements([]);
+                    setError('Invalid data format received from server');
+                }
             } catch (err) {
                 console.error("API Error:", err);
-                setError("Failed to fetch stock movements from server.");
+                
+                // More detailed error handling
+                if (err.response) {
+                    const status = err.response.status;
+                    const message = err.response.data?.detail || err.response.data?.message || 'Server error';
+                    
+                    if (status === 401) {
+                        setError('Authentication failed. Please login again.');
+                    } else if (status === 403) {
+                        setError('Access denied. You do not have permission to view this data.');
+                    } else if (status === 404) {
+                        setError('Warehouse not found or no data available.');
+                    } else {
+                        setError(`Server error (${status}): ${message}`);
+                    }
+                } else if (err.request) {
+                    setError('Cannot connect to server. Please check your internet connection.');
+                } else {
+                    setError('An unexpected error occurred: ' + err.message);
+                }
+                
+                setMovements([]);
             } finally {
                 setLoading(false);
             }
@@ -33,11 +67,15 @@ const InventoryPage = ({ onBack }) => {
         loadData();
     }, []);
 
-    // Filter logic for search bar (searching by product name or batch)
-    const filteredMovements = movements.filter(m =>
-        m.product_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.batch_number?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter logic for search bar (searching by reference number or batch)
+    const filteredMovements = Array.isArray(movements) ? movements.filter(m => {
+        // Safely handle potential null/undefined values
+        const refNumber = m?.reference_number?.toLowerCase() || '';
+        const batch = m?.batch?.toLowerCase() || '';
+        const searchLower = searchTerm.toLowerCase();
+        
+        return refNumber.includes(searchLower) || batch.includes(searchLower);
+    }) : [];
 
     if (loading) {
         return (
@@ -75,7 +113,7 @@ const InventoryPage = ({ onBack }) => {
                     <input 
                         type="text" 
                         className="search-input"
-                        placeholder="Search by product or batch..." 
+                        placeholder="Search by reference or batch..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -97,26 +135,36 @@ const InventoryPage = ({ onBack }) => {
                     </thead>
                     <tbody>
                         {filteredMovements.length > 0 ? (
-                            filteredMovements.map(m => (
-                                <tr key={m.id}>
-                                    <td>{new Date(m.created_at).toLocaleDateString()}</td>
-                                    <td style={{ fontWeight: '600' }}>{m.product_name}</td>
-                                    <td><code className="batch-tag">{m.batch_number}</code></td>
-                                    <td>
-                                        <span className={`badge ${m.movement_type.toLowerCase()}`}>
-                                            {m.movement_type}
-                                        </span>
-                                    </td>
-                                    <td style={{ fontWeight: '700', color: m.quantity < 0 ? '#ef4444' : '#10b981' }}>
-                                        {m.quantity} {m.unit}
-                                    </td>
-                                    <td className="text-muted">{m.remarks || '---'}</td>
-                                </tr>
-                            ))
+                            filteredMovements.map(m => {
+                                // Safe data extraction with fallbacks
+                                const date = m?.created_at ? new Date(m.created_at).toLocaleDateString() : 'N/A';
+                                const refNumber = m?.reference_number || 'N/A';
+                                const batch = m?.batch || 'N/A';
+                                const movementType = m?.movement_type || 'UNKNOWN';
+                                const quantity = m?.quantity !== undefined ? m.quantity : 0;
+                                const notes = m?.notes || '---';
+                                
+                                return (
+                                    <tr key={m?.id || Math.random()}>
+                                        <td>{date}</td>
+                                        <td style={{ fontWeight: '600' }}>{refNumber}</td>
+                                        <td><code className="batch-tag">{batch}</code></td>
+                                        <td>
+                                            <span className={`badge ${movementType.toLowerCase()}`}>
+                                                {movementType}
+                                            </span>
+                                        </td>
+                                        <td style={{ fontWeight: '700', color: quantity < 0 ? '#ef4444' : '#10b981' }}>
+                                            {quantity}
+                                        </td>
+                                        <td className="text-muted">{notes}</td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
-                                    No movements found for this warehouse.
+                                    {error ? 'Error loading data. Please try again.' : 'No movements found for this warehouse.'}
                                 </td>
                             </tr>
                         )}

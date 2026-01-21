@@ -18,8 +18,10 @@ const Dashboard = ({ user, onLogout, onNavigate }) => {
         return permissions[user?.role]?.includes(moduleName);
     };
 
-    // Extract initials for the profile avatar
-    const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??';
+    // Extract initials for the profile avatar with safe fallback
+    const initials = user?.name ? 
+        user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 
+        '??';
 
     return (
         <div className="erp-layout">
@@ -57,8 +59,8 @@ const Dashboard = ({ user, onLogout, onNavigate }) => {
                         <div className="user-profile">
                             <div className="avatar">{initials}</div>
                             <div className="user-info">
-                                <span className="user-name">{user?.name}</span>
-                                <span className="user-role">{user?.role}</span>
+                                <span className="user-name">{user?.name || 'Unknown User'}</span>
+                                <span className="user-role">{user?.role || 'No Role'}</span>
                             </div>
                         </div>
                         <button className="logout-link" onClick={onLogout}>
