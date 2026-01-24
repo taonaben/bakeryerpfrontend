@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// 1. Updated imports to include Navigate for redirection and Router for navigation
+// 1. Using BrowserRouter for URL persistence (fixes the Refresh problem)
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import LoginPage from './pages/auth/LoginPage';
 import Dashboard from './pages/dashboard/Dashboard'; 
@@ -7,14 +7,20 @@ import InventoryPage from './pages/inventory/InventoryPage';
 
 /**
  * Main Application Component
- * Handles Global State for Authentication and URL-based Routing
+ * Handles Global State for Authentication, Multi-Warehouse context, and Routing.
  */
 function App() {
-  // Global state to store the authenticated user's profile
+  // --- AUTHENTICATION STATE ---
   const [currentUser, setCurrentUser] = useState(null);
-  
-  // State to track if we are currently checking for a saved session
   const [isInitializing, setIsInitializing] = useState(true);
+
+  // --- GLOBAL WAREHOUSE STATE ---
+  // Initialized from localStorage so the system remembers which warehouse 
+  // you were looking at even after a hard browser refresh.
+  const [activeWarehouse, setActiveWarehouse] = useState(() => {
+    const savedWarehouse = localStorage.getItem('active_warehouse');
+    return savedWarehouse ? JSON.parse(savedWarehouse) : null;
+  });
 
   /**
    * SESSION PERSISTENCE (useEffect)
@@ -42,20 +48,31 @@ function App() {
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
     localStorage.setItem('erp_user', JSON.stringify(userData));
-    // Note: We no longer need setCurrentView('dashboard') here 
-    // because the Router will handle the move.
+  };
+
+  /**
+   * Action: Global Warehouse Change
+   * Updates state and persists the selection to localStorage.
+   * This is the function that the Dashboard will call.
+   */
+  const handleWarehouseChange = (warehouse) => {
+    console.log("Global state updating to warehouse:", warehouse.name);
+    setActiveWarehouse(warehouse);
+    localStorage.setItem('active_warehouse', JSON.stringify(warehouse));
   };
 
   /**
    * Action: Handle Logout
+   * Wipes all session and warehouse data.
    */
   const handleLogout = () => {
     setCurrentUser(null);
+    setActiveWarehouse(null);
     localStorage.clear(); 
     console.log("User session terminated.");
   };
 
-  // Prevent "flicker" while checking for saved session in useEffect
+  // Prevent "flicker" while checking for saved session
   if (isInitializing) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#566d7e' }}>
@@ -69,31 +86,42 @@ function App() {
       <div className="App">
         <Routes>
           {/* --- PUBLIC ROUTE --- */}
-          {/* If the user is NOT logged in, show LoginPage. If they ARE, redirect home (/) */}
           <Route 
             path="/login" 
             element={!currentUser ? <LoginPage onLogin={handleLoginSuccess} /> : <Navigate to="/" />} 
           />
 
-          {/* --- PROTECTED ROUTES --- */}
-          {/* We only allow access to these if currentUser is not null */}
+          {/* --- PROTECTED ROUTES (Requires currentUser) --- */}
           {currentUser ? (
             <>
-              {/* Home path shows the Dashboard */}
+              {/* 
+                  Dashboard: Receives activeWarehouse and the change handler. 
+                  This fixes the "onWarehouseChange is not a function" error.
+              */}
               <Route path="/" element={
-                <Dashboard user={currentUser} onLogout={handleLogout} />
+                <Dashboard 
+                  user={currentUser} 
+                  onLogout={handleLogout}
+                  activeWarehouse={activeWarehouse}
+                  onWarehouseChange={handleWarehouseChange} 
+                />
               } />
 
-              {/* Inventory path shows the Inventory Page */}
+              {/* 
+                  Inventory: Receives the activeWarehouse so it knows 
+                  which movements/balances to fetch from the API.
+              */}
               <Route path="/inventory" element={
-                <InventoryPage />
+                <InventoryPage 
+                  activeWarehouse={activeWarehouse} 
+                />
               } />
 
-              {/* Redirect any other unknown logged-in paths back to Dashboard */}
+              {/* Redirect unknown paths back to Dashboard */}
               <Route path="*" element={<Navigate to="/" />} />
             </>
           ) : (
-            /* If NOT logged in and trying to access any page, force to /login */
+            /* If NOT logged in, force all paths to /login */
             <Route path="*" element={<Navigate to="/login" />} />
           )}
         </Routes>

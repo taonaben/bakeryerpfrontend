@@ -1,21 +1,60 @@
-import React from 'react';
-// 1. Import useNavigate to handle URL-based navigation
+import React, { useState, useEffect } from 'react';
+// 1. Import useNavigate for URL-based navigation
 import { useNavigate } from 'react-router-dom';
 import { 
     LayoutDashboard, Package, ClipboardList, 
     ShoppingCart, BarChart3, Truck, Settings, 
-    LogOut, Factory, TrendingUp, AlertCircle, Clock
+    LogOut, Factory, TrendingUp, AlertCircle, Clock, ChevronDown
 } from 'lucide-react';
+import apiClient from '../../services/api'; 
 import '../../assets/css/dashboard.css';
 
 /**
  * Dashboard Component
- * Now uses React Router 'navigate' to ensure the URL stays in the browser bar on refresh.
+ * Receives activeWarehouse and onWarehouseChange from App.jsx to maintain 
+ * a global context across all ERP modules.
  */
-const Dashboard = ({ user, onLogout }) => {
-    // 2. Initialize the navigation hook
-    const navigate = useNavigate();
+const Dashboard = ({ user, onLogout, activeWarehouse, onWarehouseChange }) => {
+    const navigate = useNavigate(); 
     
+    // Internal state for the list of available warehouses
+    const [warehouses, setWarehouses] = useState([]);
+    // State to toggle the visibility of the dropdown menu
+    const [showWhDropdown, setShowWhDropdown] = useState(false);
+
+    /**
+     * WAREHOUSE FETCHING
+     * Automatically runs on load to fetch available locations from the backend.
+     */
+    useEffect(() => {
+        const fetchWarehouses = async () => {
+            try {
+                // Ensure this URL matches your backend exactly (e.g., 'inventory/warehouses/')
+                const response = await apiClient.get('/warehouses');
+                const data = response.data.results || response.data;
+                setWarehouses(data);
+
+                /**
+                 * AUTO-SELECT DEFAULT:
+                 * If there's no warehouse in localStorage yet, we pick the first one
+                 * from the database automatically.
+                 */
+                if (!activeWarehouse && data.length > 0) {
+                    // Line 37 FIX: Added safety check to ensure function exists before calling
+                    if (typeof onWarehouseChange === 'function') {
+                        onWarehouseChange(data[0]);
+                    }
+                }
+            } catch (err) {
+                console.error("Dashboard: Error loading warehouses:", err);
+            }
+        };
+        fetchWarehouses();
+    }, [activeWarehouse, onWarehouseChange]);
+
+    /**
+     * PERMISSIONS logic for UI filtering
+     */
     const canAccess = (moduleName) => {
         const permissions = {
             'Admin': ['Procurement', 'Inventory', 'Production', 'Sales', 'Reporting'],
@@ -26,29 +65,27 @@ const Dashboard = ({ user, onLogout }) => {
         return permissions[user?.role]?.includes(moduleName);
     };
 
-    // Extract initials for the profile avatar with safe fallback
+    // UI Helper: Get first letters for Avatar
     const initials = user?.name ? 
         user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 
         '??';
 
     return (
         <div className="erp-layout">
-            {/* 1. SIDEBAR (YOUR EXACT STRUCTURE) */}
+            {/* 1. SIDEBAR */}
             <aside className="sidebar">
                 <div className="sidebar-logo">
                     <Factory size={24} style={{ marginRight: '10px' }} />
                     Bakery ERP
                 </div>
                 <nav className="sidebar-nav">
-                    {/* navigate('/') takes the user to the base URL (Dashboard) */}
                     <div className="nav-item active" onClick={() => navigate('/')}>
                         <LayoutDashboard size={20}/> Dashboard
                     </div>
-
+                    
                     {canAccess('Procurement') && <div className="nav-item"><Truck size={20}/> Procurement</div>}
                     
                     {canAccess('Inventory') && (
-                        /* navigate('/inventory') updates the browser URL to /inventory */
                         <div className="nav-item" onClick={() => navigate('/inventory')}>
                             <Package size={20}/> Inventory
                         </div>
@@ -64,9 +101,49 @@ const Dashboard = ({ user, onLogout }) => {
 
             {/* 2. MAIN AREA */}
             <main className="main-area">
-                {/* UPGRADED TOP BAR */}
                 <header className="top-bar">
-                    <div className="warehouse-tag">Main Factory Warehouse #01</div>
+                    {/* --- DYNAMIC WAREHOUSE SELECTOR CONTAINER --- */}
+                    <div style={{ position: 'relative' }}>
+                        <div 
+                            className="warehouse-tag" 
+                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                            onClick={() => setShowWhDropdown(!showWhDropdown)}
+                        >
+                            <Factory size={14} />
+                            <span>{activeWarehouse ? activeWarehouse.name : "Select Warehouse"}</span>
+                            <ChevronDown size={14} />
+                        </div>
+
+                        {/* DROPDOWN MENU */}
+                        {showWhDropdown && (
+                            <div className="warehouse-dropdown">
+                                {warehouses.length > 0 ? (
+                                    warehouses.map(wh => (
+                                        <div 
+                                            key={wh.id} 
+                                            className={`dropdown-item ${activeWarehouse?.id === wh.id ? 'active' : ''}`}
+                                            onClick={() => {
+                                                // Line 118 FIX: Check if function is valid before executing
+                                                if (typeof onWarehouseChange === 'function') {
+                                                    onWarehouseChange(wh);
+                                                }
+                                                setShowWhDropdown(false);
+                                            }}
+                                        >
+                                            <div style={{ fontWeight: '600' }}>{wh.name}</div>
+                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                                                Code: {wh.id.substring(0, 8)}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="dropdown-item" style={{ color: '#999', fontStyle: 'italic' }}>
+                                        No warehouses available
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     
                     <div className="user-nav">
                         <div className="user-profile">
@@ -114,27 +191,25 @@ const Dashboard = ({ user, onLogout }) => {
 
                     {/* OPERATIONAL SPLIT GRID */}
                     <div className="ops-grid">
-                        {/* LEFT: Quick Action Modules */}
                         <div className="actions-column">
                             <h3 className="section-title">Quick Actions</h3>
                             <div className="module-grid">
                                 {canAccess('Production') && (
-                                    <div className="action-card">
+                                    <div className="action-card" onClick={() => navigate('/production')}>
                                         <ClipboardList size={28} color="#566d7e" />
                                         <h3>Production Plan</h3>
                                         <p>Create batches & BOMs.</p>
                                     </div>
                                 )}
                                 {canAccess('Inventory') && (
-                                    /* Quick Action Card now also uses navigate('/inventory') */
                                     <div className="action-card" onClick={() => navigate('/inventory')}>
                                         <Package size={28} color="#566d7e" />
                                         <h3>Stock Control</h3>
-                                        <p>Monitor raw materials.</p>
+                                        <p>Monitor raw materials in <b>{activeWarehouse?.name || 'warehouse'}</b>.</p>
                                     </div>
                                 )}
                                 {canAccess('Procurement') && (
-                                    <div className="action-card">
+                                    <div className="action-card" onClick={() => navigate('/procurement')}>
                                         <Truck size={28} color="#566d7e" />
                                         <h3>Purchasing</h3>
                                         <p>Log incoming orders.</p>
@@ -143,15 +218,14 @@ const Dashboard = ({ user, onLogout }) => {
                             </div>
                         </div>
 
-                        {/* RIGHT: Notifications Panel */}
                         <div className="alerts-column">
                             <h3 className="section-title">System Alerts</h3>
                             <div className="alerts-panel">
                                 <div className="alert-item">
                                     <AlertCircle size={18} color="#e74c3c" />
                                     <div className="alert-text">
-                                        <b>Critical Low Stock</b>
-                                        <span>Diced Beef (Dry Store) is below 5kg.</span>
+                                        <b>Context Active</b>
+                                        <span>Viewing: {activeWarehouse?.name || 'Please select warehouse'}</span>
                                     </div>
                                 </div>
                                 <div className="alert-item">
