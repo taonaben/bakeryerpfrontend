@@ -397,3 +397,15 @@
     gap: 12px; /* Spacing between Filter and Log Movement */
     align-items: center;
 }
+.category-tag {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+/* Specific Status Badges from API */
+.badge.empty { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+.badge.low { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+.badge.full { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }

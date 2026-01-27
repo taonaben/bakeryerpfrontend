@@ -19,9 +19,22 @@ export const inventoryService = {
         return response.data;
     },
 
-    // Optional: If you have an endpoint for current stock balances
+   /**
+     * FETCH STOCK BALANCES
+     * Returns a list of products and their total quantities in the specific warehouse.
+     */
     getStockBalances: async (warehouseId) => {
-        const response = await apiClient.get(`/inventory/stocks`, {
+        const response = await apiClient.get('/inventory/stocks', {
+            params: { warehouse_id: warehouseId }
+        });
+        return response.data;
+    },
+    /**
+     * FETCH BATCH REGISTRY
+     * Returns specific batch details including manufacture and expiry dates.
+     */
+    getStockBatches: async (warehouseId) => {
+        const response = await apiClient.get('/inventory/batches', {
             params: { warehouse_id: warehouseId }
         });
         return response.data;
