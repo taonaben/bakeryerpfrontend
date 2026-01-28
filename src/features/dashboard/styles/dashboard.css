@@ -1,162 +1,26 @@
+/* DASHBOARD CONTENT STYLES */
 :root {
     --marble-blue: #566d7e;
-    --sidebar-dark: #2c3e50;
     --bg-light: #f4f7f6;
     --white: #ffffff;
     --text-main: #333;
-    --accent-gold: #d4af37; /* Traditional bakery accent */
+    --accent-gold: #d4af37;
     --slate-500: #64748b;
     --slate-800: #1e293b;
 }
 
-.erp-layout {
-    display: flex;
-    height: 100vh;
-    background-color: var(--bg-light);
-}
-
-/* =========================================
-   SIDEBAR (KEEPING YOUR PERFECT STYLE) 
-   ========================================= */
-.sidebar {
-    width: 260px;
-    background-color: var(--sidebar-dark);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s;
-}
-
-.sidebar-logo {
-    padding: 20px;
-    text-align: center;
-    background: rgba(0,0,0,0.2);
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: var(--white);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.sidebar-nav {
-    flex-grow: 1;
-    padding: 20px 0;
-}
-
-.nav-item {
-    padding: 12px 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
-    color: #bdc3c7;
-    text-decoration: none;
-    font-size: 0.95rem;
-}
-
-.nav-item:hover {
-    background: var(--marble-blue);
-    color: white;
-}
-
-.nav-item.active {
-    background: var(--marble-blue);
-    border-left: 4px solid var(--accent-gold);
-    color: white;
-}
-
-/* =========================================
-   MAIN AREA & TOP BAR (PROFESSIONAL UPGRADE)
-   ========================================= */
-.main-area {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.top-bar {
-    height: 70px;
-    background: white;
-    border-bottom: 1px solid #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
-}
-
-.warehouse-tag {
-    background: #eef2f3;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--marble-blue);
-    border: 1px solid var(--marble-blue);
-}
-
-/* User Profile & Logout section in Top Bar */
-.user-nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-right: 20px;
-    border-right: 1px solid #eee;
-}
-
-.avatar {
-    width: 35px;
-    height: 35px;
-    background: var(--marble-blue);
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.85rem;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-}
-
-.user-name {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--slate-800);
-}
-
-.user-role {
-    font-size: 0.75rem;
-    color: var(--slate-500);
-}
-
-.logout-link {
-    background: none;
-    border: none;
-    color: #e74c3c;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* =========================================
-   DASHBOARD CONTENT (COMMAND CENTER STYLE)
-   ========================================= */
+/* Dashboard Content Container */
 .dashboard-content {
-    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Dashboard Title */
+.dashboard-title {
+    color: #566d7e;
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 1.75rem;
 }
 
 /* KPI Ribbon (Top Stats) */
@@ -167,7 +31,8 @@
     margin-bottom: 35px;
 }
 
-.kpi-stat-card {
+.kpi-stat-card,
+.kpi-card {
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -192,11 +57,21 @@
     color: var(--slate-800);
 }
 
+.kpi-data .value.alert {
+    color: #e74c3c;
+}
+
 /* Grid Layout for Actions vs Alerts */
 .ops-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 30px;
+}
+
+@media (max-width: 968px) {
+    .ops-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .section-title {
@@ -244,7 +119,7 @@
     margin: 0;
 }
 
-/* Notifications Panel */
+/* Alerts Panel */
 .alerts-panel {
     background: white;
     border-radius: 12px;
@@ -259,151 +134,22 @@
     border-bottom: 1px solid #f8f9fa;
 }
 
-.alert-item:last-child { border-bottom: none; }
-
-.alert-text b { font-size: 0.85rem; color: var(--slate-800); display: block; }
-.alert-text span { font-size: 0.75rem; color: var(--slate-500); }
-.warehouse-selector-container {
-    position: relative;
+.alert-item:last-child { 
+    border-bottom: none; 
 }
 
-.warehouse-dropdown {
-    position: absolute;
-    top: 110%;
-    left: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 1000;
-    width: 250px;
-    overflow: hidden;
-}
-
-.dropdown-item {
-    padding: 12px 15px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--slate-800);
-    transition: background 0.2s;
-}
-
-.dropdown-item:hover {
-    background: #f1f5f9;
-    color: var(--marble-blue);
-}
-.warehouse-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    width: 220px;
-    z-index: 100;
-    margin-top: 5px;
-}
-
-.dropdown-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: #333;
-}
-
-.dropdown-item:hover {
-    background-color: #f1f5f9;
-    color: #566d7e;
-}
-.warehouse-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    width: 260px;
-    z-index: 1000;
-    margin-top: 10px;
-    padding: 8px 0;
-}
-
-.dropdown-item {
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background 0.2s;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.dropdown-item:last-child { border-bottom: none; }
-
-.dropdown-item:hover {
-    background-color: #f8fafc;
-    color: var(--marble-blue);
-}
-/* Container for the selector */
-.warehouse-selector-container {
-    position: relative;
-    display: inline-block;
-}
-
-/* The actual floating dropdown menu */
-.warehouse-dropdown {
-    position: absolute;
-    top: calc(100% + 8px); /* Sits 8px below the button */
-    left: 0;
-    background: white;
-    min-width: 280px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    z-index: 9999; /* Ensures it floats above EVERYTHING */
-    padding: 8px 0;
-    animation: slideIn 0.2s ease-out;
-}
-
-/* Dropdown Animation */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Individual Warehouse Item */
-.dropdown-item {
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 1px solid #f8fafc;
+.alert-text {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
-.dropdown-item:last-child {
-    border-bottom: none;
+.alert-text b { 
+    font-size: 0.85rem; 
+    color: var(--slate-800); 
 }
 
-.dropdown-item:hover {
-    background-color: #f1f5f9;
-}
-
-/* Warehouse Name in list */
-.dropdown-item b {
-    color: var(--slate-800);
-    font-size: 0.9rem;
-    margin-bottom: 2px;
-}
-
-/* Warehouse Code/ID in list */
-.dropdown-item span {
-    color: var(--slate-500);
-    font-size: 0.7rem;
-    font-family: monospace;
-}
-
-/* Active state for currently selected warehouse */
-.dropdown-item.active {
-    background-color: #f0f4f8;
-    border-left: 4px solid var(--marble-blue);
+.alert-text span { 
+    font-size: 0.75rem; 
+    color: var(--slate-500); 
 }
