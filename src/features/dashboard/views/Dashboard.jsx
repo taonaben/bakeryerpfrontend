@@ -6,8 +6,8 @@ import {
     ShoppingCart, BarChart3, Truck, Settings, 
     LogOut, Factory, TrendingUp, AlertCircle, Clock, ChevronDown
 } from 'lucide-react';
-import apiClient from '../../services/api'; 
-import '../../assets/css/dashboard.css';
+import apiClient from '../../../services/api'; 
+import '../styles/dashboard.css';
 
 /**
  * Dashboard Component

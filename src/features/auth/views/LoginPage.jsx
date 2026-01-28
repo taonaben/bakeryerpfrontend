@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Ensure you ran 'npm install axios'
 import { Lock, User, Factory } from 'lucide-react';
-import '../../assets/css/LoginPage.css';
+import '../styles/LoginPage.css';
 
 const LoginPage = ({ onLogin }) => {
     // State hooks for form inputs and UI feedback

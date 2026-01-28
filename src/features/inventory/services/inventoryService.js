@@ -1,4 +1,4 @@
-import apiClient from './api.js';
+import apiClient from '../../../services/api.js';
 
 export const inventoryService = {
     // Fetches the ledger of movements (what you provided in Postman)

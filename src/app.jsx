@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-// 1. Using BrowserRouter for URL persistence (fixes the Refresh problem)
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import LoginPage from './pages/auth/LoginPage';
-import Dashboard from './pages/dashboard/Dashboard'; 
-import InventoryPage from './pages/inventory/InventoryPage';
+import LoginPage from './features/auth/views/LoginPage';
+import Dashboard from './features/dashboard/views/Dashboard'; 
+import InventoryPage from './features/inventory/views/InventoryPage';
+import { ThemeProvider } from './contexts/ThemeContext';
+import GlobalStyles from './components/GlobalStyles';
 
 /**
  * Main Application Component
@@ -76,57 +77,60 @@ function App() {
   if (isInitializing) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#566d7e' }}>
-        Initialising Bakery ERP...
+        Initializing Bakery ERP...
       </div>
     );
   }
 
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* --- PUBLIC ROUTE --- */}
-          <Route 
-            path="/login" 
-            element={!currentUser ? <LoginPage onLogin={handleLoginSuccess} /> : <Navigate to="/" />} 
-          />
+    // <ThemeProvider>
+    //   <GlobalStyles />
+      <Router>
+        <div className="App">
+          <Routes>
+            {/* --- PUBLIC ROUTE --- */}
+            <Route 
+              path="/login" 
+              element={!currentUser ? <LoginPage onLogin={handleLoginSuccess} /> : <Navigate to="/" />} 
+            />
 
-          {/* --- PROTECTED ROUTES (Requires currentUser) --- */}
-          {currentUser ? (
-            <>
-              {/* 
-                  Dashboard: Receives activeWarehouse and the change handler. 
-                  This fixes the "onWarehouseChange is not a function" error.
-              */}
-              <Route path="/" element={
-                <Dashboard 
-                  user={currentUser} 
-                  onLogout={handleLogout}
-                  activeWarehouse={activeWarehouse}
-                  onWarehouseChange={handleWarehouseChange} 
-                />
-              } />
+            {/* --- PROTECTED ROUTES (Requires currentUser) --- */}
+            {currentUser ? (
+              <>
+                {/* 
+                    Dashboard: Receives activeWarehouse and the change handler. 
+                    This fixes the "onWarehouseChange is not a function" error.
+                */}
+                <Route path="/" element={
+                  <Dashboard 
+                    user={currentUser} 
+                    onLogout={handleLogout}
+                    activeWarehouse={activeWarehouse}
+                    onWarehouseChange={handleWarehouseChange} 
+                  />
+                } />
 
-              {/* 
-                  Inventory: Receives the activeWarehouse so it knows 
-                  which movements/balances to fetch from the API.
-              */}
-              <Route path="/inventory" element={
-                <InventoryPage 
-                  activeWarehouse={activeWarehouse} 
-                />
-              } />
+                {/* 
+                    Inventory: Receives the activeWarehouse so it knows 
+                    which movements/balances to fetch from the API.
+                */}
+                <Route path="/inventory" element={
+                  <InventoryPage 
+                    activeWarehouse={activeWarehouse} 
+                  />
+                } />
 
-              {/* Redirect unknown paths back to Dashboard */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </>
-          ) : (
-            /* If NOT logged in, force all paths to /login */
-            <Route path="*" element={<Navigate to="/login" />} />
-          )}
-        </Routes>
-      </div>
-    </Router>
+                {/* Redirect unknown paths back to Dashboard */}
+                <Route path="*" element={<Navigate to="/" />} />
+              </>
+            ) : (
+              /* If NOT logged in, force all paths to /login */
+              <Route path="*" element={<Navigate to="/login" />} />
+            )}
+          </Routes>
+        </div>
+      </Router>
+    // </ThemeProvider>
   );
 }
 
