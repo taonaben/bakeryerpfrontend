@@ -45,6 +45,7 @@ export const authService = {
   logout(): void {
     inMemoryAccessToken = null;
     inMemoryRefreshToken = null;
+    sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('refreshToken');
     localStorage.removeItem('accessToken'); // Clean up old implementation
     localStorage.removeItem('refreshToken'); // Clean up old implementation
@@ -54,7 +55,10 @@ export const authService = {
    * Refresh access token using refresh token
    */
   async refreshToken(): Promise<string> {
-    const refreshToken = inMemoryRefreshToken || sessionStorage.getItem('refreshToken');
+    const refreshToken =
+      inMemoryRefreshToken ||
+      sessionStorage.getItem('refreshToken') ||
+      localStorage.getItem('refreshToken');
 
     if (!refreshToken) {
       throw new Error('No refresh token available');
@@ -67,6 +71,7 @@ export const authService = {
       );
 
       inMemoryAccessToken = response.data.access;
+      sessionStorage.setItem('accessToken', response.data.access);
       return response.data.access;
     } catch (error) {
       // If refresh fails, user needs to login again
@@ -79,14 +84,32 @@ export const authService = {
    * Get current access token
    */
   getAccessToken(): string | null {
-    return inMemoryAccessToken;
+    const storedToken =
+      inMemoryAccessToken ||
+      sessionStorage.getItem('accessToken') ||
+      localStorage.getItem('accessToken');
+
+    if (storedToken && storedToken !== inMemoryAccessToken) {
+      inMemoryAccessToken = storedToken;
+    }
+
+    return storedToken;
   },
 
   /**
    * Get current refresh token
    */
   getRefreshToken(): string | null {
-    return inMemoryRefreshToken || sessionStorage.getItem('refreshToken');
+    const storedToken =
+      inMemoryRefreshToken ||
+      sessionStorage.getItem('refreshToken') ||
+      localStorage.getItem('refreshToken');
+
+    if (storedToken && storedToken !== inMemoryRefreshToken) {
+      inMemoryRefreshToken = storedToken;
+    }
+
+    return storedToken;
   },
 
   /**
