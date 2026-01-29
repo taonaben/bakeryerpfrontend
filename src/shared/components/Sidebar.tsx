@@ -2,11 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Factory, ChevronLeft, ChevronRight } from 'lucide-react';
 import { navigationItems, settingsItem, getNavigationForRole } from '../config/navigation';
-import type { User } from '../types/navigation';
+
 import './Sidebar.css';
+import { User } from '@/features/auth/types/models';
+import { Warehouse } from '@/core/warehouses/types/models';
 
 interface SidebarProps {
   user: User | null;
+  activeWarehouse: Warehouse | null;
+  warehouses: Warehouse[];
+  onWarehouseChange: (warehouse: Warehouse) => void;
+
 }
 
 /**
@@ -87,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
               {!isCollapsed && <span>{item.label}</span>}
             </div>
           );
-        })}
+        })} 
 
       
         {/* Settings Item (at bottom) */}

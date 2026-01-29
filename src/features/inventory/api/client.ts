@@ -1,4 +1,4 @@
-import apiClient from '../../../shared/services/api.js';
+import apiClient from '@/shared/services/api';
 import type { 
   PaginatedResponse, 
   StockMovement, 

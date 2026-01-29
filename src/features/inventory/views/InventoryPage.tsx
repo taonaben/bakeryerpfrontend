@@ -112,7 +112,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   return (
     <div className="inventory-page">
       <div className="inventory-header">
-        <Button 
+        {/* <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => navigate('/dashboard')}
@@ -120,7 +120,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
         >
           <ArrowLeft size={16} />
           Back
-        </Button>
+        </Button> */}
         <h1>Inventory Management</h1>
       </div>
 

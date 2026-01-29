@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { LogOut, Factory, ChevronDown } from 'lucide-react';
 import Sidebar from './Sidebar';
-import type { User, Warehouse } from '../types/navigation';
+// import type { Warehouse } from '../types/navigation';
 import './Layout.css';
+import { User } from '@/features/auth/types/models';
+import { Warehouse } from '@/core/warehouses/types/models';
 
 interface LayoutProps {
   user: User | null;
@@ -50,19 +52,15 @@ const Layout: React.FC<LayoutProps> = ({
   }, []);
 
   // Get user initials for avatar
-  const initials = user?.name
-    ? user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2)
+  const initials = user
+    ? `${user.first_name?.[0] || '?'}${user.last_name?.[0] || '?'}`.toUpperCase()
     : '??';
+
 
   return (
     <div className="erp-layout">
       {/* Global Sidebar */}
-      <Sidebar user={user} />
+      <Sidebar user={user} activeWarehouse={activeWarehouse} warehouses={warehouses} onWarehouseChange={onWarehouseChange} />
 
       {/* Main Content Area */}
       <div className={`main-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -112,7 +110,7 @@ const Layout: React.FC<LayoutProps> = ({
             <div className="user-profile">
               <div className="avatar">{initials}</div>
               <div className="user-info">
-                <span className="user-name">{user?.name || 'Unknown User'}</span>
+                <span className="user-name">{user ? `${user.username} ` :  'Unknown User'}</span>
                 <span className="user-role">{user?.role || 'No Role'}</span>
               </div>
             </div>

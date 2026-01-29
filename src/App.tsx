@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import LoginPage from './features/auth/views/LoginPage';
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
 import Layout from './shared/components/Layout';
-import apiClient from './shared/services/api';
-import type { User, Warehouse } from './shared/types/navigation';
+// import type { User, Warehouse } from './shared/types/navigation';
+import LoginPage from './features/auth/views/LoginPage';
+import { warehouseService } from './core/warehouses/services/warehouseService';
+import { User } from './features/auth/types/models';
+import { Warehouse } from './core/warehouses/types/models';
 
 /**
  * Main Application Component
@@ -18,7 +20,7 @@ import type { User, Warehouse } from './shared/types/navigation';
  */
 function App() {
   // Authentication state
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User| null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Global warehouse state
@@ -38,7 +40,21 @@ function App() {
 
     if (savedUser) {
       try {
-        setCurrentUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser) as Partial<User>;
+        const hasRequiredFields =
+          !!parsedUser.id &&
+          !!parsedUser.emp_code &&
+          !!parsedUser.username &&
+          !!parsedUser.first_name &&
+          !!parsedUser.last_name &&
+          !!parsedUser.company;
+
+        if (hasRequiredFields) {
+          setCurrentUser(parsedUser as User);
+        } else {
+          console.warn('Stored user session missing required fields. Clearing.');
+          localStorage.removeItem('erp_user');
+        }
       } catch (error) {
         console.error('Failed to parse saved user session:', error);
         localStorage.removeItem('erp_user');
@@ -50,27 +66,34 @@ function App() {
 
   /**
    * FETCH WAREHOUSES
-   * Load available warehouses when user logs in
+   * Load warehouses for the user's company when user logs in
    */
   useEffect(() => {
     if (!currentUser) return;
 
-    const fetchWarehouses = async () => {
+    const fetchCompanyWarehouses = async () => {
       try {
-        const response = await apiClient.get('/warehouses');
-        const data = response.data.results || response.data;
-        setWarehouses(data);
+        // Use the company ID from the user object to fetch warehouses
+        if (!currentUser.company) {
+          console.error('User has no company assigned');
+          return;
+        }
+
+        const companyWarehouses = await warehouseService.getWarehousesByCompany(
+          currentUser.company
+        );
+        setWarehouses(companyWarehouses);
 
         // Auto-select first warehouse if none selected
-        if (!activeWarehouse && data.length > 0) {
-          handleWarehouseChange(data[0]);
+        if (!activeWarehouse && companyWarehouses.length > 0) {
+          handleWarehouseChange(companyWarehouses[0]);
         }
       } catch (err) {
-        console.error('Error loading warehouses:', err);
+        console.error('Error loading company warehouses:', err);
       }
     };
 
-    fetchWarehouses();
+    fetchCompanyWarehouses();
   }, [currentUser]);
 
   /**
@@ -163,7 +186,13 @@ function App() {
                   <Route
                     path="/inventory"
                     element={
-                      <InventoryPage activeWarehouse={activeWarehouse} />
+                      activeWarehouse ? (
+                        <InventoryPage activeWarehouse={activeWarehouse} />
+                      ) : (
+                        <div style={{ padding: '30px' }}>
+                          <p>Please select a warehouse to view inventory.</p>
+                        </div>
+                      )
                     }
                   />
 

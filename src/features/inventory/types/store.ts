@@ -1,3 +1,5 @@
+import type { StockMovement, StockBalance, BatchRegistry } from "./models";
+
 export interface CacheMetadata {
   lastFetched: number | null;
   isStale: boolean;

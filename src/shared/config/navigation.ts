@@ -29,7 +29,20 @@ export const navigationItems: NavigationItem[] = [
     label: 'Dashboard',
     path: '/',
     icon: LayoutDashboard,
-    roles: ['Admin', 'Production', 'Warehouse', 'Sales'],
+    roles: [
+      'warehouse_staff',
+      'production_operator',
+      'production_supervisor',
+      'inventory_controller',
+      'planner',
+      'sales_rep',
+      'purchasing_officer',
+      'accountant',
+      'quality_officer',
+      'manager',
+      'owner_director',
+      'system_admin',
+    ],
     isActive: (pathname) => pathname === '/',
   },
   {
@@ -37,7 +50,13 @@ export const navigationItems: NavigationItem[] = [
     label: 'Procurement',
     path: '/procurement',
     icon: Truck,
-    roles: ['Admin', 'Warehouse'],
+    roles: [
+      'warehouse_staff',
+      'planner',
+      'purchasing_officer',
+      'manager',
+      'owner_director',
+    ],
     isActive: (pathname) => pathname.startsWith('/procurement'),
   },
   {
@@ -45,7 +64,17 @@ export const navigationItems: NavigationItem[] = [
     label: 'Inventory',
     path: '/inventory',
     icon: Package,
-    roles: ['Admin', 'Production', 'Warehouse'],
+    roles: [
+      'warehouse_staff',
+      'production_operator',
+      'production_supervisor',
+      'inventory_controller',
+      'planner',
+      'sales_rep',
+      'purchasing_officer',
+      'manager',
+      'owner_director',
+    ],
     isActive: (pathname) => pathname.startsWith('/inventory'),
   },
   {
@@ -53,7 +82,14 @@ export const navigationItems: NavigationItem[] = [
     label: 'Production',
     path: '/production',
     icon: ClipboardList,
-    roles: ['Admin', 'Production'],
+    roles: [
+      'production_operator',
+      'production_supervisor',
+      'planner',
+      'quality_officer',
+      'manager',
+      'owner_director',
+    ],
     isActive: (pathname) => pathname.startsWith('/production'),
   },
   {
@@ -61,7 +97,11 @@ export const navigationItems: NavigationItem[] = [
     label: 'Sales & Dist.',
     path: '/sales',
     icon: ShoppingCart,
-    roles: ['Admin', 'Sales'],
+    roles: [
+      'sales_rep',
+      'manager',
+      'owner_director',
+    ],
     isActive: (pathname) => pathname.startsWith('/sales'),
   },
   {
@@ -69,7 +109,17 @@ export const navigationItems: NavigationItem[] = [
     label: 'Reports',
     path: '/reports',
     icon: BarChart3,
-    roles: ['Admin', 'Sales'],
+    roles: [
+      'production_supervisor',
+      'inventory_controller',
+      'planner',
+      'sales_rep',
+      'purchasing_officer',
+      'accountant',
+      'quality_officer',
+      'manager',
+      'owner_director',
+    ],
     isActive: (pathname) => pathname.startsWith('/reports'),
   },
 ];
@@ -82,9 +132,10 @@ export const settingsItem: NavigationItem = {
   label: 'Settings',
   path: '/settings',
   icon: Settings,
-  roles: ['Admin', 'Production', 'Warehouse', 'Sales'],
+  roles: ['system_admin', 'owner_director'],
   isActive: (pathname) => pathname.startsWith('/settings'),
 };
+
 
 /**
  * UTILITY: Filter navigation items by user role
