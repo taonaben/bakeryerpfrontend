@@ -6,6 +6,8 @@ import Layout from './shared/components/Layout';
 // import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
 import { warehouseService } from './core/warehouses/services/warehouseService';
+import { Company } from './core/companies/types/models';
+import { authService } from './features/auth/services/authService';
 import { User } from './features/auth/types/models';
 import { Warehouse } from './core/warehouses/types/models';
 
@@ -40,6 +42,14 @@ function App() {
 
     if (savedUser) {
       try {
+        const hasValidTokens = authService.isAuthenticated();
+        if (!hasValidTokens) {
+          console.warn('No valid auth tokens found. Clearing stored user.');
+          localStorage.removeItem('erp_user');
+          setIsInitializing(false);
+          return;
+        }
+
         const parsedUser = JSON.parse(savedUser) as Partial<User>;
         const hasRequiredFields =
           !!parsedUser.id &&
@@ -51,10 +61,25 @@ function App() {
 
         if (hasRequiredFields) {
           setCurrentUser(parsedUser as User);
-        } else {
-          console.warn('Stored user session missing required fields. Clearing.');
-          localStorage.removeItem('erp_user');
+          setIsInitializing(false);
+          return;
         }
+
+        // If stored user is incomplete, refresh from API
+        authService
+          .getCurrentUser()
+          .then((freshUser) => {
+            setCurrentUser(freshUser);
+            localStorage.setItem('erp_user', JSON.stringify(freshUser));
+          })
+          .catch((error) => {
+            console.warn('Failed to refresh user profile:', error);
+            localStorage.removeItem('erp_user');
+          })
+          .finally(() => {
+            setIsInitializing(false);
+          });
+        return;
       } catch (error) {
         console.error('Failed to parse saved user session:', error);
         localStorage.removeItem('erp_user');
@@ -74,13 +99,17 @@ function App() {
     const fetchCompanyWarehouses = async () => {
       try {
         // Use the company ID from the user object to fetch warehouses
-        if (!currentUser.company) {
+        const company_id =
+          (typeof currentUser.company === 'string' && currentUser.company) ||
+          (typeof currentUser.company === 'object' ? currentUser.company : undefined);
+
+        if (!company_id || typeof company_id !== 'string') {
           console.error('User has no company assigned');
           return;
         }
 
         const companyWarehouses = await warehouseService.getWarehousesByCompany(
-          currentUser.company
+          company_id
         );
         setWarehouses(companyWarehouses);
 

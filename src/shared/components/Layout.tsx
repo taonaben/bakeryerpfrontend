@@ -111,7 +111,7 @@ const Layout: React.FC<LayoutProps> = ({
               <div className="avatar">{initials}</div>
               <div className="user-info">
                 <span className="user-name">{user ? `${user.username} ` :  'Unknown User'}</span>
-                <span className="user-role">{user?.role || 'No Role'}</span>
+                <span className="user-role">{user ? `${user.role}` : 'No Role'}</span>
               </div>
             </div>
             <button className="logout-link" onClick={onLogout}>

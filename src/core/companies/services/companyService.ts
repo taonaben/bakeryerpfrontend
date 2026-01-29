@@ -20,16 +20,16 @@ export const companyService = {
   /**
    * Get a specific company by ID
    */
-  async getCompany(companyId: string): Promise<Company> {
-    const response = await apiClient.get<Company>(`/companies/${companyId}`);
+  async getCompany(company_id: string): Promise<Company> {
+    const response = await apiClient.get<Company>(`/companies/${company_id}`);
     return response.data;
   },
 
   /**
    * Get warehouses for a specific company
    */
-  async getCompanyWarehouses(companyId: string) {
-    const response = await apiClient.get(`/companies/${companyId}/warehouses`);
+  async getCompanyWarehouses(company_id: string) {
+    const response = await apiClient.get(`/companies/${company_id}/warehouses`);
     return response.data.results || response.data;
   },
 };

@@ -20,9 +20,9 @@ export const warehouseService = {
   /**
    * Get warehouses for a specific company
    */
-  async getWarehousesByCompany(companyId: string): Promise<Warehouse[]> {
+  async getWarehousesByCompany(company_id: string): Promise<Warehouse[]> {
     const response = await apiClient.get(
-      `/warehouses?company_id=${companyId}`
+      `/warehouses?company_id=${company_id}`
     );
     
     const data = response.data as any;
@@ -32,8 +32,8 @@ export const warehouseService = {
   /**
    * Get a specific warehouse by ID
    */
-  async getWarehouse(warehouseId: string): Promise<Warehouse> {
-    const response = await apiClient.get<Warehouse>(`/warehouses/${warehouseId}`);
+  async getWarehouse(warehouse_id: string): Promise<Warehouse> {
+    const response = await apiClient.get<Warehouse>(`/warehouses/${warehouse_id}`);
     return response.data;
   },
 };

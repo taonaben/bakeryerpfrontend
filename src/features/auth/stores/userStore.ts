@@ -44,8 +44,15 @@ export const useUserStore = create<AuthState>((set, get) => ({
     try {
       const response = await authService.login({ emp_code: empCode, password });
 
+      let userProfile = response.user;
+      try {
+        userProfile = await authService.getCurrentUser();
+      } catch (profileError) {
+        // Fallback to login response user if profile fetch fails
+      }
+
       set({
-        user: response.user,
+        user: userProfile,
         accessToken: response.access,
         refreshToken: response.refresh,
         isAuthenticated: true,

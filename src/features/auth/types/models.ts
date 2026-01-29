@@ -20,7 +20,7 @@ export interface User {
     last_name: string;
     username: string;
     company: string;
-    company_name: string;
+    company_name?: string;
     role: UserRole;
     is_active: boolean;
     is_staff: boolean;

@@ -100,7 +100,7 @@ export const authService = {
    * Get current user profile
    */
   async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<User>('/account/profile/');
+    const response = await apiClient.get<User>('/account/users/me');
     return response.data;
   },
 
