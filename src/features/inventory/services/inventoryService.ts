@@ -30,6 +30,7 @@ export const inventoryService = {
   normalizeMovement(raw: any): StockMovement {
     return {
       ...raw,
+      reference_number: raw.reference_number || raw.reference || raw.referenceNumber || raw.ref_number || raw.ref || '',
       quantity: parseFloat(raw.quantity),
       movement_type: raw.movement_type.toUpperCase(),
       created_at: raw.created_at || new Date().toISOString(),

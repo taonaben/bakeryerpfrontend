@@ -15,7 +15,7 @@ import StockBalancesTable from '../components/StockBalancesTable';
 import BatchesRegistryTable from '../components/BatchesRegistryTable';
 import MovementModal from '../components/MovementModal';
 import NoWarehouseSelected from '../components/NoWarehouseSelected';
-import Button from '../../../components/ui/Button';
+// import Button from '../../../components/ui/Button';
 import type { CreateMovementDTO } from '../types/models';
 
 interface InventoryPageProps {
@@ -111,7 +111,8 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
 
   return (
     <div className="inventory-page">
-      <div className="inventory-header">
+      <div className="inventory-sticky-stack">
+        <div className="inventory-header">
         {/* <Button 
           variant="ghost" 
           size="sm" 
@@ -121,35 +122,38 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           <ArrowLeft size={16} />
           Back
         </Button> */}
-        <h1>Inventory Management</h1>
+          <h1>Inventory Management</h1>
+        </div>
+
+        <InventoryTabs 
+          activeTab={activeTab} 
+          onChange={setActiveTab} 
+        />
+
+        <InventoryToolbar
+          activeTab={activeTab}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onOpenMovementModal={() => setShowModal(true)}
+          onQualityAudit={() => console.log('Quality audit clicked')}
+        />
       </div>
 
-      <InventoryTabs 
-        activeTab={activeTab} 
-        onChange={setActiveTab} 
-      />
+      <div className="inventory-content">
+        {error && (
+          <div className="error-banner">{error}</div>
+        )}
 
-      <InventoryToolbar
-        activeTab={activeTab}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onOpenMovementModal={() => setShowModal(true)}
-        onQualityAudit={() => console.log('Quality audit clicked')}
-      />
-
-      {error && (
-        <div className="error-banner">{error}</div>
-      )}
-
-      {loading ? (
-        <div className="loading-spinner">Loading...</div>
-      ) : (
-        <>
-          {activeTab === 'movements' && <MovementLedgerTable movements={movements} />}
-          {activeTab === 'balances' && <StockBalancesTable balances={balances} />}
-          {activeTab === 'batches' && <BatchesRegistryTable batches={batches} />}
-        </>
-      )}
+        {loading ? (
+          <div className="loading-spinner">Loading...</div>
+        ) : (
+          <>
+            {activeTab === 'movements' && <MovementLedgerTable movements={movements} />}
+            {activeTab === 'balances' && <StockBalancesTable balances={balances} />}
+            {activeTab === 'batches' && <BatchesRegistryTable batches={batches} />}
+          </>
+        )}
+      </div>
 
       <MovementModal 
         isOpen={showModal}

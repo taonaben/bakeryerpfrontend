@@ -4,16 +4,35 @@ export interface Timestamp {
   updated_at: string;
 }
 
+
+
 // Domain models
+
+export interface BatchRegistry extends Timestamp {
+  id: string;
+  batch_number: string;
+  product: string;
+  warehouse: string;
+  manufacture_date: string;
+  expiry_date: string;
+  quantity: number | string;
+  status: 'ACTIVE' | 'EXPIRED' | 'DEPLETED';
+}
+
+export interface StockMovementBatchDetail {
+  batch: BatchRegistry;
+  quantity: number | string;
+}
 export interface StockMovement extends Timestamp {
   id: string;
-  warehouse: string;
-  batch: string;
-  product_name: string;
+  warehouse?: string;
   movement_type: 'IN' | 'OUT' | 'ADJUSTMENT';
-  quantity: number;
   reference_number: string;
-  notes: string;
+  notes?: string;
+  total_quantity: number;
+  created_at: string;
+  batches_detail: StockMovementBatchDetail[];
+
 }
 
 export interface StockBalance extends Timestamp {
@@ -25,16 +44,7 @@ export interface StockBalance extends Timestamp {
   last_updated: string;
 }
 
-export interface BatchRegistry extends Timestamp {
-  id: string;
-  batch_number: string;
-  product: string;
-  warehouse: string;
-  manufacture_date: string;
-  expiry_date: string;
-  quantity: number;
-  status: 'ACTIVE' | 'EXPIRED' | 'DEPLETED';
-}
+
 
 // API response wrappers
 export interface PaginatedResponse<T> {
