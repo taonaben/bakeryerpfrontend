@@ -40,8 +40,9 @@ export interface StockBalance extends Timestamp {
   product: string;
   warehouse: string;
   quantity_on_hand: number;
-  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  status: 'EMPTY' | 'ALMOST_OUT' | 'GOOD' | "FULL";
   last_updated: string;
+  created_at: string;
 }
 
 
