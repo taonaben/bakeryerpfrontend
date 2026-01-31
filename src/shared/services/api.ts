@@ -1,4 +1,13 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
+
+
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    metadata?: {
+      retryCount: number;
+    };
+  }
+}
 
 /**
  * API CLIENT
@@ -7,12 +16,23 @@ import axios from 'axios';
  * - Automatic token injection
  * - Automatic token refresh on 401
  * - Request/Response interceptors
+ * - Exponential backoff retry on timeout/network errors
+ * - Extended timeout for slow DB wake-up
  */
 
+// Configuration for retry logic
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  initialDelay: 1000, // 1 second
+  maxDelay: 10000, // 10 seconds
+  backoffMultiplier: 2,
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504], // Timeout, Rate limit, Server errors
+};
+
 const apiClient = axios.create({
-    // baseURL: 'https://bakeryerpbackend.onrender.com',
-    baseURL: "http://localhost:8000", // Uncomment for local dev
-    timeout: 10000,
+    baseURL: 'https://bakeryerpbackend.onrender.com',
+    // baseURL: "http://localhost:8000", // Uncomment for local dev
+    timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
     }
@@ -35,8 +55,43 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 /**
+ * Exponential backoff delay calculator
+ * Returns delay in milliseconds with jitter to avoid thundering herd
+ */
+const getRetryDelay = (retryCount: number): number => {
+  const exponentialDelay = Math.min(
+    RETRY_CONFIG.initialDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryCount),
+    RETRY_CONFIG.maxDelay
+  );
+  // Add random jitter (±20%)
+  const jitter = exponentialDelay * 0.2 * Math.random();
+  return exponentialDelay + jitter;
+};
+
+
+const isRetryableError = (error: any): boolean => {
+  // Timeout or network errors
+  if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+    return true;
+  }
+  
+  // Retryable status codes
+  if (error.response?.status && RETRY_CONFIG.retryableStatusCodes.includes(error.response.status)) {
+    return true;
+  }
+  
+  // Network timeout
+  if (error.message?.includes('timeout')) {
+    return true;
+  }
+  
+  return false;
+};
+
+/**
  * REQUEST INTERCEPTOR
  * Automatically inject access token into every request
+ * Initialize retry counter
  */
 apiClient.interceptors.request.use(
   (config) => {
@@ -48,6 +103,11 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Initialize retry counter if not already set
+    if (!config.metadata) {
+      config.metadata = { retryCount: 0 };
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -55,13 +115,36 @@ apiClient.interceptors.request.use(
 
 /**
  * RESPONSE INTERCEPTOR
- * Automatically refresh token on 401 errors
+ * - Automatically refresh token on 401 errors
+ * - Retry with exponential backoff on timeout/network errors
  */
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Get retry count from metadata
+    if (!originalRequest.metadata) {
+      originalRequest.metadata = { retryCount: 0 };
+    }
+
+    // ==================== RETRY LOGIC ====================
+    // Retry if error is retryable AND we haven't exceeded max retries
+    if (isRetryableError(error) && originalRequest.metadata.retryCount < RETRY_CONFIG.maxRetries) {
+      originalRequest.metadata.retryCount += 1;
+      const delayMs = getRetryDelay(originalRequest.metadata.retryCount - 1);
+      
+      console.warn(
+        `[API] Request failed (${error.response?.status || error.code}). ` +
+        `Retrying in ${Math.round(delayMs)}ms... (Attempt ${originalRequest.metadata.retryCount}/${RETRY_CONFIG.maxRetries})`
+      );
+
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      return apiClient(originalRequest);
+    }
+
+    // ==================== TOKEN REFRESH LOGIC ====================
     // If error is 401 and we haven't tried to refresh yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -91,7 +174,7 @@ apiClient.interceptors.response.use(
         }
 
         const response = await axios.post(
-          'http://localhost:8000/api/token/refresh/',
+          'https://bakeryerpbackend.onrender.com/api/token/refresh/',
           { refresh: refreshToken }
         );
         

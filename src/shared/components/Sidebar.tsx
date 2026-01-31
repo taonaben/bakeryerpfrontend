@@ -6,6 +6,7 @@ import { navigationItems, settingsItem, getNavigationForRole } from '../config/n
 import './Sidebar.css';
 import { User } from '@/features/auth/types/models';
 import { Warehouse } from '@/core/warehouses/types/models';
+import { companyService } from '@/core/companies/services/companyService';
 
 interface SidebarProps {
   user: User | null;
@@ -35,12 +36,33 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
     return saved === 'true';
   });
 
+  // Company name state
+  const [companyName, setCompanyName] = useState<string>('');
+
   // Persist collapsed state
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', String(isCollapsed));
     // Dispatch event for Layout to adjust margins
     window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { isCollapsed } }));
   }, [isCollapsed]);
+
+  // Fetch company name when user changes
+  useEffect(() => {
+    const fetchCompanyName = async () => {
+      try {
+        // If user has company_id, fetch the company details
+        if (user?.company) {
+          const company = await companyService.getCompany(user.company);
+          setCompanyName(company.name);
+        }
+      } catch (error) {
+        console.error('Failed to load company name:', error);
+        setCompanyName('');
+      }
+    };
+
+    fetchCompanyName();
+  }, [user?.company]);
 
   // Filter navigation items by user role
   const visibleNavItems = user ? getNavigationForRole(user.role) : [];
@@ -68,8 +90,10 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       {/* Logo */}
       <div className="sidebar-logo" onClick={() => navigate('/')}>
         <Factory size={24} />
-        {!isCollapsed && <span>Bakery ERP</span>}
+        {!isCollapsed && <span>{companyName} ERP</span>}
+        
       </div>
+      
 
       {/* Toggle Button */}
       <button className="sidebar-toggle" onClick={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
