@@ -1,0 +1,155 @@
+/* DASHBOARD CONTENT STYLES */
+:root {
+    --marble-blue: #566d7e;
+    --bg-light: #f4f7f6;
+    --white: #ffffff;
+    --text-main: #333;
+    --accent-gold: #d4af37;
+    --slate-500: #64748b;
+    --slate-800: #1e293b;
+}
+
+/* Dashboard Content Container */
+.dashboard-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Dashboard Title */
+.dashboard-title {
+    color: #566d7e;
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 1.75rem;
+}
+
+/* KPI Ribbon (Top Stats) */
+.kpi-ribbon {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.kpi-stat-card,
+.kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.kpi-data h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--slate-500);
+    margin: 0 0 10px 0;
+    letter-spacing: 0.5px;
+}
+
+.kpi-data .value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--slate-800);
+}
+
+.kpi-data .value.alert {
+    color: #e74c3c;
+}
+
+/* Grid Layout for Actions vs Alerts */
+.ops-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 968px) {
+    .ops-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--slate-800);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Action Cards */
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-card:hover {
+    border-color: var(--marble-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.action-card h3 {
+    font-size: 0.95rem;
+    margin: 15px 0 8px 0;
+    color: var(--slate-800);
+}
+
+.action-card p {
+    font-size: 0.8rem;
+    color: var(--slate-500);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Alerts Panel */
+.alerts-panel {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    padding: 20px;
+}
+
+.alert-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.alert-item:last-child { 
+    border-bottom: none; 
+}
+
+.alert-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.alert-text b { 
+    font-size: 0.85rem; 
+    color: var(--slate-800); 
+}
+
+.alert-text span { 
+    font-size: 0.75rem; 
+    color: var(--slate-500); 
+}
