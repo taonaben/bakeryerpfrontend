@@ -26,6 +26,7 @@ interface InventoryStore extends InventoryStoreState {
   
   // Mutations
   addMovement: (movement: CreateMovementDTO) => Promise<void>;
+  createBatch: (batch: Omit<BatchRegistry, 'id'>) => Promise<void>;
   
   // Cache invalidation
   invalidateMovements: () => void;
@@ -195,6 +196,21 @@ export const useInventoryStore = create<InventoryStore>()(
         }
       },
 
+      createBatch: async (batch) => {
+        try {
+          const created = await inventoryService.createBatch(batch);
+          set((draft) => {
+            draft.batches.unshift(created);
+          });
+          // Invalidate batches cache and force refetch
+          get().invalidateBatches();
+          await get().fetchBatches(batch.warehouse, true);
+        } catch (error: any) {
+          set({ error: error.message || 'Failed to create batch' });
+          throw error;
+        }
+      },
+
       // Cache Invalidation
       invalidateMovements: () => set((draft) => {
         draft.movementsCache.isStale = true;
@@ -225,9 +241,8 @@ export const selectFilteredMovements = (state: InventoryStore) => {
   const term = state.searchTerm.toLowerCase();
   if (!term) return state.movements;
   return state.movements.filter(m => 
-    m.reference_number.toLowerCase().includes(term) ||
-    m.batch.toLowerCase().includes(term) ||
-    m.product_name.toLowerCase().includes(term)
+    m.reference_number.toLowerCase().includes(term)
+    
   );
 };
 

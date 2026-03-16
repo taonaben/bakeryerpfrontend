@@ -26,6 +26,15 @@ export const inventoryService = {
     return response.results.map(this.normalizeBatch);
   },
 
+  async createBatch(batch: Omit<BatchRegistry, 'id'>): Promise<BatchRegistry> {
+    const created = await inventoryApi.createBatch(batch);
+    return this.normalizeBatch(created);
+  },
+
+  // Note: Cache invalidation should be handled by the store after calling this
+  // See: useInventoryStore.createBatch() or invalidateBatches()
+
+
   // Normalization (ensure consistent data shape)
   normalizeMovement(raw: any): StockMovement {
     return {
@@ -52,4 +61,6 @@ export const inventoryService = {
       status: raw.status?.toUpperCase() || 'ACTIVE',
     };
   },
+
+  
 };

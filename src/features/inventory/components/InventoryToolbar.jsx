@@ -23,10 +23,10 @@ const InventoryToolbar = ({
         <div className="toolbar-actions" style={{ display: 'flex', gap: '10px' }}>
             <Button variant="outline">
                 <Filter size={18} /> Filters
-            </Button>
-            {activeTab === 'movements' && (
+            </Button>   
+            {activeTab === 'balances' && (
                 <Button onClick={onOpenMovementModal}>
-                    <Plus size={18} /> Log Movement
+                    <Plus size={18} /> Add Item
                 </Button>
             )}
             {activeTab === 'batches' && (

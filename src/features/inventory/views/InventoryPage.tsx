@@ -13,10 +13,9 @@ import InventoryToolbar from '../components/InventoryToolbar';
 import MovementLedgerTable from '../components/MovementLedgerTable';
 import StockBalancesTable from '../components/StockBalancesTable';
 import BatchesRegistryTable from '../components/BatchesRegistryTable';
-import MovementModal from '../components/MovementModal';
+import BatchModal from '../components/add_batch_modal';
 import NoWarehouseSelected from '../components/NoWarehouseSelected';
 // import Button from '../../../components/ui/Button';
-import type { CreateMovementDTO } from '../types/models';
 
 interface InventoryPageProps {
   activeWarehouse?: { id: string; name: string };
@@ -43,27 +42,18 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const fetchMovements = useInventoryStore((state) => state.fetchMovements);
   const fetchBalances = useInventoryStore((state) => state.fetchBalances);
   const fetchBatches = useInventoryStore((state) => state.fetchBatches);
-  const addMovement = useInventoryStore((state) => state.addMovement);
+  const createBatch = useInventoryStore((state) => state.createBatch);
 
   const warehouseId = activeWarehouse?.id;
 
   // Local UI state for modal
-  const [showModal, setShowModal] = useState(false);
+  const [showBatchModal, setShowBatchModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateMovementDTO>({
-    warehouse: warehouseId || '',
-    batch: '',
-    movement_type: 'IN',
-    quantity: 0,
-    reference_number: '',
-    notes: '',
-  });
 
   // Set warehouse when it changes (invalidates cache)
   useEffect(() => {
     if (warehouseId) {
       setWarehouse(warehouseId);
-      setFormData((prev) => ({ ...prev, warehouse: warehouseId }));
     }
   }, [warehouseId, setWarehouse]);
 
@@ -80,26 +70,16 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
     }
   }, [activeTab, warehouseId, fetchMovements, fetchBalances, fetchBatches]);
 
-  // Form submission handler
-  const handleSubmitMovement = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle batch creation with cache invalidation
+  const handleCreateBatch = async (batchData: any) => {
     if (!warehouseId) return;
     
     setSubmitting(true);
     try {
-      await addMovement(formData);
-      setShowModal(false);
-      // Reset form
-      setFormData({
-        warehouse: warehouseId,
-        batch: '',
-        movement_type: 'IN',
-        quantity: 0,
-        reference_number: '',
-        notes: '',
-      });
+      await createBatch(batchData);
+      setShowBatchModal(false);
     } catch (err) {
-      console.error('Failed to add movement:', err);
+      console.error('Failed to create batch:', err);
     } finally {
       setSubmitting(false);
     }
@@ -134,7 +114,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           activeTab={activeTab}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onOpenMovementModal={() => setShowModal(true)}
+          onOpenMovementModal={() => setShowBatchModal(true)}
           onQualityAudit={() => console.log('Quality audit clicked')}
         />
       </div>
@@ -155,12 +135,11 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
         )}
       </div>
 
-      <MovementModal 
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        formData={formData}
-        setFormData={setFormData}
-        onSubmit={handleSubmitMovement}
+      <BatchModal 
+        isOpen={showBatchModal}
+        onClose={() => setShowBatchModal(false)}
+        warehouseId={warehouseId}
+        onSubmit={handleCreateBatch}
         submitting={submitting}
       />
     </div>

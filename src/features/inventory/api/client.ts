@@ -34,4 +34,9 @@ export const inventoryApi = {
     });
     return data;
   },
+
+  createBatch: async (batch: Omit<BatchRegistry, 'id'>): Promise<BatchRegistry> => {
+    const { data } = await apiClient.post('/inventory/batches', batch);
+    return data;
+  }
 };
