@@ -57,6 +57,16 @@ const MovementLedgerTable = ({ movements = [] }) => {
         return palette[hash] || 'batch-chip--neutral';
     };
 
+    const getProductName = (movement) => {
+        return (
+            movement?.product?.name ||
+            movement?.product_name ||
+            movement?.product?.product_name ||
+            movement?.product?.title ||
+            '---'
+        );
+    };
+
     return (
         <div className="table-container">
             <table className="inventory-table">
@@ -70,7 +80,7 @@ const MovementLedgerTable = ({ movements = [] }) => {
                                 aria-label="Select all movements"
                             />
                         </th>
-                        <th>Batches Used</th><th>Ref num</th><th>Type</th><th>Quantity</th><th>Date</th><th>Notes</th>
+                        <th>Batches Used</th><th>Product</th><th>Ref num</th><th>Type</th><th>Quantity</th><th>Date</th><th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,6 +114,7 @@ const MovementLedgerTable = ({ movements = [] }) => {
                                         )}
                                     </div>
                                 </td>
+                                <td>{getProductName(m)}</td>
                                 <td><code className="batch-tag">{m.reference_number || '---'}</code></td>
                                 <td><span className={`badge ${m.movement_type?.toLowerCase()}`}>{m.movement_type}</span></td>
                                 <td style={{ fontWeight: '700', color: m.total_quantity <= 0 ? '#ef4444' : '#10b981' }}>{m.total_quantity}</td>

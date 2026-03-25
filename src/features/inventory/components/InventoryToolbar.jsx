@@ -26,7 +26,7 @@ const InventoryToolbar = ({
             </Button>   
             {activeTab === 'balances' && (
                 <Button onClick={onOpenMovementModal}>
-                    <Plus size={18} /> Add Item
+                    <Plus size={18} /> Add Stock
                 </Button>
             )}
             {activeTab === 'batches' && (
