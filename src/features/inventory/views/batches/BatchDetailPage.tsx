@@ -20,7 +20,7 @@ import MovementHistorySection from '../../components/batch-detail/MovementHistor
 import QualityCheckPlaceholder from '../../components/batch-detail/QualityCheckPlaceholder';
 import LotTrackingPlaceholder from '../../components/batch-detail/LotTrackingPlaceholder';
 import ShelfLifePlaceholder from '../../components/batch-detail/ShelfLifePlaceholder';
-import '../styles/batch-detail.css';
+import '../../styles/batch-detail.css';
 
 const BatchDetailPage: React.FC = () => {
   const { batchId } = useParams<{ batchId: string }>();

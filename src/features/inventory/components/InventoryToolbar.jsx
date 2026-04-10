@@ -1,41 +1,53 @@
-import React from 'react';
-import { Search, Filter, Plus, CheckCircle } from 'lucide-react';
-import Button from '../../../components/ui/Button';
+import React, { useState } from 'react';
+import SearchBar from './SearchBar';
+import FilterButton from './FilterButton';
+import ActionButtons from './ActionButtons';
+import './InventoryToolbar.css';
 
 const InventoryToolbar = ({
     activeTab,
     searchTerm,
     onSearchChange,
     onOpenMovementModal,
-    onQualityAudit
-}) => (
-    <div className="inventory-toolbar">
-        <div className="search-container">
-            <Search size={18} className="search-icon" />
-            <input
-                type="text"
-                className="search-input"
-                placeholder={`Search ${activeTab === 'batches' ? 'batch number' : activeTab === 'balances' ? 'product ID' : 'reference'}...`}
-                value={searchTerm}
-                onChange={(e) => onSearchChange(e.target.value)}
+    onQualityAudit,
+    onFilterToggle
+}) => {
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    const handleFilterToggle = (newState) => {
+        setIsFilterOpen(newState);
+        onFilterToggle?.(newState);
+    };
+
+    // Map tab to search placeholder
+    const searchPlaceholders = {
+        batches: 'Search batch number...',
+        balances: 'Search product ID...',
+        movements: 'Search reference...'
+    };
+
+    const placeholder = searchPlaceholders[activeTab] || 'Search...';
+
+    return (
+        <div className="inventory-toolbar">
+            <SearchBar
+                searchTerm={searchTerm}
+                onSearchChange={onSearchChange}
+                placeholder={placeholder}
             />
+            <div className="toolbar-controls">
+                <FilterButton
+                    isOpen={isFilterOpen}
+                    onToggle={handleFilterToggle}
+                />
+                <ActionButtons
+                    activeTab={activeTab}
+                    onOpenMovementModal={onOpenMovementModal}
+                    onQualityAudit={onQualityAudit}
+                />
+            </div>
         </div>
-        <div className="toolbar-actions" style={{ display: 'flex', gap: '10px' }}>
-            <Button variant="outline">
-                <Filter size={18} /> Filters
-            </Button>   
-            {activeTab === 'balances' && (
-                <Button onClick={onOpenMovementModal}>
-                    <Plus size={18} /> Add Stock
-                </Button>
-            )}
-            {activeTab === 'batches' && (
-                <Button onClick={onQualityAudit}>
-                    <CheckCircle size={18} /> Quality Audit
-                </Button>
-            )}
-        </div>
-    </div>
-);
+    );
+};
 
 export default InventoryToolbar;

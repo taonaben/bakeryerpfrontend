@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
+import { useBatchFilters } from '../hooks/useBatchFilters';
 import '../styles/inventory.css';
 import InventoryTabs from './InventoryTabs';
 import InventoryToolbar from '../components/InventoryToolbar';
@@ -17,6 +18,9 @@ interface InventoryPageProps {
 const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Batch-specific filter hook
+  const batchFilters = useBatchFilters();
 
   // Determine active tab from URL query parameter
   const getActiveTabFromQuery = () => {
@@ -39,8 +43,6 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const [movementsTotalPages, setMovementsTotalPages] = useState(1);
   const [balancesCurrentPage, setBalancesCurrentPage] = useState(1);
   const [balancesTotalPages, setBalancesTotalPages] = useState(1);
-  const [batchesCurrentPage, setBatchesCurrentPage] = useState(1);
-  const [batchesTotalPages, setBatchesTotalPages] = useState(1);
 
   // Data state
   const [movements, setMovements] = useState([]);
@@ -67,10 +69,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
 
   const warehouseId = activeWarehouse?.id;
 
-  // Remove the previous redirect effect
-  // Users will stay on /inventory, just with different query params
-
-  // Fetch data based on active tab, warehouse, and search term
+  // Fetch data based on active tab, warehouse, and filters
   useEffect(() => {
     if (!warehouseId) return;
 
@@ -88,9 +87,15 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           setBalances(result.data);
           setBalancesTotalPages(result.totalPages);
         } else if (activeTab === 'batches') {
-          const result = await inventoryService.fetchBatches(warehouseId, searchTerm, batchesCurrentPage);
+          // Use batch filters (includes search, date ranges, sorting, pagination)
+          const filterParams = {
+            warehouse_id: warehouseId,
+            ...batchFilters.getApiQueryParams(),
+            // Search term still handled as legacy parameter for compatibility
+            ...(searchTerm && { search: searchTerm }),
+          };
+          const result = await inventoryService.fetchBatches(warehouseId, filterParams);
           setBatches(result.data);
-          setBatchesTotalPages(result.totalPages);
         }
       } catch (err: any) {
         setError(err.message || 'Failed to load data');
@@ -101,7 +106,14 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
     };
 
     fetchData();
-  }, [activeTab, warehouseId, searchTerm, movementsCurrentPage, balancesCurrentPage, batchesCurrentPage]);
+  }, [
+    activeTab,
+    warehouseId,
+    searchTerm,
+    movementsCurrentPage,
+    balancesCurrentPage,
+    batchFilters.filters, // Dependency on batch filter state
+  ]);
 
   // Handle batch creation
   const handleCreateBatch = async (batchData: any) => {
@@ -114,11 +126,14 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
         warehouse: warehouseId,
       });
       setShowBatchModal(false);
-      // Refetch batches from page 1
-      setBatchesCurrentPage(1);
-      const result = await inventoryService.fetchBatches(warehouseId);
+      // Refetch batches with current filters
+      const filterParams = {
+        warehouse_id: warehouseId,
+        ...batchFilters.getApiQueryParams(),
+        page: 1, // Reset to page 1
+      };
+      const result = await inventoryService.fetchBatches(warehouseId, filterParams);
       setBatches(result.data);
-      setBatchesTotalPages(result.totalPages);
     } catch (err: any) {
       setError(err.message || 'Failed to create batch');
       console.error('Create batch error:', err);
@@ -128,7 +143,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   };
 
   const handleBatchPageChange = (page: number) => {
-    setBatchesCurrentPage(page);
+    batchFilters.updateFilter('page', page);
   };
 
   const handleMovementsPageChange = (page: number) => {
@@ -143,7 +158,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   useEffect(() => {
     setMovementsCurrentPage(1);
     setBalancesCurrentPage(1);
-    setBatchesCurrentPage(1);
+    batchFilters.updateFilter('page', 1);
   }, [searchTerm, activeTab]);
 
   if (!warehouseId) {
@@ -168,6 +183,13 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           onSearchChange={setSearchTerm}
           onOpenMovementModal={() => setShowBatchModal(true)}
           onQualityAudit={() => console.log('Quality audit clicked')}
+          // Batch filter props
+          batchFilters={batchFilters}
+          onBatchFilterChange={batchFilters.updateFilter}
+          onBatchSetQuickFilter={batchFilters.setQuickFilter}
+          onBatchSetDatePreset={batchFilters.setDatePreset}
+          onBatchApplyAdvancedFilters={batchFilters.applyAdvancedFilters}
+          onBatchClearAll={batchFilters.clearAllFilters}
         />
       </div>
 
@@ -201,8 +223,8 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
             {activeTab === 'batches' && (
               <BatchesRegistryTable 
                 batches={batches}
-                currentPage={batchesCurrentPage}
-                totalPages={batchesTotalPages}
+                currentPage={batchFilters.filters.page || 1}
+                totalPages={Math.ceil(1000 / (batchFilters.filters.page_size || 25))} // Approximate for now
                 onPageChange={handleBatchPageChange}
                 isLoading={loading}
               />

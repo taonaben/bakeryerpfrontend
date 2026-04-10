@@ -1,5 +1,6 @@
 import { inventoryApi } from '../api/client';
 import type { StockMovement, StockBalance, BatchRegistry, CreateMovementDTO } from '../types/models';
+import type { BatchFilters } from '../hooks/useBatchFilters';
 
 // Service layer: transforms and validates data
 export const inventoryService = {
@@ -39,17 +40,34 @@ export const inventoryService = {
     };
   },
 
-  // Batches
-  async fetchBatches(warehouseId: string, searchTerm?: string, page: number = 1): Promise<{ data: BatchRegistry[]; count: number; currentPage: number; totalPages: number }> {
+  // Batches - with advanced filtering
+  async fetchBatches(warehouseId: string, filterParams?: Partial<BatchFilters> | string, page?: number): Promise<{ data: BatchRegistry[]; count: number; currentPage: number; totalPages: number }> {
     if (!warehouseId) throw new Error('Warehouse ID is required');
-    const response = await inventoryApi.getBatches(warehouseId, searchTerm, page);
-    const pageSize = response.results.length > 0 ? 10 : response.results.length; // Assuming 10 items per page
-    const totalPages = Math.ceil(response.count / (pageSize || 10));
+    
+    // Support both old API (searchTerm, page) and new API (filterParams)
+    let apiParams: Record<string, any> = { warehouse_id: warehouseId };
+    
+    if (typeof filterParams === 'string') {
+      // Legacy: searchTerm as string
+      if (filterParams) apiParams.search = filterParams;
+      if (page) apiParams.page = page;
+    } else if (filterParams && typeof filterParams === 'object') {
+      // New: full filter object
+      Object.entries(filterParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          apiParams[key] = value;
+        }
+      });
+    }
+    
+    const response = await inventoryApi.getBatches(apiParams);
+    const pageSize = apiParams.page_size || 25;
+    const totalPages = Math.ceil(response.count / pageSize);
     
     return {
       data: response.results.map(b => this.normalizeBatch(b)),
       count: response.count,
-      currentPage: page,
+      currentPage: apiParams.page || 1,
       totalPages
     };
   },

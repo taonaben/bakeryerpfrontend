@@ -36,13 +36,14 @@ export const inventoryApi = {
     return data;
   },
 
-  getBatches: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<BatchRegistry>> => {
+  /**
+   * Fetch batches with custom params
+   * @param params - Full query parameters object including warehouse_id, filters, sorting, pagination
+   * Example: { warehouse_id: 'wh1', batch_number__icontains: 'B123', page: 1, page_size: 25, ordering: '-expiry_date' }
+   */
+  getBatches: async (params: Record<string, any>): Promise<PaginatedResponse<BatchRegistry>> => {
     const { data } = await apiClient.get('/inventory/batches', {
-      params: { 
-        warehouse_id: warehouseId,
-        ...(searchTerm && { search: searchTerm }),
-        ...(page && { page })
-      }
+      params
     });
     return data;
   },

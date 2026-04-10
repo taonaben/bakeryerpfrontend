@@ -14,7 +14,7 @@ import type { BreadcrumbDropdownItem, BreadcrumbItem } from '../../../../shared/
 import MovementSidePanelActions from '../../components/stock-movement-detail/MovementSidePanelActions';
 import OverviewCard from '../../components/stock-movement-detail/OverviewCard';
 import BatchesDetailTable from '../../components/stock-movement-detail/BatchesDetailTable';
-import '../styles/stock-movement-detail.css';
+import '../../styles/stock-movement-detail.css';
 
 const StockMovementDetailPage: React.FC = () => {
   const { movementId } = useParams<{ movementId: string }>();
