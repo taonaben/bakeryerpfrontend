@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
 import '../styles/inventory.css';
 import InventoryTabs from '../components/InventoryTabs';
@@ -16,9 +16,20 @@ interface InventoryPageProps {
 
 const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Determine active tab from URL query parameter
+  const getActiveTabFromQuery = () => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab === 'batches' || tab === 'movements' || tab === 'balances') {
+      return tab;
+    }
+    return 'movements'; // default
+  };
 
   // Local state
-  const [activeTab, setActiveTab] = useState<'movements' | 'balances' | 'batches'>('movements');
+  const [activeTab, setActiveTab] = useState<'movements' | 'balances' | 'batches'>(getActiveTabFromQuery());
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +51,24 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Sync URL with active tab
+  useEffect(() => {
+    const currentTab = getActiveTabFromQuery();
+    if (currentTab !== activeTab) {
+      setActiveTab(currentTab);
+    }
+  }, [location.search]);
+
+  // Navigate to tab via query parameter
+  const handleTabChange = (tab: 'movements' | 'balances' | 'batches') => {
+    setActiveTab(tab);
+    navigate(`/inventory?tab=${tab}`);
+  };
+
   const warehouseId = activeWarehouse?.id;
+
+  // Remove the previous redirect effect
+  // Users will stay on /inventory, just with different query params
 
   // Fetch data based on active tab, warehouse, and search term
   useEffect(() => {
@@ -131,7 +159,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
 
         <InventoryTabs
           activeTab={activeTab}
-          onChange={setActiveTab}
+          onChange={handleTabChange}
         />
 
         <InventoryToolbar

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getExpiryStatus } from '../utils/getExpiryStatus';
 import { useProductStore } from '../../../core/products/stores/productStore';
@@ -11,6 +11,7 @@ const BatchesRegistryTable = ({
     onPageChange,
     isLoading = false
 }) => {
+    const navigate = useNavigate();
     const rowIds = useMemo(
         () => batches.map((b, index) => b.id || b.batch_number || index),
         [batches]
@@ -107,7 +108,15 @@ const BatchesRegistryTable = ({
                             const expiryStatus = getExpiryStatus(b.expiry_date);
                             const productLabel = b?.product ? `${b.product.substring(0, 13)}...` : '---';
                             return (
-                                <tr key={rowId}>
+                                <tr 
+                                    key={rowId}
+                                    onClick={(e) => {
+                                        if (e.target.type !== 'checkbox') {
+                                            navigate(`/inventory/batch/${b.id}`);
+                                        }
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <td>
                                         <input
                                             type="checkbox"
@@ -117,13 +126,7 @@ const BatchesRegistryTable = ({
                                         />
                                     </td>
                                     <td> 
-                                        <Link
-                                            to={`/inventory/batch/${b.id}`}
-                                            className={`batch-chip ${getChipColorClass(b.batch_number)}`}
-                                            title={`View details for batch ${b.batch_number}`}
-                                        >
-                                            {b.batch_number}
-                                        </Link>
+                                        {b.batch_number}
                                     </td>
                                      <td style={{ fontWeight: '600', fontSize: '0.85rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>

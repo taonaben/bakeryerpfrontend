@@ -82,7 +82,7 @@ const BatchDetailPage: React.FC = () => {
       },
       {
         label: 'Batches',
-        href: '/inventory',
+        href: '/inventory?tab=batches',
         dropdownItems: batchesList.map((b) => ({
           label: `${b.batch_number}`,
           value: b.id,
@@ -110,12 +110,12 @@ const BatchDetailPage: React.FC = () => {
       <div className="batch-detail-page">
         <div className="detail-header">
           <button
-            onClick={() => navigate('/inventory')}
+            onClick={() => navigate(-1)}
             className="back-button"
-            aria-label="Go back to inventory"
+            aria-label="Go back to previous page"
           >
             <ArrowLeft size={18} />
-            <span>Back to Batches</span>
+            <span>Back</span>
           </button>
         </div>
         <div className="loading-skeleton">
@@ -132,12 +132,12 @@ const BatchDetailPage: React.FC = () => {
       <div className="batch-detail-page">
         <div className="detail-header">
           <button
-            onClick={() => navigate('/inventory')}
+            onClick={() => navigate(-1)}
             className="back-button"
-            aria-label="Go back to inventory"
+            aria-label="Go back to previous page"
           >
             <ArrowLeft size={18} />
-            <span>Back to Batches</span>
+            <span>Back</span>
           </button>
         </div>
         <div className="error-banner" role="alert">
@@ -163,12 +163,12 @@ const BatchDetailPage: React.FC = () => {
       <div className="batch-detail-page">
         <div className="detail-header">
           <button
-            onClick={() => navigate('/inventory')}
+            onClick={() => navigate(-1)}
             className="back-button"
-            aria-label="Go back to inventory"
+            aria-label="Go back to previous page"
           >
             <ArrowLeft size={18} />
-            <span>Back to Batches</span>
+            <span>Back</span>
           </button>
         </div>
         <div className="empty-state">
@@ -184,12 +184,12 @@ const BatchDetailPage: React.FC = () => {
       {/* Breadcrumb Navigation */}
       <div className="detail-header">
         <button
-          onClick={() => navigate('/inventory')}
+          onClick={() => navigate(-1)}
           className="back-button"
-          aria-label="Go back to inventory"
+          aria-label="Go back to previous page"
         >
           <ArrowLeft size={18} />
-          <span>Back to Batches</span>
+          <span>Back</span>
         </button>
         <Breadcrumb items={breadcrumbItems} />
       </div>
