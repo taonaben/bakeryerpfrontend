@@ -1,8 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useProductStore } from '../../../core/products/stores/productStore';
 
-const StockBalancesTable = ({ balances = [] }) => {
+const StockBalancesTable = ({ 
+    balances = [],
+    currentPage = 1,
+    totalPages = 1,
+    onPageChange,
+    isLoading = false
+}) => {
     const rowIds = useMemo(
         () => balances.map((b, index) => b.id || b.product || index),
         [balances]
@@ -106,6 +112,49 @@ const StockBalancesTable = ({ balances = [] }) => {
                     })}
                 </tbody>
             </table>
+            
+            {/* Accessible Pagination Footer */}
+            {totalPages > 1 && (
+                <footer 
+                    className="pagination-footer" 
+                    aria-label="Table pagination"
+                    role="contentinfo"
+                >
+                    <div className="pagination-container">
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || isLoading}
+                            className="pagination-btn pagination-btn--prev"
+                            aria-label={`Go to previous page (page ${currentPage - 1})`}
+                            title="Previous page"
+                        >
+                            <ChevronLeft size={18} />
+                            <span>Previous</span>
+                        </button>
+
+                        <div 
+                            className="pagination-info" 
+                            aria-live="polite" 
+                            aria-atomic="true"
+                        >
+                            <span className="page-number">
+                                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || isLoading}
+                            className="pagination-btn pagination-btn--next"
+                            aria-label={`Go to next page (page ${currentPage + 1})`}
+                            title="Next page"
+                        >
+                            <span>Next</span>
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
+                </footer>
+            )}
         </div>
     );
 };

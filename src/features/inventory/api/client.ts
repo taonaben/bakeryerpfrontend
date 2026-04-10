@@ -9,9 +9,13 @@ import type {
 
 // Raw API calls - no caching, no state
 export const inventoryApi = {
-  getMovements: async (warehouseId: string): Promise<PaginatedResponse<StockMovement>> => {
+  getMovements: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<StockMovement>> => {
     const { data } = await apiClient.get('/inventory/stock_movements', {
-      params: { warehouse_id: warehouseId }
+      params: { 
+        warehouse_id: warehouseId,
+        ...(searchTerm && { search: searchTerm }),
+        ...(page && { page })
+      }
     });
     return data;
   },
@@ -21,16 +25,24 @@ export const inventoryApi = {
     return data;
   },
 
-  getBalances: async (warehouseId: string): Promise<PaginatedResponse<StockBalance>> => {
+  getBalances: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<StockBalance>> => {
     const { data } = await apiClient.get('/inventory/stocks', {
-      params: { warehouse_id: warehouseId }
+      params: { 
+        warehouse_id: warehouseId,
+        ...(searchTerm && { search: searchTerm }),
+        ...(page && { page })
+      }
     });
     return data;
   },
 
-  getBatches: async (warehouseId: string): Promise<PaginatedResponse<BatchRegistry>> => {
+  getBatches: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<BatchRegistry>> => {
     const { data } = await apiClient.get('/inventory/batches', {
-      params: { warehouse_id: warehouseId }
+      params: { 
+        warehouse_id: warehouseId,
+        ...(searchTerm && { search: searchTerm }),
+        ...(page && { page })
+      }
     });
     return data;
   },

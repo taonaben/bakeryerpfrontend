@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { 
-  useInventoryStore, 
-  selectFilteredMovements,
-  selectFilteredBalances,
-  selectFilteredBatches 
-} from '../stores/inventoryStore';
+import { inventoryService } from '../services/inventoryService';
 import '../styles/inventory.css';
 import InventoryTabs from '../components/InventoryTabs';
 import InventoryToolbar from '../components/InventoryToolbar';
@@ -15,7 +9,6 @@ import StockBalancesTable from '../components/StockBalancesTable';
 import BatchesRegistryTable from '../components/BatchesRegistryTable';
 import BatchModal from '../components/add_batch_modal';
 import NoWarehouseSelected from '../components/NoWarehouseSelected';
-// import Button from '../../../components/ui/Button';
 
 interface InventoryPageProps {
   activeWarehouse?: { id: string; name: string };
@@ -23,67 +16,107 @@ interface InventoryPageProps {
 
 const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const navigate = useNavigate();
-  
-  // Subscribe to store (only re-renders when these specific slices change)
-  const activeTab = useInventoryStore((state) => state.activeTab);
-  const loading = useInventoryStore((state) => state.loading);
-  const error = useInventoryStore((state) => state.error);
-  const searchTerm = useInventoryStore((state) => state.searchTerm);
-  
-  // Use memoized selectors for filtered data
-  const movements = useInventoryStore(selectFilteredMovements);
-  const balances = useInventoryStore(selectFilteredBalances);
-  const batches = useInventoryStore(selectFilteredBatches);
-  
-  // Actions
-  const setActiveTab = useInventoryStore((state) => state.setActiveTab);
-  const setSearchTerm = useInventoryStore((state) => state.setSearchTerm);
-  const setWarehouse = useInventoryStore((state) => state.setWarehouse);
-  const fetchMovements = useInventoryStore((state) => state.fetchMovements);
-  const fetchBalances = useInventoryStore((state) => state.fetchBalances);
-  const fetchBatches = useInventoryStore((state) => state.fetchBatches);
-  const createBatch = useInventoryStore((state) => state.createBatch);
 
-  const warehouseId = activeWarehouse?.id;
+  // Local state
+  const [activeTab, setActiveTab] = useState<'movements' | 'balances' | 'batches'>('movements');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Local UI state for modal
+  // Pagination state
+  const [movementsCurrentPage, setMovementsCurrentPage] = useState(1);
+  const [movementsTotalPages, setMovementsTotalPages] = useState(1);
+  const [balancesCurrentPage, setBalancesCurrentPage] = useState(1);
+  const [balancesTotalPages, setBalancesTotalPages] = useState(1);
+  const [batchesCurrentPage, setBatchesCurrentPage] = useState(1);
+  const [batchesTotalPages, setBatchesTotalPages] = useState(1);
+
+  // Data state
+  const [movements, setMovements] = useState([]);
+  const [balances, setBalances] = useState([]);
+  const [batches, setBatches] = useState([]);
+
+  // Modal state
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Set warehouse when it changes (invalidates cache)
-  useEffect(() => {
-    if (warehouseId) {
-      setWarehouse(warehouseId);
-    }
-  }, [warehouseId, setWarehouse]);
+  const warehouseId = activeWarehouse?.id;
 
-  // Fetch data when tab or warehouse changes (respects cache)
+  // Fetch data based on active tab, warehouse, and search term
   useEffect(() => {
     if (!warehouseId) return;
 
-    if (activeTab === 'movements') {
-      fetchMovements(warehouseId); // Will use cache if fresh
-    } else if (activeTab === 'balances') {
-      fetchBalances(warehouseId);
-    } else if (activeTab === 'batches') {
-      fetchBatches(warehouseId);
-    }
-  }, [activeTab, warehouseId, fetchMovements, fetchBalances, fetchBatches]);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
 
-  // Handle batch creation with cache invalidation
+      try {
+        if (activeTab === 'movements') {
+          const result = await inventoryService.fetchMovements(warehouseId, searchTerm, movementsCurrentPage);
+          setMovements(result.data);
+          setMovementsTotalPages(result.totalPages);
+        } else if (activeTab === 'balances') {
+          const result = await inventoryService.fetchBalances(warehouseId, searchTerm, balancesCurrentPage);
+          setBalances(result.data);
+          setBalancesTotalPages(result.totalPages);
+        } else if (activeTab === 'batches') {
+          const result = await inventoryService.fetchBatches(warehouseId, searchTerm, batchesCurrentPage);
+          setBatches(result.data);
+          setBatchesTotalPages(result.totalPages);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to load data');
+        console.error('Fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeTab, warehouseId, searchTerm, movementsCurrentPage, balancesCurrentPage, batchesCurrentPage]);
+
+  // Handle batch creation
   const handleCreateBatch = async (batchData: any) => {
     if (!warehouseId) return;
-    
+
     setSubmitting(true);
     try {
-      await createBatch(batchData);
+      await inventoryService.createBatch({
+        ...batchData,
+        warehouse: warehouseId,
+      });
       setShowBatchModal(false);
-    } catch (err) {
-      console.error('Failed to create batch:', err);
+      // Refetch batches from page 1
+      setBatchesCurrentPage(1);
+      const result = await inventoryService.fetchBatches(warehouseId);
+      setBatches(result.data);
+      setBatchesTotalPages(result.totalPages);
+    } catch (err: any) {
+      setError(err.message || 'Failed to create batch');
+      console.error('Create batch error:', err);
     } finally {
       setSubmitting(false);
     }
   };
+
+  const handleBatchPageChange = (page: number) => {
+    setBatchesCurrentPage(page);
+  };
+
+  const handleMovementsPageChange = (page: number) => {
+    setMovementsCurrentPage(page);
+  };
+
+  const handleBalancesPageChange = (page: number) => {
+    setBalancesCurrentPage(page);
+  };
+
+  // Reset pages to 1 when search term or tab changes
+  useEffect(() => {
+    setMovementsCurrentPage(1);
+    setBalancesCurrentPage(1);
+    setBatchesCurrentPage(1);
+  }, [searchTerm, activeTab]);
 
   if (!warehouseId) {
     return <NoWarehouseSelected onBack={() => navigate('/dashboard')} />;
@@ -93,21 +126,12 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
     <div className="inventory-page">
       <div className="inventory-sticky-stack">
         <div className="inventory-header">
-        {/* <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate('/dashboard')}
-          className="back-button"
-        >
-          <ArrowLeft size={16} />
-          Back
-        </Button> */}
           <h1>Inventory Management</h1>
         </div>
 
-        <InventoryTabs 
-          activeTab={activeTab} 
-          onChange={setActiveTab} 
+        <InventoryTabs
+          activeTab={activeTab}
+          onChange={setActiveTab}
         />
 
         <InventoryToolbar
@@ -128,14 +152,38 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           <div className="loading-spinner">Loading...</div>
         ) : (
           <>
-            {activeTab === 'movements' && <MovementLedgerTable movements={movements} />}
-            {activeTab === 'balances' && <StockBalancesTable balances={balances} />}
-            {activeTab === 'batches' && <BatchesRegistryTable batches={batches} />}
+            {activeTab === 'movements' && (
+              <MovementLedgerTable 
+                movements={movements}
+                currentPage={movementsCurrentPage}
+                totalPages={movementsTotalPages}
+                onPageChange={handleMovementsPageChange}
+                isLoading={loading}
+              />
+            )}
+            {activeTab === 'balances' && (
+              <StockBalancesTable 
+                balances={balances}
+                currentPage={balancesCurrentPage}
+                totalPages={balancesTotalPages}
+                onPageChange={handleBalancesPageChange}
+                isLoading={loading}
+              />
+            )}
+            {activeTab === 'batches' && (
+              <BatchesRegistryTable 
+                batches={batches}
+                currentPage={batchesCurrentPage}
+                totalPages={batchesTotalPages}
+                onPageChange={handleBatchPageChange}
+                isLoading={loading}
+              />
+            )}
           </>
         )}
       </div>
 
-      <BatchModal 
+      <BatchModal
         isOpen={showBatchModal}
         onClose={() => setShowBatchModal(false)}
         warehouseId={warehouseId}

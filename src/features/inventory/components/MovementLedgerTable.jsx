@@ -1,6 +1,25 @@
 import React, { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const MovementLedgerTable = ({ movements = [] }) => {
+/** @typedef {import('../types/models').StockMovement} StockMovement */
+
+/**
+ * @param {{
+ *   movements?: StockMovement[];
+ *   currentPage?: number;
+ *   totalPages?: number;
+ *   onPageChange?: (page: number) => void;
+ *   isLoading?: boolean;
+ * }} props
+ */
+const MovementLedgerTable = ({ 
+    movements = [],
+    currentPage = 1,
+    totalPages = 1,
+    onPageChange,
+    isLoading = false
+}) => {
     const rowIds = useMemo(
         () => movements.map((m, index) => m?.id || m?.reference_number || index),
         [movements]
@@ -38,6 +57,15 @@ const MovementLedgerTable = ({ movements = [] }) => {
         if (movement?.batch) return [movement.batch];
         return [];
     };
+
+    const getBatchID = (movement) => {
+        if (Array.isArray(movement?.batches_detail) && movement.batches_detail.length > 0) {
+            return movement.batches_detail.map((detail) => detail?.batch?.id).filter(Boolean);
+        }
+        if (movement?.batch_id) return [movement.batch_id];
+        return [];
+    };
+
 
     const getChipColorClass = (value) => {
         if (!value) return 'batch-chip--neutral';
@@ -98,17 +126,21 @@ const MovementLedgerTable = ({ movements = [] }) => {
                                 </td>
                                 <td>
                                     <div className="batch-chips" title="Batches used">
-                                        {getBatchNumbers(m).length > 0 ? (
-                                            getBatchNumbers(m).map((batchNumber, chipIndex) => (
-                                                <button
-                                                    key={`${rowId}-batch-${chipIndex}`}
-                                                    type="button"
-                                                    className={`batch-chip ${getChipColorClass(batchNumber)}`}
-                                                    aria-label={`Batch ${batchNumber}`}
-                                                >
-                                                    {batchNumber}
-                                                </button>
-                                            ))
+                                        {Array.isArray(m?.batches_detail) && m.batches_detail.length > 0 ? (
+                                            m.batches_detail.map((detail, chipIndex) => {
+                                                const batchId = detail?.batch?.id;
+                                                const batchNumber = detail?.batch?.batch_number;
+                                                return batchId && batchNumber ? (
+                                                    <Link
+                                                        key={`${rowId}-batch-${chipIndex}`}
+                                                        to={`/inventory/batch/${batchId}`}
+                                                        className={`batch-chip ${getChipColorClass(batchNumber)}`}
+                                                        title={`View details for batch ${batchNumber}`}
+                                                    >
+                                                        {batchNumber}
+                                                    </Link>
+                                                ) : null;
+                                            })
                                         ) : (
                                             <span className="text-muted">---</span>
                                         )}
@@ -125,6 +157,49 @@ const MovementLedgerTable = ({ movements = [] }) => {
                     })}
                 </tbody>
             </table>
+            
+            {/* Accessible Pagination Footer */}
+            {totalPages > 1 && (
+                <footer 
+                    className="pagination-footer" 
+                    aria-label="Table pagination"
+                    role="contentinfo"
+                >
+                    <div className="pagination-container">
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || isLoading}
+                            className="pagination-btn pagination-btn--prev"
+                            aria-label={`Go to previous page (page ${currentPage - 1})`}
+                            title="Previous page"
+                        >
+                            <ChevronLeft size={18} />
+                            <span>Previous</span>
+                        </button>
+
+                        <div 
+                            className="pagination-info" 
+                            aria-live="polite" 
+                            aria-atomic="true"
+                        >
+                            <span className="page-number">
+                                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || isLoading}
+                            className="pagination-btn pagination-btn--next"
+                            aria-label={`Go to next page (page ${currentPage + 1})`}
+                            title="Next page"
+                        >
+                            <span>Next</span>
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
+                </footer>
+            )}
         </div>
     );
 };

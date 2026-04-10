@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
+import BatchDetailPage from './features/inventory/views/BatchDetailPage';
 import Layout from './shared/components/Layout';
 // import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
@@ -220,6 +221,20 @@ function App() {
                       ) : (
                         <div style={{ padding: '30px' }}>
                           <p>Please select a warehouse to view inventory.</p>
+                        </div>
+                      )
+                    }
+                  />
+
+                  {/* Batch Detail */}
+                  <Route
+                    path="/inventory/batch/:batchId"
+                    element={
+                      activeWarehouse ? (
+                        <BatchDetailPage />
+                      ) : (
+                        <div style={{ padding: '30px' }}>
+                          <p>Please select a warehouse to view batch details.</p>
                         </div>
                       )
                     }
