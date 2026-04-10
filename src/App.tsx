@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
 import BatchDetailPage from './features/inventory/views/BatchDetailPage';
+import StockMovementDetailPage from './features/inventory/views/StockMovementDetailPage';
 import Layout from './shared/components/Layout';
 // import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
@@ -235,6 +236,20 @@ function App() {
                       ) : (
                         <div style={{ padding: '30px' }}>
                           <p>Please select a warehouse to view batch details.</p>
+                        </div>
+                      )
+                    }
+                  />
+
+                  {/* Stock Movement Detail */}
+                  <Route
+                    path="/inventory/stock_movements/:movementId"
+                    element={
+                      activeWarehouse ? (
+                        <StockMovementDetailPage />
+                      ) : (
+                        <div style={{ padding: '30px' }}>
+                          <p>Please select a warehouse to view stock movement details.</p>
                         </div>
                       )
                     }

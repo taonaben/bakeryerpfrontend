@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 /** @typedef {import('../types/models').StockMovement} StockMovement */
 
@@ -20,6 +20,7 @@ const MovementLedgerTable = ({
     onPageChange,
     isLoading = false
 }) => {
+    const navigate = useNavigate();
     const rowIds = useMemo(
         () => movements.map((m, index) => m?.id || m?.reference_number || index),
         [movements]
@@ -115,7 +116,15 @@ const MovementLedgerTable = ({
                     {movements.map((m, index) => {
                         const rowId = m?.id || m?.reference_number || index;
                         return (
-                            <tr key={rowId}>
+                            <tr 
+                                key={rowId}
+                                onClick={() => {
+                                    if (m?.id) {
+                                        navigate(`/inventory/stock_movements/${m.id}`);
+                                    }
+                                }}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <td>
                                     <input
                                         type="checkbox"
