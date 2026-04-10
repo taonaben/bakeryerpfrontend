@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getExpiryStatus } from '../utils/getExpiryStatus';
-import { useProductStore } from '../../../core/products/stores/productStore';
+import { getExpiryStatus } from '../../utils/getExpiryStatus';
+import { useProductStore } from '../../../../core/products/stores/productStore';
 
 const BatchesRegistryTable = ({ 
     batches = [],

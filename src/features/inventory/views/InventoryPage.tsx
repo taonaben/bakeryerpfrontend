@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
 import '../styles/inventory.css';
-import InventoryTabs from '../components/InventoryTabs';
+import InventoryTabs from './InventoryTabs';
 import InventoryToolbar from '../components/InventoryToolbar';
-import MovementLedgerTable from '../components/MovementLedgerTable';
-import StockBalancesTable from '../components/StockBalancesTable';
-import BatchesRegistryTable from '../components/BatchesRegistryTable';
-import BatchModal from '../components/add_batch_modal';
+import MovementLedgerTable from './stock_movements/MovementLedgerTable';
+import StockBalancesTable from './stock_balances/StockBalancesTable';
+import BatchesRegistryTable from './batches/BatchesRegistryTable';
+import BatchModal from './batches/add_batch_modal';
 import NoWarehouseSelected from '../components/NoWarehouseSelected';
 
 interface InventoryPageProps {

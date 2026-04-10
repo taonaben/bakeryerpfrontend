@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { X, Search } from 'lucide-react';
-import Button from '../../../components/ui/Button';
-import { productService } from '../../../core/products/services/productServices';
+import Button from '../../../../components/ui/Button';
+import { productService } from '../../../../core/products/services/productServices';
 
 const BatchModal = ({ isOpen, onClose, warehouseId, onSubmit, submitting }) => {
     const [companyProducts, setCompanyProducts] = useState([]); // Full list of products

@@ -8,7 +8,7 @@ import React from 'react';
 import { BatchDetailResponse } from '../../types/batchDetail';
 import { StockMovement } from '../../types/models';
 import useBatchDetailStore from '../../stores/batchDetailStore';
-import MovementLedgerTable from '../MovementLedgerTable';
+import MovementLedgerTable from '../../views/stock_movements/MovementLedgerTable';
 
 interface MovementHistorySectionProps {
   batch: BatchDetailResponse;

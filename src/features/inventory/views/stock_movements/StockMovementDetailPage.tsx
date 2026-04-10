@@ -8,12 +8,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
-import useStockMovementDetailStore from '../stores/stockMovementDetailStore';
-import Breadcrumb from '../../../shared/components/Breadcrumb';
-import type { BreadcrumbDropdownItem, BreadcrumbItem } from '../../../shared/components/Breadcrumb';
-import MovementSidePanelActions from '../components/stock-movement-detail/MovementSidePanelActions';
-import OverviewCard from '../components/stock-movement-detail/OverviewCard';
-import BatchesDetailTable from '../components/stock-movement-detail/BatchesDetailTable';
+import useStockMovementDetailStore from '../../stores/stockMovementDetailStore';
+import Breadcrumb from '../../../../shared/components/Breadcrumb';
+import type { BreadcrumbDropdownItem, BreadcrumbItem } from '../../../../shared/components/Breadcrumb';
+import MovementSidePanelActions from '../../components/stock-movement-detail/MovementSidePanelActions';
+import OverviewCard from '../../components/stock-movement-detail/OverviewCard';
+import BatchesDetailTable from '../../components/stock-movement-detail/BatchesDetailTable';
 import '../styles/stock-movement-detail.css';
 
 const StockMovementDetailPage: React.FC = () => {

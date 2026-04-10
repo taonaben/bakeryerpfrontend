@@ -8,18 +8,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
-import useBatchDetailStore from '../stores/batchDetailStore';
-import { inventoryService } from '../services/inventoryService';
-import Breadcrumb from '../../../shared/components/Breadcrumb';
-import type { BreadcrumbDropdownItem, BreadcrumbItem } from '../../../shared/components/Breadcrumb';
-import type { BatchRegistry } from '../types/models';
-import SidePanelActions from '../components/batch-detail/SidePanelActions';
-import OverviewCard from '../components/batch-detail/OverviewCard';
-import ReworkStatusSection from '../components/batch-detail/ReworkStatusSection';
-import MovementHistorySection from '../components/batch-detail/MovementHistorySection';
-import QualityCheckPlaceholder from '../components/batch-detail/QualityCheckPlaceholder';
-import LotTrackingPlaceholder from '../components/batch-detail/LotTrackingPlaceholder';
-import ShelfLifePlaceholder from '../components/batch-detail/ShelfLifePlaceholder';
+import useBatchDetailStore from '../../stores/batchDetailStore';
+import { inventoryService } from '../../services/inventoryService';
+import Breadcrumb from '../../../../shared/components/Breadcrumb';
+import type { BreadcrumbDropdownItem, BreadcrumbItem } from '../../../../shared/components/Breadcrumb';
+import type { BatchRegistry } from '../../types/models';
+import SidePanelActions from '../../components/batch-detail/SidePanelActions';
+import OverviewCard from '../../components/batch-detail/OverviewCard';
+import ReworkStatusSection from '../../components/batch-detail/ReworkStatusSection';
+import MovementHistorySection from '../../components/batch-detail/MovementHistorySection';
+import QualityCheckPlaceholder from '../../components/batch-detail/QualityCheckPlaceholder';
+import LotTrackingPlaceholder from '../../components/batch-detail/LotTrackingPlaceholder';
+import ShelfLifePlaceholder from '../../components/batch-detail/ShelfLifePlaceholder';
 import '../styles/batch-detail.css';
 
 const BatchDetailPage: React.FC = () => {

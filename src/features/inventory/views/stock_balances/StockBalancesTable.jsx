@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useProductStore } from '../../../core/products/stores/productStore';
+import { useProductStore } from '../../../../core/products/stores/productStore';
 
 const StockBalancesTable = ({ 
     balances = [],

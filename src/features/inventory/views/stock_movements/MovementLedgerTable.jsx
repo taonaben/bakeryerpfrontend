@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-/** @typedef {import('../types/models').StockMovement} StockMovement */
+/** @typedef {import('../../types/models').StockMovement} StockMovement */
 
 /**
  * @param {{
