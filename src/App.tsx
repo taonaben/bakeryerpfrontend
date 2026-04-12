@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
+import PurchasingPage from './features/purchasing/views/PurchasingPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
 import Layout from './shared/components/Layout';
@@ -254,6 +255,9 @@ function App() {
                       )
                     }
                   />
+
+                  {/* Purchasing */}
+                  <Route path="/purchasing" element={<PurchasingPage />} />
 
                   {/* Placeholder routes for other modules */}
                   <Route path="/procurement" element={<div style={{ padding: '30px' }}>Procurement Module (Coming Soon)</div>} />

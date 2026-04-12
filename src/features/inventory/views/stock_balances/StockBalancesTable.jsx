@@ -77,7 +77,7 @@ const StockBalancesTable = ({
                                 aria-label="Select all stock balances"
                             />
                         </th>
-                        <th>Product ID</th><th>Quantity</th><th>Unit</th><th>Status</th><th>Last Updated</th>
+                        <th>Product</th><th>Quantity</th><th>Unit</th><th>Status</th><th>Last Updated</th>
                     </tr>
                 </thead>
                 <tbody>

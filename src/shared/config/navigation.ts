@@ -3,6 +3,7 @@ import {
   Package,
   ClipboardList,
   ShoppingCart,
+  ShoppingBag,
   BarChart3,
   Truck,
   Settings,
@@ -58,6 +59,20 @@ export const navigationItems: NavigationItem[] = [
       'owner_director',
     ],
     isActive: (pathname) => pathname.startsWith('/procurement'),
+  },
+  {
+    id: 'purchasing',
+    label: 'Purchasing',
+    path: '/purchasing',
+    icon: ShoppingBag,
+    roles: [
+      'purchasing_officer',
+      'accountant',
+      'planner',
+      'manager',
+      'owner_director',
+    ],
+    isActive: (pathname) => pathname.startsWith('/purchasing'),
   },
   {
     id: 'inventory',
