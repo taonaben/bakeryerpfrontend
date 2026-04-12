@@ -114,7 +114,7 @@ const StockBalancesTable = ({
             </table>
             
             {/* Accessible Pagination Footer */}
-            {totalPages > 1 && (
+            {totalPages >= 1 && (
                 <footer 
                     className="pagination-footer" 
                     aria-label="Table pagination"

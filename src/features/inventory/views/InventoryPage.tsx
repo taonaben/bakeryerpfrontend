@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
 import { useBatchFilters } from '../hooks/useBatchFilters';
+import { useStockFilters } from '../hooks/useStockFilters';
+import { useMovementFilters } from '../hooks/useMovementFilters';
+import type { StockMovement, StockBalance, BatchRegistry } from '../types/models';
 import '../styles/inventory.css';
 import InventoryTabs from './InventoryTabs';
 import InventoryToolbar from '../components/InventoryToolbar';
@@ -19,8 +22,10 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Batch-specific filter hook
+  // Per-tab filter hooks (Zustand singletons — state persists across tab switches)
   const batchFilters = useBatchFilters();
+  const stockFilters = useStockFilters();
+  const movementFilters = useMovementFilters();
 
   // Determine active tab from URL query parameter
   const getActiveTabFromQuery = () => {
@@ -34,20 +39,20 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
 
   // Local state
   const [activeTab, setActiveTab] = useState<'movements' | 'balances' | 'batches'>(getActiveTabFromQuery());
+  // Shared search bar — syncs to the active tab's filter hook
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Pagination state
-  const [movementsCurrentPage, setMovementsCurrentPage] = useState(1);
   const [movementsTotalPages, setMovementsTotalPages] = useState(1);
-  const [balancesCurrentPage, setBalancesCurrentPage] = useState(1);
   const [balancesTotalPages, setBalancesTotalPages] = useState(1);
+  const [batchesTotalPages, setBatchesTotalPages] = useState(1);
 
   // Data state
-  const [movements, setMovements] = useState([]);
-  const [balances, setBalances] = useState([]);
-  const [batches, setBatches] = useState([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [balances, setBalances] = useState<StockBalance[]>([]);
+  const [batches, setBatches] = useState<BatchRegistry[]>([]);
 
   // Modal state
   const [showBatchModal, setShowBatchModal] = useState(false);
@@ -79,23 +84,30 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
 
       try {
         if (activeTab === 'movements') {
-          const result = await inventoryService.fetchMovements(warehouseId, searchTerm, movementsCurrentPage);
+          const filterParams = {
+            ...movementFilters.getApiQueryParams(),
+            ...(searchTerm && { search: searchTerm }),
+          };
+          const result = await inventoryService.fetchMovements(warehouseId, filterParams);
           setMovements(result.data);
           setMovementsTotalPages(result.totalPages);
         } else if (activeTab === 'balances') {
-          const result = await inventoryService.fetchBalances(warehouseId, searchTerm, balancesCurrentPage);
+          const filterParams = {
+            ...stockFilters.getApiQueryParams(),
+            ...(searchTerm && { search: searchTerm }),
+          };
+          const result = await inventoryService.fetchBalances(warehouseId, filterParams);
           setBalances(result.data);
           setBalancesTotalPages(result.totalPages);
         } else if (activeTab === 'batches') {
-          // Use batch filters (includes search, date ranges, sorting, pagination)
           const filterParams = {
             warehouse_id: warehouseId,
             ...batchFilters.getApiQueryParams(),
-            // Search term still handled as legacy parameter for compatibility
             ...(searchTerm && { search: searchTerm }),
           };
           const result = await inventoryService.fetchBatches(warehouseId, filterParams);
           setBatches(result.data);
+          setBatchesTotalPages(result.totalPages);
         }
       } catch (err: any) {
         setError(err.message || 'Failed to load data');
@@ -110,9 +122,9 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
     activeTab,
     warehouseId,
     searchTerm,
-    movementsCurrentPage,
-    balancesCurrentPage,
-    batchFilters.filters, // Dependency on batch filter state
+    batchFilters.filters,
+    stockFilters.filters,
+    movementFilters.filters,
   ]);
 
   // Handle batch creation
@@ -134,6 +146,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
       };
       const result = await inventoryService.fetchBatches(warehouseId, filterParams);
       setBatches(result.data);
+      setBatchesTotalPages(result.totalPages);
     } catch (err: any) {
       setError(err.message || 'Failed to create batch');
       console.error('Create batch error:', err);
@@ -147,18 +160,18 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
   };
 
   const handleMovementsPageChange = (page: number) => {
-    setMovementsCurrentPage(page);
+    movementFilters.updateFilter('page', page);
   };
 
   const handleBalancesPageChange = (page: number) => {
-    setBalancesCurrentPage(page);
+    stockFilters.updateFilter('page', page);
   };
 
   // Reset pages to 1 when search term or tab changes
   useEffect(() => {
-    setMovementsCurrentPage(1);
-    setBalancesCurrentPage(1);
     batchFilters.updateFilter('page', 1);
+    stockFilters.updateFilter('page', 1);
+    movementFilters.updateFilter('page', 1);
   }, [searchTerm, activeTab]);
 
   if (!warehouseId) {
@@ -183,13 +196,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
           onSearchChange={setSearchTerm}
           onOpenMovementModal={() => setShowBatchModal(true)}
           onQualityAudit={() => console.log('Quality audit clicked')}
-          // Batch filter props
-          batchFilters={batchFilters}
-          onBatchFilterChange={batchFilters.updateFilter}
-          onBatchSetQuickFilter={batchFilters.setQuickFilter}
-          onBatchSetDatePreset={batchFilters.setDatePreset}
-          onBatchApplyAdvancedFilters={batchFilters.applyAdvancedFilters}
-          onBatchClearAll={batchFilters.clearAllFilters}
+          warehouseId={warehouseId}
         />
       </div>
 
@@ -205,7 +212,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
             {activeTab === 'movements' && (
               <MovementLedgerTable 
                 movements={movements}
-                currentPage={movementsCurrentPage}
+                currentPage={movementFilters.filters.page || 1}
                 totalPages={movementsTotalPages}
                 onPageChange={handleMovementsPageChange}
                 isLoading={loading}
@@ -214,7 +221,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
             {activeTab === 'balances' && (
               <StockBalancesTable 
                 balances={balances}
-                currentPage={balancesCurrentPage}
+                currentPage={stockFilters.filters.page || 1}
                 totalPages={balancesTotalPages}
                 onPageChange={handleBalancesPageChange}
                 isLoading={loading}
@@ -224,7 +231,7 @@ const InventoryPage = ({ activeWarehouse }: InventoryPageProps) => {
               <BatchesRegistryTable 
                 batches={batches}
                 currentPage={batchFilters.filters.page || 1}
-                totalPages={Math.ceil(1000 / (batchFilters.filters.page_size || 25))} // Approximate for now
+                totalPages={batchesTotalPages}
                 onPageChange={handleBatchPageChange}
                 isLoading={loading}
               />

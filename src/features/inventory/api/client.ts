@@ -9,14 +9,8 @@ import type {
 
 // Raw API calls - no caching, no state
 export const inventoryApi = {
-  getMovements: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<StockMovement>> => {
-    const { data } = await apiClient.get('/inventory/stock_movements', {
-      params: { 
-        warehouse_id: warehouseId,
-        ...(searchTerm && { search: searchTerm }),
-        ...(page && { page })
-      }
-    });
+  getMovements: async (params: Record<string, any>): Promise<PaginatedResponse<StockMovement>> => {
+    const { data } = await apiClient.get('/inventory/stock_movements', { params });
     return data;
   },
 
@@ -25,14 +19,8 @@ export const inventoryApi = {
     return data;
   },
 
-  getBalances: async (warehouseId: string, searchTerm?: string, page?: number): Promise<PaginatedResponse<StockBalance>> => {
-    const { data } = await apiClient.get('/inventory/stocks', {
-      params: { 
-        warehouse_id: warehouseId,
-        ...(searchTerm && { search: searchTerm }),
-        ...(page && { page })
-      }
-    });
+  getBalances: async (params: Record<string, any>): Promise<PaginatedResponse<StockBalance>> => {
+    const { data } = await apiClient.get('/inventory/stocks', { params });
     return data;
   },
 

@@ -5,16 +5,28 @@ import type { BatchFilters } from '../hooks/useBatchFilters';
 // Service layer: transforms and validates data
 export const inventoryService = {
   // Movements
-  async fetchMovements(warehouseId: string, searchTerm?: string, page: number = 1): Promise<{ data: StockMovement[]; count: number; currentPage: number; totalPages: number }> {
+  async fetchMovements(warehouseId: string, filterParams?: Record<string, any>, page: number = 1): Promise<{ data: StockMovement[]; count: number; currentPage: number; totalPages: number }> {
     if (!warehouseId) throw new Error('Warehouse ID is required');
-    const response = await inventoryApi.getMovements(warehouseId, searchTerm, page);
-    const pageSize = response.results.length > 0 ? 10 : response.results.length; // Assuming 10 items per page
-    const totalPages = Math.ceil(response.count / (pageSize || 10));
-    
+
+    const apiParams: Record<string, any> = { warehouse_id: warehouseId };
+    if (filterParams && typeof filterParams === 'object') {
+      Object.entries(filterParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '' && !(Array.isArray(value) && value.length === 0)) {
+          apiParams[key] = value;
+        }
+      });
+    } else {
+      apiParams.page = page;
+    }
+
+    const response = await inventoryApi.getMovements(apiParams);
+    const pageSize = apiParams.page_size || 25;
+    const totalPages = Math.ceil(response.count / pageSize);
+
     return {
       data: response.results.map(m => this.normalizeMovement(m)),
       count: response.count,
-      currentPage: page,
+      currentPage: apiParams.page || 1,
       totalPages
     };
   },
@@ -26,16 +38,28 @@ export const inventoryService = {
   },
 
   // Balances
-  async fetchBalances(warehouseId: string, searchTerm?: string, page: number = 1): Promise<{ data: StockBalance[]; count: number; currentPage: number; totalPages: number }> {
+  async fetchBalances(warehouseId: string, filterParams?: Record<string, any>, page: number = 1): Promise<{ data: StockBalance[]; count: number; currentPage: number; totalPages: number }> {
     if (!warehouseId) throw new Error('Warehouse ID is required');
-    const response = await inventoryApi.getBalances(warehouseId, searchTerm, page);
-    const pageSize = response.results.length > 0 ? 10 : response.results.length; // Assuming 10 items per page
-    const totalPages = Math.ceil(response.count / (pageSize || 10));
-    
+
+    const apiParams: Record<string, any> = { warehouse_id: warehouseId };
+    if (filterParams && typeof filterParams === 'object') {
+      Object.entries(filterParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '' && !(Array.isArray(value) && value.length === 0)) {
+          apiParams[key] = value;
+        }
+      });
+    } else {
+      apiParams.page = page;
+    }
+
+    const response = await inventoryApi.getBalances(apiParams);
+    const pageSize = apiParams.page_size || 25;
+    const totalPages = Math.ceil(response.count / pageSize);
+
     return {
       data: response.results.map(b => this.normalizeBalance(b)),
       count: response.count,
-      currentPage: page,
+      currentPage: apiParams.page || 1,
       totalPages
     };
   },
