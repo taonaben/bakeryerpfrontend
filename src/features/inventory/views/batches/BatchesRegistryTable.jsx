@@ -1,8 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getExpiryStatus } from '../utils/getExpiryStatus';
-import { useProductStore } from '../../../core/products/stores/productStore';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getExpiryStatus } from '../../utils/getExpiryStatus';
+import { useProductStore } from '../../../../core/products/stores/productStore';
 
-const BatchesRegistryTable = ({ batches = [] }) => {
+const BatchesRegistryTable = ({ 
+    batches = [],
+    currentPage = 1,
+    totalPages = 1,
+    onPageChange,
+    isLoading = false
+}) => {
+    const navigate = useNavigate();
     const rowIds = useMemo(
         () => batches.map((b, index) => b.id || b.batch_number || index),
         [batches]
@@ -99,7 +108,15 @@ const BatchesRegistryTable = ({ batches = [] }) => {
                             const expiryStatus = getExpiryStatus(b.expiry_date);
                             const productLabel = b?.product ? `${b.product.substring(0, 13)}...` : '---';
                             return (
-                                <tr key={rowId}>
+                                <tr 
+                                    key={rowId}
+                                    onClick={(e) => {
+                                        if (e.target.type !== 'checkbox') {
+                                            navigate(`/inventory/batch/${b.id}`);
+                                        }
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <td>
                                         <input
                                             type="checkbox"
@@ -108,14 +125,8 @@ const BatchesRegistryTable = ({ batches = [] }) => {
                                             aria-label={`Select batch ${b.batch_number || rowId}`}
                                         />
                                     </td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className={`batch-chip ${getChipColorClass(b.batch_number)}`}
-                                            aria-label={`Batch ${b.batch_number}`}
-                                        >
-                                            {b.batch_number}
-                                        </button>
+                                    <td> 
+                                        {b.batch_number}
                                     </td>
                                      <td style={{ fontWeight: '600', fontSize: '0.85rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -140,6 +151,49 @@ const BatchesRegistryTable = ({ batches = [] }) => {
                     )}
                 </tbody>
             </table>
+            
+            {/* Accessible Pagination Footer */}
+            {totalPages >= 1 && (
+                <footer 
+                    className="pagination-footer" 
+                    aria-label="Table pagination"
+                    role="contentinfo"
+                >
+                    <div className="pagination-container">
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage - 1)}
+                            disabled={currentPage === 1 || isLoading}
+                            className="pagination-btn pagination-btn--prev"
+                            aria-label={`Go to previous page (page ${currentPage - 1})`}
+                            title="Previous page"
+                        >
+                            <ChevronLeft size={18} />
+                            <span>Previous</span>
+                        </button>
+
+                        <div 
+                            className="pagination-info" 
+                            aria-live="polite" 
+                            aria-atomic="true"
+                        >
+                            <span className="page-number">
+                                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={() => onPageChange && onPageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages || isLoading}
+                            className="pagination-btn pagination-btn--next"
+                            aria-label={`Go to next page (page ${currentPage + 1})`}
+                            title="Next page"
+                        >
+                            <span>Next</span>
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
+                </footer>
+            )}
         </div>
     );
 };

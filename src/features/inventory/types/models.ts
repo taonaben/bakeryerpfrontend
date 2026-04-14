@@ -64,3 +64,11 @@ export interface CreateMovementDTO {
   reference_number: string;
   notes: string;
 }
+
+export interface CreateBatchDTO {
+  product: string;
+  warehouse: string;
+  quantity: number;
+  manufacture_date: string;
+  expiry_date: string;
+}

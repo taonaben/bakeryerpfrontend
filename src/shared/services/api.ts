@@ -30,8 +30,8 @@ const RETRY_CONFIG = {
 };
 
 const apiClient = axios.create({
-    baseURL: 'https://bakeryerpbackend.onrender.com',
-    // baseURL: "http://localhost:8000", // Uncomment for local dev
+    // baseURL: 'https://bakeryerpbackend.onrender.com',
+    baseURL: "http://localhost:8000", // Uncomment for local dev
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',

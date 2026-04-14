@@ -9,10 +9,8 @@ import type {
 
 // Raw API calls - no caching, no state
 export const inventoryApi = {
-  getMovements: async (warehouseId: string): Promise<PaginatedResponse<StockMovement>> => {
-    const { data } = await apiClient.get('/inventory/stock_movements', {
-      params: { warehouse_id: warehouseId }
-    });
+  getMovements: async (params: Record<string, any>): Promise<PaginatedResponse<StockMovement>> => {
+    const { data } = await apiClient.get('/inventory/stock_movements', { params });
     return data;
   },
 
@@ -21,17 +19,25 @@ export const inventoryApi = {
     return data;
   },
 
-  getBalances: async (warehouseId: string): Promise<PaginatedResponse<StockBalance>> => {
-    const { data } = await apiClient.get('/inventory/stocks', {
-      params: { warehouse_id: warehouseId }
+  getBalances: async (params: Record<string, any>): Promise<PaginatedResponse<StockBalance>> => {
+    const { data } = await apiClient.get('/inventory/stocks', { params });
+    return data;
+  },
+
+  /**
+   * Fetch batches with custom params
+   * @param params - Full query parameters object including warehouse_id, filters, sorting, pagination
+   * Example: { warehouse_id: 'wh1', batch_number__icontains: 'B123', page: 1, page_size: 25, ordering: '-expiry_date' }
+   */
+  getBatches: async (params: Record<string, any>): Promise<PaginatedResponse<BatchRegistry>> => {
+    const { data } = await apiClient.get('/inventory/batches', {
+      params
     });
     return data;
   },
 
-  getBatches: async (warehouseId: string): Promise<PaginatedResponse<BatchRegistry>> => {
-    const { data } = await apiClient.get('/inventory/batches', {
-      params: { warehouse_id: warehouseId }
-    });
+  createBatch: async (batch: Omit<BatchRegistry, 'id'>): Promise<BatchRegistry> => {
+    const { data } = await apiClient.post('/inventory/batches', batch);
     return data;
-  },
+  }
 };

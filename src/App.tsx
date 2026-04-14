@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
+import PurchasingPage from './features/purchasing/views/PurchasingPage';
+import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
+import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
 import Layout from './shared/components/Layout';
 // import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
@@ -224,6 +227,37 @@ function App() {
                       )
                     }
                   />
+
+                  {/* Batch Detail */}
+                  <Route
+                    path="/inventory/batch/:batchId"
+                    element={
+                      activeWarehouse ? (
+                        <BatchDetailPage />
+                      ) : (
+                        <div style={{ padding: '30px' }}>
+                          <p>Please select a warehouse to view batch details.</p>
+                        </div>
+                      )
+                    }
+                  />
+
+                  {/* Stock Movement Detail */}
+                  <Route
+                    path="/inventory/stock_movements/:movementId"
+                    element={
+                      activeWarehouse ? (
+                        <StockMovementDetailPage />
+                      ) : (
+                        <div style={{ padding: '30px' }}>
+                          <p>Please select a warehouse to view stock movement details.</p>
+                        </div>
+                      )
+                    }
+                  />
+
+                  {/* Purchasing */}
+                  <Route path="/purchasing" element={<PurchasingPage />} />
 
                   {/* Placeholder routes for other modules */}
                   <Route path="/procurement" element={<div style={{ padding: '30px' }}>Procurement Module (Coming Soon)</div>} />
