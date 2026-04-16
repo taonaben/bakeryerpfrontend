@@ -5,9 +5,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Copy, Trash2, Send, CheckCircle, XCircle, ArrowRightCircle, Download } from 'lucide-react';
+import { Copy, Trash2, Send, CheckCircle, XCircle, ArrowRightCircle, Download, Clock } from 'lucide-react';
 import type { PurchaseRequisition } from '../../types/models';
 import useRequisitionDetailStore from '../../stores/requisitionDetailStore';
+import { useUserStore } from '../../../auth/stores/userStore';
 import RejectModal from './RejectModal';
 import EditRequisitionModal from './EditRequisitionModal';
 
@@ -40,6 +41,20 @@ const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition, onPrin
   const isDraft = requisition.status === 'Draft';
   const isSubmitted = requisition.status === 'Submitted';
   const isApproved = requisition.status === 'Approved';
+
+  // Resolve current user ID (Zustand store or localStorage fallback)
+  const storeUser = useUserStore((s) => s.user);
+  const currentUserId = (() => {
+    if (storeUser?.id) return storeUser.id;
+    try {
+      const saved = localStorage.getItem('erp_user');
+      if (saved) return JSON.parse(saved)?.id ?? null;
+    } catch { /* ignore */ }
+    return null;
+  })();
+
+  // Approver must differ from requester
+  const isRequester = currentUserId === requisition.requested_by;
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(requisition.id);
@@ -182,7 +197,17 @@ const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition, onPrin
         )}
 
         {/* Submitted actions */}
-        {isSubmitted && (
+        {isSubmitted && isRequester && (
+          <div className="waiting-approval-notice">
+            <Clock size={18} />
+            <div>
+              <strong>Waiting for Approval</strong>
+              <p>Another user must approve this requisition.</p>
+            </div>
+          </div>
+        )}
+
+        {isSubmitted && !isRequester && (
           <>
             <button onClick={handleApprove} disabled={isApproving} className="btn btn-primary btn-block" style={{ background: '#059669', borderColor: '#059669' }}>
               <CheckCircle size={16} />

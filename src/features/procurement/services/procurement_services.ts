@@ -141,9 +141,22 @@ export const requisitionService = {
 
   /** Get the current authenticated user's ID */
   _getCurrentUserId(): string {
-    const user = useUserStore.getState().user;
-    if (!user?.id) throw new Error('You must be logged in to perform this action');
-    return user.id;
+    // Try Zustand store first
+    const storeUser = useUserStore.getState().user;
+    if (storeUser?.id) return storeUser.id;
+
+    // Fallback to localStorage (store isn't populated on page refresh)
+    const saved = localStorage.getItem('erp_user');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed?.id) return parsed.id;
+      } catch {
+        // ignore parse errors
+      }
+    }
+
+    throw new Error('You must be logged in to perform this action');
   },
 
   /** Submit a draft requisition for approval */
