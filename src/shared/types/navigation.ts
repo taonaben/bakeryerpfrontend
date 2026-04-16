@@ -10,3 +10,23 @@ export interface NavigationItem {
   isActive?: (pathname: string) => boolean;
 }
 
+export interface SidebarSectionItem {
+  id: string;
+  label: string;
+  path: string;
+  icon: LucideIcon;
+  roles?: UserRole[];
+  badgeKey?: string;
+}
+
+export interface SidebarSection {
+  id: string;
+  label: string;
+  items: SidebarSectionItem[];
+}
+
+export interface ModuleSidebarConfig {
+  moduleId: string;
+  sections: SidebarSection[];
+}
+

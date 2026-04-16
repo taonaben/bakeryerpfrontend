@@ -2,17 +2,30 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
 import InventoryPage from './features/inventory/views/InventoryPage';
-import PurchasingPage from './features/purchasing/views/PurchasingPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
 import Layout from './shared/components/Layout';
-// import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
 import { warehouseService } from './core/warehouses/services/warehouseService';
 import { Company } from './core/companies/types/models';
 import { authService } from './features/auth/services/authService';
 import { User } from './features/auth/types/models';
 import { Warehouse } from './core/warehouses/types/models';
+
+// Procurement views
+import ProcurementDashboard from './features/procurement/views/ProcurementDashboard';
+import RequisitionsPage from './features/procurement/views/RequisitionsPage';
+import PurchaseOrdersPage from './features/procurement/views/PurchaseOrdersPage';
+import GoodsReceiptsPage from './features/procurement/views/GoodsReceiptsPage';
+import SupplierInvoicesPage from './features/procurement/views/SupplierInvoicesPage';
+import ProcurementSuppliersPage from './features/procurement/views/SuppliersPage';
+
+// Finance views
+import FinanceDashboard from './features/finance/views/FinanceDashboard';
+import InvoicesPage from './features/finance/views/InvoicesPage';
+import PriceListsPage from './features/finance/views/PriceListsPage';
+import CostingPage from './features/finance/views/CostingPage';
+import FinanceSuppliersPage from './features/finance/views/SuppliersPage';
 
 /**
  * Main Application Component
@@ -256,11 +269,25 @@ function App() {
                     }
                   />
 
-                  {/* Purchasing */}
-                  <Route path="/purchasing" element={<PurchasingPage />} />
+                  {/* Purchasing → Finance redirect */}
+                  <Route path="/purchasing" element={<Navigate to="/finance" replace />} />
+
+                  {/* Procurement Module */}
+                  <Route path="/procurement" element={<ProcurementDashboard />} />
+                  <Route path="/procurement/requisitions" element={<RequisitionsPage />} />
+                  <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage />} />
+                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
+                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
+                  <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
+
+                  {/* Finance Module */}
+                  <Route path="/finance" element={<FinanceDashboard />} />
+                  <Route path="/finance/invoices" element={<InvoicesPage />} />
+                  <Route path="/finance/price-lists" element={<PriceListsPage />} />
+                  <Route path="/finance/costing" element={<CostingPage />} />
+                  <Route path="/finance/suppliers" element={<FinanceSuppliersPage />} />
 
                   {/* Placeholder routes for other modules */}
-                  <Route path="/procurement" element={<div style={{ padding: '30px' }}>Procurement Module (Coming Soon)</div>} />
                   <Route path="/production" element={<div style={{ padding: '30px' }}>Production Module (Coming Soon)</div>} />
                   <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
