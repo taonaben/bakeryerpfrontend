@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
-import InventoryPage from './features/inventory/views/InventoryPage';
+import InventoryDashboard from './features/inventory/views/InventoryDashboard';
+import StockMovementsPage from './features/inventory/views/StockMovementsPage';
+import StockBalancesPage from './features/inventory/views/StockBalancesPage';
+import BatchesPage from './features/inventory/views/BatchesPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
 import Layout from './shared/components/Layout';
@@ -227,17 +230,29 @@ function App() {
                     }
                   />
 
-                  {/* Inventory */}
+                  {/* Inventory Module */}
                   <Route
                     path="/inventory"
                     element={
-                      activeWarehouse ? (
-                        <InventoryPage activeWarehouse={activeWarehouse} />
-                      ) : (
-                        <div style={{ padding: '30px' }}>
-                          <p>Please select a warehouse to view inventory.</p>
-                        </div>
-                      )
+                      <InventoryDashboard activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/movements"
+                    element={
+                      <StockMovementsPage activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/balances"
+                    element={
+                      <StockBalancesPage activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/batches"
+                    element={
+                      <BatchesPage activeWarehouse={activeWarehouse} />
                     }
                   />
 

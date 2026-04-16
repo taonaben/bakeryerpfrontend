@@ -14,6 +14,9 @@ import {
   CheckSquare,
   Tag,
   Calculator,
+  History,
+  Database,
+  Layers,
 } from 'lucide-react';
 import type { NavigationItem, ModuleSidebarConfig } from '../types/navigation';
 
@@ -235,6 +238,27 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
+        ],
+      },
+    ],
+  },
+  inventory: {
+    moduleId: 'inventory',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          { id: 'inventory-dashboard', label: 'Dashboard', path: '/inventory', icon: LayoutDashboard },
+        ],
+      },
+      {
+        id: 'inventory',
+        label: 'Inventory',
+        items: [
+          { id: 'stock-movements', label: 'Stock Movements', path: '/inventory/movements', icon: History },
+          { id: 'stock-balances', label: 'Stock Balances', path: '/inventory/balances', icon: Database },
+          { id: 'batches', label: 'Batches Registry', path: '/inventory/batches', icon: Layers },
         ],
       },
     ],
