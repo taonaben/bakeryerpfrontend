@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Factory, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Factory, ChevronLeft, ChevronRight, ArrowLeft, ChevronDown, LogOut } from 'lucide-react';
 import {
   navigationItems,
   settingsItem,
@@ -19,6 +19,7 @@ interface SidebarProps {
   activeWarehouse: Warehouse | null;
   warehouses: Warehouse[];
   onWarehouseChange: (warehouse: Warehouse) => void;
+  onLogout: () => void;
   badges?: Record<string, number>;
 }
 
@@ -39,8 +40,10 @@ interface SidebarProps {
  * - Badge support for notification counts
  * - Role-based filtering
  * - Route-derived module context (auto-detects from URL)
+ * - Warehouse selector (top)
+ * - User info & logout (bottom)
  */
-const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
+const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, onWarehouseChange, onLogout, badges = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,6 +55,28 @@ const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
 
   // Company name state
   const [companyName, setCompanyName] = useState<string>('');
+
+  // Warehouse dropdown state
+  const [showWhDropdown, setShowWhDropdown] = useState(false);
+  const whDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to close warehouse dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (whDropdownRef.current && !whDropdownRef.current.contains(event.target as Node)) {
+        setShowWhDropdown(false);
+      }
+    };
+    if (showWhDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showWhDropdown]);
+
+  // User initials for avatar
+  const initials = user
+    ? `${user.first_name?.[0] || '?'}${user.last_name?.[0] || '?'}`.toUpperCase()
+    : '??';
 
   // Derive active module from current path
   const activeModuleId = getActiveModuleFromPath(location.pathname);
@@ -125,6 +150,41 @@ const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
           )}
         </div>
 
+        {/* Warehouse Selector */}
+        <div className="sidebar-warehouse" ref={whDropdownRef}>
+          <div
+            className="sidebar-warehouse-tag"
+            onClick={() => setShowWhDropdown(!showWhDropdown)}
+            data-tooltip={isCollapsed ? (activeWarehouse?.name || 'Select Warehouse') : undefined}
+          >
+            <Factory size={16} />
+            {!isCollapsed && (
+              <>
+                <span>{activeWarehouse ? activeWarehouse.name : 'Select Warehouse'}</span>
+                <ChevronDown size={14} className={`wh-chevron ${showWhDropdown ? 'open' : ''}`} />
+              </>
+            )}
+          </div>
+          {showWhDropdown && (
+            <div className={`sidebar-warehouse-dropdown ${isCollapsed ? 'flyout' : ''}`}>
+              {warehouses.length > 0 ? (
+                warehouses.map((wh) => (
+                  <div
+                    key={wh.id}
+                    className={`sidebar-wh-item ${activeWarehouse?.id === wh.id ? 'active' : ''}`}
+                    onClick={() => { onWarehouseChange(wh); setShowWhDropdown(false); }}
+                  >
+                    <div className="sidebar-wh-item-title">{wh.name}</div>
+                    <div className="sidebar-wh-item-subtitle">Code: {wh.id.substring(0, 8)}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="sidebar-wh-item empty">No warehouses available</div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Toggle Button */}
         <button className="sidebar-toggle" onClick={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
           {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -185,6 +245,27 @@ const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
               {!isCollapsed && <span>{settingsItem.label}</span>}
             </div>
           )}
+
+          {/* User Section (at very bottom) */}
+          <div className="sidebar-user-section">
+            <div className="sidebar-user-profile" data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}>
+              <div className="sidebar-avatar">{initials}</div>
+              {!isCollapsed && (
+                <div className="sidebar-user-info">
+                  <span className="sidebar-user-name">{user?.username || 'Unknown User'}</span>
+                  <span className="sidebar-user-role">{user?.role || 'No Role'}</span>
+                </div>
+              )}
+            </div>
+            <button
+              className="sidebar-logout-btn"
+              onClick={onLogout}
+              data-tooltip={isCollapsed ? 'Logout' : undefined}
+            >
+              <LogOut size={18} />
+              {!isCollapsed && <span>Logout</span>}
+            </button>
+          </div>
         </nav>
       </aside>
     );
@@ -197,6 +278,41 @@ const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
       <div className="sidebar-logo" onClick={() => navigate('/')}>
         <Factory size={24} />
         {!isCollapsed && <span>{companyName} ERP</span>}
+      </div>
+
+      {/* Warehouse Selector */}
+      <div className="sidebar-warehouse" ref={whDropdownRef}>
+        <div
+          className="sidebar-warehouse-tag"
+          onClick={() => setShowWhDropdown(!showWhDropdown)}
+          data-tooltip={isCollapsed ? (activeWarehouse?.name || 'Select Warehouse') : undefined}
+        >
+          <Factory size={16} />
+          {!isCollapsed && (
+            <>
+              <span>{activeWarehouse ? activeWarehouse.name : 'Select Warehouse'}</span>
+              <ChevronDown size={14} className={`wh-chevron ${showWhDropdown ? 'open' : ''}`} />
+            </>
+          )}
+        </div>
+        {showWhDropdown && (
+          <div className={`sidebar-warehouse-dropdown ${isCollapsed ? 'flyout' : ''}`}>
+            {warehouses.length > 0 ? (
+              warehouses.map((wh) => (
+                <div
+                  key={wh.id}
+                  className={`sidebar-wh-item ${activeWarehouse?.id === wh.id ? 'active' : ''}`}
+                  onClick={() => { onWarehouseChange(wh); setShowWhDropdown(false); }}
+                >
+                  <div className="sidebar-wh-item-title">{wh.name}</div>
+                  <div className="sidebar-wh-item-subtitle">Code: {wh.id.substring(0, 8)}</div>
+                </div>
+              ))
+            ) : (
+              <div className="sidebar-wh-item empty">No warehouses available</div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Toggle Button */}
@@ -234,6 +350,27 @@ const Sidebar: React.FC<SidebarProps> = ({ user, badges = {} }) => {
             {!isCollapsed && <span>{settingsItem.label}</span>}
           </div>
         )}
+
+        {/* User Section (at very bottom) */}
+        <div className="sidebar-user-section">
+          <div className="sidebar-user-profile" data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}>
+            <div className="sidebar-avatar">{initials}</div>
+            {!isCollapsed && (
+              <div className="sidebar-user-info">
+                <span className="sidebar-user-name">{user?.username || 'Unknown User'}</span>
+                <span className="sidebar-user-role">{user?.role || 'No Role'}</span>
+              </div>
+            )}
+          </div>
+          <button
+            className="sidebar-logout-btn"
+            onClick={onLogout}
+            data-tooltip={isCollapsed ? 'Logout' : undefined}
+          >
+            <LogOut size={18} />
+            {!isCollapsed && <span>Logout</span>}
+          </button>
+        </div>
       </nav>
     </aside>
   );
