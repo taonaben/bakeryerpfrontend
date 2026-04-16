@@ -1,0 +1,623 @@
+/* ═══════════════════════════════════════════════
+   Procurement Module — Shared Styles
+   Mirrors inventory.css conventions
+   ═══════════════════════════════════════════════ */
+
+/* ─── Page Layout ─────────────────────────────── */
+.procurement-page {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.procurement-sticky-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 0.4rem;
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.procurement-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
+/* ─── Page Header ─────────────────────────────── */
+.procurement-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0.25rem 0;
+}
+
+.procurement-page-header__left h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark, #1e293b);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.procurement-page-header__breadcrumb {
+  color: var(--text-secondary, #64748b);
+  font-size: 0.82rem;
+  margin: 2px 0 0 0;
+}
+
+.procurement-page-header__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ─── Status Tabs (All / Pending / Approved / …) */
+.status-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-tab {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.status-tab:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.status-tab.active {
+  background: var(--marble-blue, #566d7e);
+  color: #fff;
+  border-color: var(--marble-blue, #566d7e);
+}
+
+.status-tab .tab-count {
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+/* ─── Toolbar ─────────────────────────────────── */
+.procurement-toolbar {
+  background: var(--white, #fff);
+  padding: 0.75rem 1rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.procurement-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.procurement-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search inside toolbar */
+.procurement-toolbar .search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f1f5f9;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  max-width: 260px;
+  width: 100%;
+}
+
+.procurement-toolbar .search-bar:focus-within {
+  border-color: var(--marble-blue, #566d7e);
+  box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.1);
+  background: #fff;
+}
+
+.procurement-toolbar .search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 0.88rem;
+  color: var(--text-dark, #1e293b);
+}
+
+/* ─── Requisitions Status Badges ──────────────── */
+.badge.draft {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.badge.submitted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge.converted {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.badge.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ─── Empty State ─────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-secondary, #64748b);
+}
+
+.empty-state__icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark, #1e293b);
+  margin: 0 0 6px 0;
+}
+
+.empty-state__description {
+  font-size: 0.88rem;
+  margin: 0 0 20px 0;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+/* ─── Loading ─────────────────────────────────── */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  color: var(--marble-blue, #566d7e);
+}
+
+.loading-container .spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--marble-blue, #566d7e);
+  border-radius: 50%;
+  animation: procurement-spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes procurement-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── PR-specific table cells ─────────────────── */
+.pr-number-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--marble-blue, #566d7e);
+  font-weight: 600;
+}
+
+.pr-title-cell {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.pr-title-cell .pr-subtitle {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+}
+
+/* ─── Create Form ─────────────────────────────── */
+.create-requisition-page {
+  max-width: 800px;
+  padding: 0;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-card {
+  background: var(--white, #fff);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.form-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark, #1e293b);
+  margin: 0 0 16px 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text-dark, #1e293b);
+  font-size: 0.88rem;
+}
+
+.form-group label .required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--marble-blue, #566d7e);
+  box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.1);
+}
+
+.form-group .field-error {
+  color: #ef4444;
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
+/* ─── Line Items ──────────────────────────────── */
+.line-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.line-item-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.line-item-card .line-item-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.line-item-card .remove-line-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.line-item-card .remove-line-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.add-line-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--marble-blue, #566d7e);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.add-line-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--marble-blue, #566d7e);
+}
+
+/* ─── Form Actions Footer ─────────────────────── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+/* ─── Responsive ──────────────────────────────── */
+@media (max-width: 768px) {
+  .procurement-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .procurement-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .procurement-toolbar__left {
+    flex-direction: column;
+  }
+
+  .status-tabs {
+    overflow-x: auto;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Requisition Detail Page — Additions
+   ═══════════════════════════════════════════════ */
+
+/* ─── Detail Page Status Badge Colors ─────────── */
+.status-badge.status-draft {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.status-badge.status-submitted {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.status-converted {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+/* ─── Detail Line Items Section ───────────────── */
+.line-items-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border, #d1d5db);
+}
+
+.line-items-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark, #1e293b);
+  margin: 0 0 1rem 0;
+}
+
+.line-items-count {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.line-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.line-items-table thead th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.line-items-table tbody td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-dark, #1e293b);
+}
+
+.line-items-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.line-items-table .product-cell {
+  font-weight: 500;
+}
+
+.line-items-table .quantity-cell {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Modal Extras ────────────────────────────── */
+.modal-description {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #6b7280);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.edit-lines-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─── Convert Page ────────────────────────────── */
+.convert-page {
+  max-width: 860px;
+  padding: 0;
+}
+
+.convert-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.convert-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.convert-table thead th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #6b7280);
+  text-transform: uppercase;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.convert-table tbody td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.convert-table input[type="number"] {
+  width: 120px;
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.convert-table input[type="number"]:focus {
+  outline: none;
+  border-color: var(--marble-blue, #566d7e);
+  box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.1);
+}
+
+/* ─── Print Styles ────────────────────────────── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .printable-area,
+  .printable-area * {
+    visibility: visible;
+  }
+
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .side-panel,
+  .detail-header,
+  .btn,
+  .modal-overlay,
+  .modal-content,
+  .confirmation-dialog {
+    display: none !important;
+  }
+}

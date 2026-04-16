@@ -17,7 +17,10 @@ import { Warehouse } from './core/warehouses/types/models';
 
 // Procurement views
 import ProcurementDashboard from './features/procurement/views/ProcurementDashboard';
-import RequisitionsPage from './features/procurement/views/RequisitionsPage';
+import RequisitionsPage from './features/procurement/views/requisitions/RequisitionsPage';
+import CreateRequisitionPage from './features/procurement/views/requisitions/CreateRequisitionPage';
+import RequisitionDetailPage from './features/procurement/views/requisitions/RequisitionDetailPage';
+import ConvertRequisitionPage from './features/procurement/views/requisitions/ConvertRequisitionPage';
 import PurchaseOrdersPage from './features/procurement/views/PurchaseOrdersPage';
 import GoodsReceiptsPage from './features/procurement/views/GoodsReceiptsPage';
 import SupplierInvoicesPage from './features/procurement/views/SupplierInvoicesPage';
@@ -290,6 +293,9 @@ function App() {
                   {/* Procurement Module */}
                   <Route path="/procurement" element={<ProcurementDashboard />} />
                   <Route path="/procurement/requisitions" element={<RequisitionsPage />} />
+                  <Route path="/procurement/requisitions/new" element={<CreateRequisitionPage />} />
+                  <Route path="/procurement/requisitions/:requisitionId/convert" element={<ConvertRequisitionPage />} />
+                  <Route path="/procurement/requisitions/:requisitionId" element={<RequisitionDetailPage />} />
                   <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage />} />
                   <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
                   <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
