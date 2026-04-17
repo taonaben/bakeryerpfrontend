@@ -107,10 +107,199 @@ export interface ConvertRequisitionDTO {
 }
 
 // ──────────────────────────────────────────────
-// Supplier (minimal — for convert page dropdown)
+// Supplier
 // ──────────────────────────────────────────────
 
-export interface Supplier {
+export type SupplierType =
+  | 'MANUFACTURER'
+  | 'WHOLESALER'
+  | 'DISTRIBUTOR'
+  | 'RETAILER'
+  | 'SERVICE_PROVIDER';
+
+export type PaymentTerms =
+  | 'NET_30'
+  | 'NET_60'
+  | 'COD'
+  | 'EOM'
+  | 'PREPAID'
+  | 'IMMEDIATE';
+
+export type DeliveryDay =
+  | 'MON'
+  | 'TUE'
+  | 'WED'
+  | 'THU'
+  | 'FRI'
+  | 'SAT'
+  | 'SUN';
+
+export type DeliveryMethod =
+  | 'OWN_TRANSPORT'
+  | 'THIRD_PARTY'
+  | 'PICKUP';
+
+export type DocumentType =
+  | 'CONTRACT'
+  | 'HEALTH_CERT'
+  | 'TAX_CLEARANCE'
+  | 'CERTIFICATION'
+  | 'OTHER';
+
+export type SupplierRating = 1 | 2 | 3 | 4 | 5;
+
+export interface SupplierContact extends Timestamp {
   id: string;
+  supplier: string;
   name: string;
+  role: string;
+  email: string;
+  phone: string;
+  is_primary: boolean;
 }
+
+export interface SupplierDocument extends Timestamp {
+  id: string;
+  supplier: string;
+  document_type: DocumentType;
+  name: string;
+  file_url: string;
+  file_name: string;
+  issued_date: string;
+  expiry_date: string;
+  notes: string;
+  is_active: boolean;
+}
+
+export interface Supplier extends Timestamp {
+  id: string;
+  company: string;
+  company_name: string;
+  name: string;
+  registration_number: string;
+  tax_number: string;
+  supplier_type: SupplierType;
+  primary_email: string;
+  secondary_email: string;
+  primary_phone: string;
+  alternate_phone: string;
+  address: string;
+  country: string;
+  city: string;
+  website: string;
+  payment_terms: PaymentTerms;
+  currency: string;
+  credit_limit: number;
+  bank_name: string;
+  bank_branch: string;
+  bank_account_number: string;
+  can_supply_on_credit: boolean;
+  default_lead_time_days: number;
+  minimum_order_value: number;
+  delivery_days: DeliveryDay[];
+  delivery_method: DeliveryMethod;
+  delivery_radius_km: number;
+  warehouses_served: string[];
+  rating: SupplierRating;
+  internal_notes: string;
+  on_hold: boolean;
+  on_hold_reason: string;
+  is_active: boolean;
+  contacts: SupplierContact[];
+  documents: SupplierDocument[];
+}
+
+export interface CreateSupplierDTO {
+  company: string;
+  name: string;
+  registration_number?: string;
+  tax_number?: string;
+  supplier_type?: SupplierType;
+  primary_email: string;
+  secondary_email?: string;
+  primary_phone: string;
+  alternate_phone?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  website?: string;
+  payment_terms?: PaymentTerms;
+  currency: string;
+  credit_limit?: string;
+  bank_name?: string;
+  bank_branch?: string;
+  bank_account_number?: string;
+  can_supply_on_credit?: boolean;
+  default_lead_time_days?: number;
+  minimum_order_value?: string;
+  delivery_days?: DeliveryDay[];
+  delivery_method?: DeliveryMethod;
+  delivery_radius_km?: string;
+  rating?: SupplierRating;
+  internal_notes?: string;
+  on_hold?: boolean;
+  on_hold_reason?: string;
+}
+
+export type UpdateSupplierDTO = Partial<CreateSupplierDTO>;
+
+// ──────────────────────────────────────────────
+// Supplier Status-Action DTOs
+// ──────────────────────────────────────────────
+
+export interface AddProductToSupplierDTO {
+  product_id: string;
+  price: string;
+  lead_time_days?: number;
+  is_preferred?: boolean;
+}
+
+export interface PutOnHoldDTO {
+  reason: string;
+}
+
+// ──────────────────────────────────────────────
+// Supplier Product (response from add-product)
+// ──────────────────────────────────────────────
+
+export interface SupplierProduct extends Timestamp {
+  id: string;
+  supplier: string;
+  product_id: string;
+  price: number;
+  lead_time_days: number;
+  is_preferred: boolean;
+}
+
+// ──────────────────────────────────────────────
+// Contact DTOs
+// ──────────────────────────────────────────────
+
+export interface CreateContactDTO {
+  supplier: string;
+  name: string;
+  role?: string;
+  email: string;
+  phone: string;
+  is_primary?: boolean;
+}
+
+export type UpdateContactDTO = Partial<CreateContactDTO>;
+
+// ──────────────────────────────────────────────
+// Document DTOs
+// ──────────────────────────────────────────────
+
+export interface CreateDocumentDTO {
+  supplier: string;
+  document_type: DocumentType;
+  name: string;
+  file_url?: string;
+  file_name?: string;
+  issued_date?: string;
+  expiry_date?: string;
+  notes?: string;
+  is_active?: boolean;
+}
+
+export type UpdateDocumentDTO = Partial<CreateDocumentDTO>;

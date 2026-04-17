@@ -16,15 +16,16 @@ import { User } from './features/auth/types/models';
 import { Warehouse } from './core/warehouses/types/models';
 
 // Procurement views
-import ProcurementDashboard from './features/procurement/views/ProcurementDashboard';
+import ProcurementDashboard from './features/procurement/views/dashboard/ProcurementDashboard';
 import RequisitionsPage from './features/procurement/views/requisitions/RequisitionsPage';
 import CreateRequisitionPage from './features/procurement/views/requisitions/CreateRequisitionPage';
 import RequisitionDetailPage from './features/procurement/views/requisitions/RequisitionDetailPage';
 import ConvertRequisitionPage from './features/procurement/views/requisitions/ConvertRequisitionPage';
-import PurchaseOrdersPage from './features/procurement/views/PurchaseOrdersPage';
-import GoodsReceiptsPage from './features/procurement/views/GoodsReceiptsPage';
-import SupplierInvoicesPage from './features/procurement/views/SupplierInvoicesPage';
-import ProcurementSuppliersPage from './features/procurement/views/SuppliersPage';
+import PurchaseOrdersPage from './features/procurement/views/purchase_orders/PurchaseOrdersPage';
+import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsReceiptsPage';
+import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
+import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
+import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -299,6 +300,7 @@ function App() {
                   <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage />} />
                   <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
                   <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
+                  <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
                   <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
 
                   {/* Finance Module */}

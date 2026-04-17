@@ -651,3 +651,102 @@
   color: #3b82f6;
   line-height: 1.4;
 }
+
+/* -----------------------------------------------
+   Supplier Module — Additions
+   ----------------------------------------------- */
+
+/* --- Supplier Status Badges -------------------- */
+.badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge.inactive {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.badge.on-hold {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* --- Supplier Table Cells ---------------------- */
+.supplier-name-cell {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-dark, #1e293b);
+}
+
+.supplier-contact-cell {
+  font-size: 0.88rem;
+  color: var(--text-dark, #1e293b);
+}
+
+.supplier-subtitle {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+}
+
+/* --- Delivery Day Pills ------------------------ */
+.delivery-day-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.delivery-day-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.delivery-day-pill:hover {
+  border-color: var(--marble-blue, #566d7e);
+  color: var(--marble-blue, #566d7e);
+}
+
+.delivery-day-pill.selected {
+  background: var(--marble-blue, #566d7e);
+  border-color: var(--marble-blue, #566d7e);
+  color: #fff;
+}
+
+/* --- Rating Input ------------------------------ */
+.rating-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.rating-star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: color 0.15s;
+  line-height: 1;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.rating-star.filled {
+  color: #f59e0b;
+}
+
+.rating-star:hover {
+  color: #f59e0b;
+}

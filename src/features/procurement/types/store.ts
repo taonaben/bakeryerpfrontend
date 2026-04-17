@@ -1,4 +1,4 @@
-import type { PurchaseRequisition, UpdateRequisitionDTO } from './models';
+import type { PurchaseRequisition, UpdateRequisitionDTO, Supplier, UpdateSupplierDTO, AddProductToSupplierDTO, CreateContactDTO, UpdateContactDTO, CreateDocumentDTO, UpdateDocumentDTO } from './models';
 
 // ──────────────────────────────────────────────
 // Cache metadata (shared by all detail stores)
@@ -42,4 +42,57 @@ export interface RequisitionDetailState {
   rejectRequisition: (id: string, reason: string) => Promise<void>;
   clearRequisition: () => void;
   setError: (error: string | null) => void;
+}
+
+// ──────────────────────────────────────────────
+// Supplier Detail Store State
+// ──────────────────────────────────────────────
+
+export interface SupplierDetailState {
+  // Main data
+  supplier: Supplier | null;
+
+  // Loading states
+  isLoading: boolean;
+  isUpdating: boolean;
+  isDeleting: boolean;
+  isPuttingOnHold: boolean;
+  isReleasingHold: boolean;
+  isReactivating: boolean;
+  isAddingProduct: boolean;
+  isContactLoading: boolean;
+  isDocumentLoading: boolean;
+
+  // Error states
+  error: string | null;
+  updateError: string | null;
+
+  // Cache
+  cache: CacheMetadata;
+
+  // Core CRUD
+  fetchSupplier: (id: string) => Promise<void>;
+  updateSupplier: (id: string, data: UpdateSupplierDTO) => Promise<void>;
+  patchSupplier: (id: string, data: Partial<UpdateSupplierDTO>) => Promise<void>;
+  deleteSupplier: (id: string) => Promise<void>;
+  clearSupplier: () => void;
+  setError: (error: string | null) => void;
+
+  // Status actions
+  putOnHold: (id: string, reason: string) => Promise<void>;
+  releaseHold: (id: string) => Promise<void>;
+  reactivate: (id: string) => Promise<void>;
+  addProduct: (id: string, dto: AddProductToSupplierDTO) => Promise<void>;
+
+  // Contacts
+  createContact: (supplierId: string, dto: CreateContactDTO) => Promise<void>;
+  updateContact: (supplierId: string, contactId: string, dto: UpdateContactDTO) => Promise<void>;
+  patchContact: (supplierId: string, contactId: string, dto: Partial<UpdateContactDTO>) => Promise<void>;
+  deleteContact: (supplierId: string, contactId: string) => Promise<void>;
+
+  // Documents
+  createDocument: (supplierId: string, dto: CreateDocumentDTO) => Promise<void>;
+  updateDocument: (supplierId: string, documentId: string, dto: UpdateDocumentDTO) => Promise<void>;
+  patchDocument: (supplierId: string, documentId: string, dto: Partial<UpdateDocumentDTO>) => Promise<void>;
+  deleteDocument: (supplierId: string, documentId: string) => Promise<void>;
 }
