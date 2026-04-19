@@ -653,7 +653,7 @@
 }
 
 /* -----------------------------------------------
-   Supplier Module � Additions
+   Supplier Module � Additions
    ----------------------------------------------- */
 
 /* --- Supplier Status Badges -------------------- */
@@ -749,4 +749,215 @@
 
 .rating-star:hover {
   color: #f59e0b;
+}
+
+/* ─── Print Preview Modal ─────────────────────── */
+.print-preview-modal {
+  width: min(860px, 95vw);
+  max-width: 860px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.print-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  background: #e5e7eb;
+  padding: 24px;
+}
+
+.print-preview-paper {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  padding: 40px 48px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  color: #111;
+  min-height: 500px;
+}
+
+/* Document Header */
+.pr-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #1a1a2e;
+  margin-bottom: 20px;
+}
+
+.pr-doc-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #1a1a2e;
+}
+
+.pr-doc-header .pr-number {
+  font-size: 12.5px;
+  color: #555;
+  font-family: monospace;
+}
+
+/* Status badge in print doc */
+.pr-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.pr-badge-draft     { background: #f3f4f6; color: #374151; }
+.pr-badge-submitted { background: #eff6ff; color: #1e40af; }
+.pr-badge-approved  { background: #f0fdf4; color: #166534; }
+.pr-badge-rejected  { background: #fef2f2; color: #991b1b; }
+.pr-badge-converted { background: #faf5ff; color: #6b21a8; }
+
+/* Meta grid */
+.pr-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 28px;
+  margin-bottom: 20px;
+}
+
+.pr-meta-item label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.pr-meta-item .value {
+  font-size: 13px;
+  color: #111;
+  font-weight: 500;
+}
+
+/* Description box */
+.pr-description-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pr-description-box strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+/* Section title */
+.pr-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+  margin: 0 0 10px;
+}
+
+/* Line items table */
+.pr-line-items {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pr-line-items thead th {
+  text-align: left;
+  padding: 7px 10px;
+  background: #f1f5f9;
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.pr-line-items tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+  color: #111;
+}
+
+.pr-line-items tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pr-line-items .num {
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+/* Rejection box */
+.pr-reject-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 20px;
+  font-size: 12.5px;
+  color: #991b1b;
+  line-height: 1.5;
+}
+
+.pr-reject-box strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+/* Footer strip */
+.pr-footer {
+  margin-top: 32px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* Modal footer action row */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.print-preview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.print-preview-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }

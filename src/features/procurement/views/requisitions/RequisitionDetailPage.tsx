@@ -5,10 +5,9 @@
  * Layout: sidebar (actions + metadata) + main content (overview card)
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
-import { useReactToPrint } from 'react-to-print';
 import useRequisitionDetailStore from '../../stores/requisitionDetailStore';
 import Breadcrumb from '../../../../shared/components/Breadcrumb';
 import type { BreadcrumbItem } from '../../../../shared/components/Breadcrumb';
@@ -20,15 +19,12 @@ import '../../../inventory/styles/batch-detail.css';
 const RequisitionDetailPage: React.FC = () => {
   const { requisitionId } = useParams<{ requisitionId: string }>();
   const navigate = useNavigate();
-  const printRef = useRef<HTMLDivElement>(null);
 
   const requisition = useRequisitionDetailStore((s) => s.requisition);
   const isLoading = useRequisitionDetailStore((s) => s.isLoading);
   const error = useRequisitionDetailStore((s) => s.error);
   const fetchRequisition = useRequisitionDetailStore((s) => s.fetchRequisition);
   const clearRequisition = useRequisitionDetailStore((s) => s.clearRequisition);
-
-  const handlePrint = useReactToPrint({ contentRef: printRef });
 
   useEffect(() => {
     if (!requisitionId) {
@@ -117,11 +113,11 @@ const RequisitionDetailPage: React.FC = () => {
       {/* Main Layout: Sidebar + Content */}
       <div className="detail-container">
         <aside className="side-panel">
-          <SidePanelActions requisition={requisition} onPrint={handlePrint} />
+          <SidePanelActions requisition={requisition} />
         </aside>
 
         <main className="main-content">
-          <section className="detail-section" ref={printRef}>
+          <section className="detail-section">
             <h2 className="section-title">Requisition Details</h2>
             <OverviewCard requisition={requisition} />
           </section>

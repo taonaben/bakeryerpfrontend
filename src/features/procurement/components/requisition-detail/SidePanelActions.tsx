@@ -11,10 +11,10 @@ import useRequisitionDetailStore from '../../stores/requisitionDetailStore';
 import { useUserStore } from '../../../auth/stores/userStore';
 import RejectModal from './RejectModal';
 import EditRequisitionModal from './EditRequisitionModal';
+import PrintPreviewModal from './PrintPreviewModal';
 
 interface SidePanelActionsProps {
   requisition: PurchaseRequisition;
-  onPrint?: () => void;
 }
 
 const statusColorMap: Record<string, string> = {
@@ -25,11 +25,12 @@ const statusColorMap: Record<string, string> = {
   Converted: 'status-converted',
 };
 
-const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition, onPrint }) => {
+const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition }) => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
 
   const isSubmitting = useRequisitionDetailStore((s) => s.isSubmitting);
   const isApproving = useRequisitionDetailStore((s) => s.isApproving);
@@ -229,12 +230,10 @@ const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition, onPrin
         )}
 
         {/* Always available: Export PDF */}
-        {onPrint && (
-          <button onClick={onPrint} className="btn btn-secondary btn-block">
-            <Download size={16} />
-            Export PDF
-          </button>
-        )}
+        <button onClick={() => setIsPrintPreviewOpen(true)} className="btn btn-secondary btn-block">
+          <Download size={16} />
+          Export PDF
+        </button>
       </div>
 
       {/* Delete Confirmation */}
@@ -269,6 +268,13 @@ const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition, onPrin
       <EditRequisitionModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
+        requisition={requisition}
+      />
+
+      {/* Print Preview Modal */}
+      <PrintPreviewModal
+        isOpen={isPrintPreviewOpen}
+        onClose={() => setIsPrintPreviewOpen(false)}
         requisition={requisition}
       />
     </>
