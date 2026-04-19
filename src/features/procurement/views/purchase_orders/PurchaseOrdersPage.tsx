@@ -1,3 +1,4 @@
+import { ThermometerSnowflake } from 'lucide-react';
 import React from 'react';
 
 const PurchaseOrdersPage: React.FC = () => {
