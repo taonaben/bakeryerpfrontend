@@ -26,6 +26,7 @@ import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsR
 import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
 import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
+import EditSupplierPage from './features/procurement/views/suppliers/EditSupplierPage';
 import SupplierDetailPage from './features/procurement/views/supplier_invoices/SupplierDetailPage';
 
 // Finance views
@@ -302,6 +303,7 @@ function App() {
                   <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
                   <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
                   <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
+                  <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />
                   <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
 

@@ -203,9 +203,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
         <nav className="sidebar-nav">
           {moduleConfig.sections.map((section) => (
             <div key={section.id} className="sidebar-section">
-              {!isCollapsed && (
-                <div className="sidebar-section-header">{section.label}</div>
-              )}
+              <div
+                className="sidebar-section-header"
+                data-tooltip={isCollapsed ? section.label : undefined}
+              >
+                {!isCollapsed && section.label}
+              </div>
               {section.items.map((item) => {
                 // If item has role restrictions, check them
                 if (item.roles && user && !item.roles.includes(user.role)) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, CheckCircle, AlertTriangle, PowerOff, RotateCcw, Package } from 'lucide-react';
+import { Copy, CheckCircle, AlertTriangle, PowerOff, RotateCcw, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Supplier, PaymentTerms } from '../../types/models';
 import { useSupplierDetailStore } from '../../stores/supplierDetailStore';
@@ -219,6 +219,15 @@ const SupplierSidePanel: React.FC<SupplierSidePanelProps> = ({ supplier }) => {
 
       {/* ── Actions ── */}
       <div className="side-panel__actions">
+        {/* Edit Details — always available */}
+        <button
+          onClick={() => navigate(`/procurement/suppliers/${supplier.id}/edit`)}
+          className="btn btn-secondary btn-block"
+        >
+          <Pencil size={15} />
+          Edit Details
+        </button>
+
         {/* Active, not on hold */}
         {isActive && !isOnHold && (
           <>
