@@ -26,6 +26,7 @@ import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsR
 import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
 import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
+import SupplierDetailPage from './features/procurement/views/supplier_invoices/SupplierDetailPage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -293,14 +294,15 @@ function App() {
 
                   {/* Procurement Module */}
                   <Route path="/procurement" element={<ProcurementDashboard />} />
-                  <Route path="/procurement/requisitions" element={<RequisitionsPage />} />
-                  <Route path="/procurement/requisitions/new" element={<CreateRequisitionPage />} />
+                  <Route path="/procurement/requisitions" element={<RequisitionsPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/requisitions/new" element={<CreateRequisitionPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/requisitions/:requisitionId/convert" element={<ConvertRequisitionPage />} />
                   <Route path="/procurement/requisitions/:requisitionId" element={<RequisitionDetailPage />} />
                   <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage />} />
                   <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
                   <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
                   <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
+                  <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />
                   <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
 
                   {/* Finance Module */}

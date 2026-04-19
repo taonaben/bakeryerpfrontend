@@ -29,7 +29,11 @@ const emptyLine = (): LineItemForm => ({
 // ──────────────────────────────────────────────
 // Component
 // ──────────────────────────────────────────────
-const CreateRequisitionPage: React.FC = () => {
+interface CreateRequisitionPageProps {
+  activeWarehouse?: { id: string; name: string } | null;
+}
+
+const CreateRequisitionPage: React.FC<CreateRequisitionPageProps> = ({ activeWarehouse }) => {
   const navigate = useNavigate();
 
   // ─── Reference data ─────────────────────────
@@ -63,7 +67,7 @@ const CreateRequisitionPage: React.FC = () => {
   }, [fetchProducts]);
 
   // ─── Form state ─────────────────────────────
-  const [warehouseId, setWarehouseId] = useState('');
+  const [warehouseId, setWarehouseId] = useState(activeWarehouse?.id ?? '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [lines, setLines] = useState<LineItemForm[]>([emptyLine()]);

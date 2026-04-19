@@ -99,6 +99,9 @@ export const supplierService = {
       documents: Array.isArray(raw.documents)
         ? raw.documents.map((d: any) => this.normalizeDocument(d))
         : [],
+      products: Array.isArray(raw.products)
+        ? raw.products.map((p: any) => this.normalizeProduct(p))
+        : [],
     };
   },
 
@@ -116,6 +119,18 @@ export const supplierService = {
     return {
       ...raw,
       notes: raw.notes || '',
+      is_active: raw.is_active ?? true,
+    };
+  },
+
+  normalizeProduct(raw: any): SupplierProduct {
+    return {
+      ...raw,
+      supplier_name: raw.supplier_name || '',
+      product_name: raw.product_name || '',
+      price: raw.price ?? '0',
+      lead_time_days: raw.lead_time_days ?? 0,
+      is_preferred: raw.is_preferred ?? false,
       is_active: raw.is_active ?? true,
     };
   },

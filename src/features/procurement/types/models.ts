@@ -207,6 +207,7 @@ export interface Supplier extends Timestamp {
   is_active: boolean;
   contacts: SupplierContact[];
   documents: SupplierDocument[];
+  products: SupplierProduct[];
 }
 
 export interface CreateSupplierDTO {
@@ -265,10 +266,13 @@ export interface PutOnHoldDTO {
 export interface SupplierProduct extends Timestamp {
   id: string;
   supplier: string;
-  product_id: string;
-  price: number;
+  supplier_name: string;
+  product: string;
+  product_name: string;
+  price: string;
   lead_time_days: number;
   is_preferred: boolean;
+  is_active: boolean;
 }
 
 // ──────────────────────────────────────────────

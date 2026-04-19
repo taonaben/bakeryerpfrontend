@@ -222,7 +222,8 @@ export const useSupplierDetailStore = create<SupplierDetailState>()(
         set((draft) => { draft.isAddingProduct = true; draft.error = null; });
         try {
           await supplierService.addProduct(id, dto);
-          set((draft) => { draft.isAddingProduct = false; });
+          set((draft) => { draft.isAddingProduct = false; draft.cache.lastFetched = null; });
+          await get().fetchSupplier(id);
         } catch (error: any) {
           set((draft) => { draft.error = error.message || 'Failed to add product'; draft.isAddingProduct = false; });
           throw error;

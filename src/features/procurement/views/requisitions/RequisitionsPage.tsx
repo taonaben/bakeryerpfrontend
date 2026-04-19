@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus, MoreHorizontal, AlertTriangle } from 'lucide-react';
 import { requisitionService } from '../../services/procurement_services';
 import useRequisitionFilters from '../../hooks/useRequisitionFilters';
 import type { PurchaseRequisition, RequisitionStatus } from '../../types/models';
@@ -8,7 +8,11 @@ import ProcurementToolbar from '../../components/toolbar';
 import RequisitionsTable from '../../components/RequisitionsTable';
 import '../../styles/procurement.css';
 
-const RequisitionsPage: React.FC = () => {
+interface RequisitionsPageProps {
+  activeWarehouse?: { id: string; name: string } | null;
+}
+
+const RequisitionsPage: React.FC<RequisitionsPageProps> = ({ activeWarehouse }) => {
   const navigate = useNavigate();
   const filters = useRequisitionFilters();
 
@@ -20,6 +24,11 @@ const RequisitionsPage: React.FC = () => {
 
   // Local search state (debounced)
   const [searchInput, setSearchInput] = useState('');
+
+  // Sync active warehouse into filter whenever it changes
+  useEffect(() => {
+    filters.setFilter('warehouse_id', activeWarehouse?.id ?? '');
+  }, [activeWarehouse?.id]);
 
   // Debounce search → filter sync
   useEffect(() => {
@@ -97,6 +106,23 @@ const RequisitionsPage: React.FC = () => {
   const handlePageChange = (page: number) => {
     filters.setFilter('page', page);
   };
+
+  // Guard — require an active warehouse
+  if (!activeWarehouse?.id) {
+    return (
+      <div className="procurement-page" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <div className="empty-state" style={{ paddingTop: 100 }}>
+          <div className="empty-state__icon">
+            <AlertTriangle size={48} color="#f59e0b" />
+          </div>
+          <h3 className="empty-state__title">No Warehouse Selected</h3>
+          <p className="empty-state__description">
+            Please select a warehouse from the sidebar to view purchase requisitions.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="procurement-page">
