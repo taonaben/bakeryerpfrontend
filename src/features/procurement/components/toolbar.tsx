@@ -1,6 +1,5 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import type { RequisitionStatus } from '../types/models';
 
 // ──────────────────────────────────────────────
 // Status tabs configuration
@@ -8,7 +7,7 @@ import type { RequisitionStatus } from '../types/models';
 
 export interface StatusTabConfig {
   label: string;
-  value: RequisitionStatus | '';
+  value: string;
 }
 
 const DEFAULT_TABS: StatusTabConfig[] = [
@@ -27,8 +26,8 @@ const DEFAULT_TABS: StatusTabConfig[] = [
 interface ProcurementToolbarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  activeStatus: RequisitionStatus | '';
-  onStatusChange: (status: RequisitionStatus | '') => void;
+  activeStatus: string;
+  onStatusChange: (status: string) => void;
   statusCounts?: Record<string, number>;
   placeholder?: string;
   tabs?: StatusTabConfig[];
@@ -63,7 +62,9 @@ const ProcurementToolbar: React.FC<ProcurementToolbarProps> = ({
                 type="button"
               >
                 {tab.label}
-                {/* <span className="tab-count">{count ?? 0}</span> */}
+                {count !== undefined && (
+                  <span className="tab-count">{count}</span>
+                )}
               </button>
             );
           })}

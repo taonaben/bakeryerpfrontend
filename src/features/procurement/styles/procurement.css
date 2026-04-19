@@ -961,3 +961,120 @@
   align-items: center;
   gap: 6px;
 }
+
+/* ═══════════════════════════════════════════════
+   Purchase Orders — Additions
+   ═══════════════════════════════════════════════ */
+
+/* ─── PO Status Badges ────────────────────────── */
+.badge.partially-received {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.received {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge.cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ─── PO Table Cells ──────────────────────────── */
+.po-number-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--marble-blue, #566d7e);
+  font-weight: 600;
+}
+
+.po-supplier-cell {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.po-supplier-name {
+  display: block;
+}
+
+.po-warehouse-badge {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.po-amount-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.88rem;
+  text-align: right;
+}
+
+/* ─── PO Create Form — Line Total Display ─────── */
+.line-total-display {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-dark, #1e293b);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── PO Order Summary Card ───────────────────── */
+.po-summary-card {
+  background: var(--white, #fff);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+
+.po-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.po-summary-row + .po-summary-row {
+  border-top: 1px solid #f1f5f9;
+}
+
+.po-summary-label {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #64748b);
+  font-weight: 500;
+}
+
+.po-summary-total {
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.po-summary-total .po-summary-label {
+  font-weight: 700;
+  color: var(--text-dark, #1e293b);
+  font-size: 0.95rem;
+}
+
+.po-summary-total .po-summary-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-dark, #1e293b);
+  font-variant-numeric: tabular-nums;
+}
+
+.po-summary-value {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-dark, #1e293b);
+}
