@@ -11,7 +11,8 @@ import useRequisitionDetailStore from '../../stores/requisitionDetailStore';
 import { useUserStore } from '../../../auth/stores/userStore';
 import RejectModal from './RejectModal';
 import EditRequisitionModal from './EditRequisitionModal';
-import PrintPreviewModal from './PrintPreviewModal';
+import PrintPreviewModal from '../../../../shared/components/export-to-pdf/PrintPreviewModal';
+import RequisitionDocument from './RequisitionDocument';
 
 interface SidePanelActionsProps {
   requisition: PurchaseRequisition;
@@ -275,8 +276,11 @@ const SidePanelActions: React.FC<SidePanelActionsProps> = ({ requisition }) => {
       <PrintPreviewModal
         isOpen={isPrintPreviewOpen}
         onClose={() => setIsPrintPreviewOpen(false)}
-        requisition={requisition}
-      />
+        title={`Preview — ${requisition.pr_number}`}
+        documentTitle={requisition.pr_number}
+      >
+        <RequisitionDocument requisition={requisition} />
+      </PrintPreviewModal>
     </>
   );
 };
