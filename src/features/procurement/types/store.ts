@@ -1,5 +1,6 @@
 import type { PurchaseRequisition, UpdateRequisitionDTO, Supplier, UpdateSupplierDTO, AddProductToSupplierDTO, CreateContactDTO, UpdateContactDTO, CreateDocumentDTO, UpdateDocumentDTO } from './models';
 import type { PurchaseOrder, UpdatePurchaseOrderDTO } from './purchase_orders_models';
+import type { GoodsReceipt, UpdateGoodsReceiptDTO, GoodsReceiptListFilters } from './grn_models';
 
 // ──────────────────────────────────────────────
 // Cache metadata (shared by all detail stores)
@@ -131,5 +132,65 @@ export interface PurchaseOrderDetailState {
   rejectOrder: (id: string, reason: string) => Promise<void>;
   cancelOrder: (id: string) => Promise<void>;
   clearOrder: () => void;
+  setError: (error: string | null) => void;
+}
+
+// ──────────────────────────────────────────────
+// Goods Receipt Detail Store State
+// ──────────────────────────────────────────────
+
+export interface GoodsReceiptDetailState {
+  // Main data
+  goodsReceipt: GoodsReceipt | null;
+
+  // Loading states
+  isLoading: boolean;
+  isUpdating: boolean;
+  isDeleting: boolean;
+  isConfirming: boolean;
+  isRejecting: boolean;
+
+  // Error states
+  error: string | null;
+  updateError: string | null;
+
+  // Cache
+  cache: CacheMetadata;
+
+  // Actions
+  fetchReceipt: (id: string) => Promise<void>;
+  updateReceipt: (id: string, data: UpdateGoodsReceiptDTO) => Promise<void>;
+  deleteReceipt: (id: string) => Promise<void>;
+  confirmReceipt: (id: string) => Promise<void>;
+  rejectReceipt: (id: string, reason: string) => Promise<void>;
+  clearReceipt: () => void;
+  setError: (error: string | null) => void;
+}
+
+// ──────────────────────────────────────────────
+// Goods Receipt List Store State
+// ──────────────────────────────────────────────
+
+export interface GoodsReceiptListState {
+  receipts: GoodsReceipt[];
+  count: number;
+  currentPage: number;
+  totalPages: number;
+  filters: GoodsReceiptListFilters;
+
+  isLoading: boolean;
+  isRefreshing: boolean;
+  error: string | null;
+
+  cache: CacheMetadata;
+  refreshToken: number;
+
+  fetchReceipts: (force?: boolean) => Promise<void>;
+  setFilters: (partial: Partial<GoodsReceiptListFilters>) => Promise<void>;
+  clearFilters: () => Promise<void>;
+  setPage: (page: number) => Promise<void>;
+  refresh: () => Promise<void>;
+  invalidateCache: () => void;
+  notifyMutation: () => void;
   setError: (error: string | null) => void;
 }
