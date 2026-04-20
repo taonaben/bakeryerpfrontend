@@ -74,7 +74,7 @@ export const requisitionService = {
     dto: UpdateRequisitionDTO,
   ): Promise<PurchaseRequisition> {
     if (!id) throw new Error('Requisition ID is required');
-    const updated = await requisitionApi.updateRequisition(id, dto);
+    const updated = await requisitionApi.patchRequisition(id, dto);
     return this.normalizeRequisition(updated);
   },
 

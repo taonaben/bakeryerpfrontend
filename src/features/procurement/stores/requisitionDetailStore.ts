@@ -90,7 +90,7 @@ export const useRequisitionDetailStore = create<RequisitionDetailState>()(
         });
 
         try {
-          const updated = await requisitionService.updateRequisition(id, data);
+          const updated = await requisitionService.patchRequisition(id, data);
           set((draft) => {
             draft.requisition = updated;
             draft.isUpdating = false;
