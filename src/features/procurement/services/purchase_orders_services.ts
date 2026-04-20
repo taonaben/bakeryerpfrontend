@@ -112,6 +112,7 @@ export const purchaseOrderService = {
       cancelled_by: raw.cancelled_by ?? null,
       cancelled_at: raw.cancelled_at ?? null,
       purchase_requisition: raw.purchase_requisition ?? null,
+      pr_number: raw.pr_number ?? null,
       expected_delivery_date: raw.expected_delivery_date ?? null,
     };
   },
@@ -212,5 +213,29 @@ export const purchaseOrderService = {
     if (!id) throw new Error('Purchase Order ID is required');
     const result = await purchaseOrderApi.recalculateTotal(id, dto);
     return this.normalizeOrder(result);
+  },
+
+  // ─── Purchase Order Line Endpoints ───────────────
+  async getLine(id: string) {
+    if (!id) throw new Error('Line ID is required');
+    const raw = await purchaseOrderApi.getLine(id);
+    return this.normalizeLineItem(raw);
+  },
+
+  async patchLine(id: string, dto: Partial<any>) {
+    if (!id) throw new Error('Line ID is required');
+    const updated = await purchaseOrderApi.patchLine(id, dto);
+    return this.normalizeLineItem(updated);
+  },
+
+  async updateLine(id: string, dto: any) {
+    if (!id) throw new Error('Line ID is required');
+    const updated = await purchaseOrderApi.updateLine(id, dto);
+    return this.normalizeLineItem(updated);
+  },
+
+  async deleteLine(id: string) {
+    if (!id) throw new Error('Line ID is required');
+    await purchaseOrderApi.deleteLine(id);
   },
 };

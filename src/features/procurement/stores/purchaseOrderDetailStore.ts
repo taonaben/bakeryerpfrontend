@@ -227,3 +227,5 @@ export const usePurchaseOrderDetailStore = create<PurchaseOrderDetailState>()(
     { name: 'purchase-order-detail-store' },
   ),
 );
+
+export default usePurchaseOrderDetailStore;

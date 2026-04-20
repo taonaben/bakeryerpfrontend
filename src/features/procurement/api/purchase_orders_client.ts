@@ -13,6 +13,28 @@ import type {
 
 // Raw API calls — no caching, no state
 export const purchaseOrderApi = {
+    /** GET /purchasing/purchase-order-lines/:id/ */
+    getLine: async (id: string) => {
+      const { data } = await apiClient.get(`/purchasing/purchase-order-lines/${id}/`);
+      return data;
+    },
+
+    /** PATCH /purchasing/purchase-order-lines/:id/ */
+    patchLine: async (id: string, dto: Partial<any>) => {
+      const { data } = await apiClient.patch(`/purchasing/purchase-order-lines/${id}/`, dto);
+      return data;
+    },
+
+    /** PUT /purchasing/purchase-order-lines/:id/ */
+    updateLine: async (id: string, dto: any) => {
+      const { data } = await apiClient.put(`/purchasing/purchase-order-lines/${id}/`, dto);
+      return data;
+    },
+
+    /** DELETE /purchasing/purchase-order-lines/:id/ */
+    deleteLine: async (id: string) => {
+      await apiClient.delete(`/purchasing/purchase-order-lines/${id}/`);
+    },
   /** GET /purchasing/purchase-orders/ */
   getOrders: async (
     params: Record<string, any>,

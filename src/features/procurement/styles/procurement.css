@@ -459,6 +459,21 @@
   color: #5b21b6;
 }
 
+.status-badge.status-partially-received {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-received {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-cancelled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
 /* ─── Detail Line Items Section ───────────────── */
 .line-items-section {
   margin-top: 1.5rem;
@@ -1077,4 +1092,70 @@
   font-weight: 600;
   font-size: 0.88rem;
   color: var(--text-dark, #1e293b);
+}
+
+.po-detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-primary, #2563eb);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.po-detail-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.po-detail-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.po-detail-table td.numeric,
+.po-detail-table th.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.po-detail-summary {
+  margin-top: 1.5rem;
+}
+
+.po-detail-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.po-detail-summary-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.po-detail-summary-card label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+.po-detail-summary-card strong {
+  color: var(--text-dark, #1e293b);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .po-detail-summary-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -34,6 +34,7 @@ export interface PurchaseOrderLineItem extends Timestamp {
 export interface PurchaseOrder extends Timestamp {
   id: string;
   po_number: string;
+  pr_number: string | null;
   supplier: string;
   supplier_name: string;
   warehouse: string;
