@@ -25,6 +25,8 @@ import PurchaseOrdersPage from './features/procurement/views/purchase_orders/Pur
 import CreatePurchaseOrderPage from './features/procurement/views/purchase_orders/CreatePurchaseOrderPage';
 import PurchaseDetailPage from './features/procurement/views/purchase_orders/PurchaseDetailPage';
 import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsReceiptsPage';
+import CreateGoodsReceiptPage from './features/procurement/views/good_receipts/CreateGoodsReceiptPage';
+import GoodsReceiptDetailPage from './features/procurement/views/good_receipts/GoodsReceiptDetailPage';
 import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
 import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
@@ -304,7 +306,9 @@ function App() {
                   <Route path="/procurement/purchase-orders/new" element={<CreatePurchaseOrderPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/purchase-orders/:orderId" element={<PurchaseDetailPage />} />
                   <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage activeWarehouse={activeWarehouse} />} />
-                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
+                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/new" element={<CreateGoodsReceiptPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/:id" element={<GoodsReceiptDetailPage />} />
                   <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
                   <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />

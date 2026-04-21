@@ -49,6 +49,8 @@ const PurchaseOrderSidePanelActions: React.FC<PurchaseOrderSidePanelActionsProps
   const isDraft = purchaseOrder.status === 'Draft';
   const isSubmitted = purchaseOrder.status === 'Submitted';
   const isApproved = purchaseOrder.status === 'Approved';
+  const canReceiveGoods =
+    purchaseOrder.status === 'Approved' || purchaseOrder.status === 'Partially Received';
 
   const storeUser = useUserStore((s) => s.user);
   const currentUserId = (() => {
@@ -305,9 +307,26 @@ const PurchaseOrderSidePanelActions: React.FC<PurchaseOrderSidePanelActionsProps
         )}
 
         {isApproved && (
-          <button onClick={handleCancel} disabled={isCancelling} className="btn btn-secondary btn-block">
-            <Ban size={16} />
-            {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+          <>
+            <button
+              onClick={() => navigate(`/procurement/goods-receipts/new?poId=${purchaseOrder.id}`)}
+              className="btn btn-primary btn-block"
+            >
+              Receive Goods
+            </button>
+            <button onClick={handleCancel} disabled={isCancelling} className="btn btn-secondary btn-block">
+              <Ban size={16} />
+              {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+            </button>
+          </>
+        )}
+
+        {canReceiveGoods && !isApproved && (
+          <button
+            onClick={() => navigate(`/procurement/goods-receipts/new?poId=${purchaseOrder.id}`)}
+            className="btn btn-primary btn-block"
+          >
+            Receive Goods
           </button>
         )}
       </div>

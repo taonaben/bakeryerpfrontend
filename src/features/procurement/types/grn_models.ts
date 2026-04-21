@@ -35,10 +35,13 @@ export interface GoodsReceipt extends Timestamp {
   gr_number: string;
   purchase_order: string;
   purchase_order_number: string;
+  supplier_name: string;
+  supplier: string;
   warehouse: string;
   warehouse_name: string;
   received_date: string;
   received_by: string;
+  received_by_name: string;
   status: GoodsReceiptStatus;
   description: string | null;
   rejection_reason: string | null;
@@ -96,4 +99,32 @@ export interface GoodsReceiptListFilters {
   ordering: string;
   page: number;
   page_size: number;
+}
+
+// ──────────────────────────────────────────────
+// Create Form Support Models
+// ──────────────────────────────────────────────
+
+export interface GoodsReceiptPurchaseOrderOption {
+  id: string;
+  po_number: string;
+  supplier_name: string;
+  warehouse: string;
+  warehouse_name: string;
+  status: string;
+}
+
+export interface GoodsReceiptCreateLineForm {
+  po_line_item_id: string;
+  product_id: string;
+  product_name: string;
+  quantity_ordered: number;
+  quantity_already_received: number;
+  quantity_remaining: number;
+  quantity_received: string;
+  unit_of_measure: string;
+  supplier_batch_ref: string;
+  expiry_date: string;
+  manufacturing_date: string;
+  description: string;
 }
