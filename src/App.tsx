@@ -7,6 +7,9 @@ import StockBalancesPage from './features/inventory/views/StockBalancesPage';
 import BatchesPage from './features/inventory/views/BatchesPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
+import ProductsPage from './features/inventory/views/products/ProductsPage';
+import CreateProductPage from './features/inventory/views/products/CreateProductPage';
+import ProductDetailPage from './features/inventory/views/products/ProductDetailPage';
 import Layout from './shared/components/Layout';
 import LoginPage from './features/auth/views/LoginPage';
 import { warehouseService } from './core/warehouses/services/warehouseService';
@@ -263,6 +266,14 @@ function App() {
                       <BatchesPage activeWarehouse={activeWarehouse} />
                     }
                   />
+                  <Route
+                    path="/inventory/products"
+                    element={
+                      <ProductsPage />
+                    }
+                  />
+                  <Route path="/inventory/products/new" element={<CreateProductPage />} />
+                  <Route path="/inventory/products/:productId" element={<ProductDetailPage />} />
 
                   {/* Batch Detail */}
                   <Route

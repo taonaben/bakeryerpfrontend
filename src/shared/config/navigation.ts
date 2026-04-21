@@ -261,6 +261,13 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
           { id: 'batches', label: 'Batches Registry', path: '/inventory/batches', icon: Layers },
         ],
       },
+      {
+        id: 'master-data',
+        label: 'Master Data',
+        items: [
+          { id: 'inventory-products', label: 'Products', path: '/inventory/products', icon: Package },
+        ],
+      },
     ],
   },
 };
