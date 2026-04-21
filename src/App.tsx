@@ -28,10 +28,13 @@ import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsR
 import CreateGoodsReceiptPage from './features/procurement/views/good_receipts/CreateGoodsReceiptPage';
 import GoodsReceiptDetailPage from './features/procurement/views/good_receipts/GoodsReceiptDetailPage';
 import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
+import CreateSupplierInvoicePage from './features/procurement/views/supplier_invoices/CreateSupplierInvoicePage';
+import SupplierInvoiceDetailPage from './features/procurement/views/supplier_invoices/SupplierInvoiceDetailPage';
+import EditSupplierInvoicePage from './features/procurement/views/supplier_invoices/EditSupplierInvoicePage';
 import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
 import EditSupplierPage from './features/procurement/views/suppliers/EditSupplierPage';
-import SupplierDetailPage from './features/procurement/views/supplier_invoices/SupplierDetailPage';
+import SupplierDetailPage from './features/procurement/views/suppliers/SupplierDetailPage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -309,7 +312,10 @@ function App() {
                   <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/goods-receipts/new" element={<CreateGoodsReceiptPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/goods-receipts/:id" element={<GoodsReceiptDetailPage />} />
-                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
+                  <Route path="/procurement/invoices/new" element={<CreateSupplierInvoicePage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/invoices/:invoiceId/edit" element={<EditSupplierInvoicePage />} />
+                  <Route path="/procurement/invoices/:invoiceId" element={<SupplierInvoiceDetailPage />} />
+                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />

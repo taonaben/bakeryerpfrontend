@@ -1,6 +1,12 @@
 import type { PurchaseRequisition, UpdateRequisitionDTO, Supplier, UpdateSupplierDTO, AddProductToSupplierDTO, CreateContactDTO, UpdateContactDTO, CreateDocumentDTO, UpdateDocumentDTO } from './models';
 import type { PurchaseOrder, UpdatePurchaseOrderDTO } from './purchase_orders_models';
 import type { GoodsReceipt, UpdateGoodsReceiptDTO, GoodsReceiptListFilters } from './grn_models';
+import type {
+  SupplierInvoice,
+  UpdateSupplierInvoiceDTO,
+  SupplierInvoiceListFilters,
+  SupplierInvoiceMatchResult,
+} from './supplier_invoices_model';
 
 // ──────────────────────────────────────────────
 // Cache metadata (shared by all detail stores)
@@ -187,6 +193,69 @@ export interface GoodsReceiptListState {
 
   fetchReceipts: (force?: boolean) => Promise<void>;
   setFilters: (partial: Partial<GoodsReceiptListFilters>) => Promise<void>;
+  clearFilters: () => Promise<void>;
+  setPage: (page: number) => Promise<void>;
+  refresh: () => Promise<void>;
+  invalidateCache: () => void;
+  notifyMutation: () => void;
+  setError: (error: string | null) => void;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Supplier Invoice Detail Store State
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export interface SupplierInvoiceDetailState {
+  supplierInvoice: SupplierInvoice | null;
+  matchResult: SupplierInvoiceMatchResult | null;
+
+  isLoading: boolean;
+  isUpdating: boolean;
+  isDeleting: boolean;
+  isApproving: boolean;
+  isRejecting: boolean;
+  isMarkingPaid: boolean;
+  isMatching: boolean;
+
+  error: string | null;
+  updateError: string | null;
+  matchError: string | null;
+
+  cache: CacheMetadata;
+
+  fetchInvoice: (id: string) => Promise<void>;
+  updateInvoice: (id: string, data: UpdateSupplierInvoiceDTO) => Promise<void>;
+  patchInvoice: (id: string, data: Partial<UpdateSupplierInvoiceDTO>) => Promise<void>;
+  deleteInvoice: (id: string) => Promise<void>;
+  approveInvoice: (id: string) => Promise<void>;
+  rejectInvoice: (id: string, reason: string) => Promise<void>;
+  markInvoicePaid: (id: string, paymentReference: string) => Promise<void>;
+  fetchMatch: (id: string, force?: boolean) => Promise<void>;
+  clearInvoice: () => void;
+  clearMatch: () => void;
+  setError: (error: string | null) => void;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Supplier Invoice List Store State
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export interface SupplierInvoiceListState {
+  invoices: SupplierInvoice[];
+  count: number;
+  currentPage: number;
+  totalPages: number;
+  filters: SupplierInvoiceListFilters;
+
+  isLoading: boolean;
+  isRefreshing: boolean;
+  error: string | null;
+
+  cache: CacheMetadata;
+  refreshToken: number;
+
+  fetchInvoices: (force?: boolean) => Promise<void>;
+  setFilters: (partial: Partial<SupplierInvoiceListFilters>) => Promise<void>;
   clearFilters: () => Promise<void>;
   setPage: (page: number) => Promise<void>;
   refresh: () => Promise<void>;
