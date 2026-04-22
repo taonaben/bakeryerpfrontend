@@ -38,6 +38,9 @@ import ProcurementSuppliersPage from './features/procurement/views/suppliers/Sup
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
 import EditSupplierPage from './features/procurement/views/suppliers/EditSupplierPage';
 import SupplierDetailPage from './features/procurement/views/suppliers/SupplierDetailPage';
+import FormulationPage from './features/formulation/views/formulationPage';
+import FormulaDetailPage from './features/formulation/views/FormulaDetailPage';
+import FormulaCreatePage from './features/formulation/views/FormulaCreatePage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -339,6 +342,11 @@ function App() {
                   <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />
                   <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
+
+                  {/* Formulation Module */}
+                  <Route path="/formulation" element={<FormulationPage />} />
+                  <Route path="/formulation/new" element={<FormulaCreatePage />} />
+                  <Route path="/formulation/:formulaId" element={<FormulaDetailPage />} />
 
                   {/* Finance Module */}
                   <Route path="/finance" element={<FinanceDashboard />} />

@@ -7,6 +7,7 @@ import {
   DollarSign,
   BarChart3,
   Truck,
+  FlaskConical,
   Settings,
   FileText,
   ShoppingBag,
@@ -105,6 +106,22 @@ export const navigationItems: NavigationItem[] = [
       'owner_director',
     ],
     isActive: (pathname) => pathname.startsWith('/inventory'),
+  },
+  {
+    id: 'formulation',
+    label: 'Formulation',
+    path: '/formulation',
+    icon: FlaskConical,
+    roles: [
+      'production_operator',
+      'production_supervisor',
+      'inventory_controller',
+      'planner',
+      'quality_officer',
+      'manager',
+      'owner_director',
+    ],
+    isActive: (pathname) => pathname.startsWith('/formulation'),
   },
   {
     id: 'production',
@@ -218,34 +235,6 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
       },
     ],
   },
-  finance: {
-    moduleId: 'finance',
-    sections: [
-      {
-        id: 'overview',
-        label: 'Overview',
-        items: [
-          { id: 'finance-dashboard', label: 'Dashboard', path: '/finance', icon: LayoutDashboard },
-        ],
-      },
-      {
-        id: 'finance',
-        label: 'Finance',
-        items: [
-          { id: 'invoices', label: 'Invoices', path: '/finance/invoices', icon: Receipt },
-          { id: 'price-lists', label: 'Price Lists', path: '/finance/price-lists', icon: Tag },
-          { id: 'costing', label: 'Costing', path: '/finance/costing', icon: Calculator },
-        ],
-      },
-      {
-        id: 'master-data',
-        label: 'Master Data',
-        items: [
-          { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
-        ],
-      },
-    ],
-  },
   inventory: {
     moduleId: 'inventory',
     sections: [
@@ -274,6 +263,19 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
       },
     ],
   },
+  formulation: {
+    moduleId: 'formulation',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          { id: 'formulation-dashboard', label: 'Dashboard', path: '/formulation', icon: LayoutDashboard },
+        ],
+      },
+    ],
+  },
+
   production: {
     moduleId: 'production',
     sections: [
@@ -341,6 +343,35 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
             icon: FileBarChart2,
             isActive: (pathname) => pathname.startsWith('/production/reports'),
           },
+        ],
+      },
+    ],
+  },
+  
+  finance: {
+    moduleId: 'finance',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          { id: 'finance-dashboard', label: 'Dashboard', path: '/finance', icon: LayoutDashboard },
+        ],
+      },
+      {
+        id: 'finance',
+        label: 'Finance',
+        items: [
+          { id: 'invoices', label: 'Invoices', path: '/finance/invoices', icon: Receipt },
+          { id: 'price-lists', label: 'Price Lists', path: '/finance/price-lists', icon: Tag },
+          { id: 'costing', label: 'Costing', path: '/finance/costing', icon: Calculator },
+        ],
+      },
+      {
+        id: 'master-data',
+        label: 'Master Data',
+        items: [
+          { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
         ],
       },
     ],
