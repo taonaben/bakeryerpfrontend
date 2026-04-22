@@ -7,6 +7,9 @@ import StockBalancesPage from './features/inventory/views/StockBalancesPage';
 import BatchesPage from './features/inventory/views/BatchesPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
+import ProductsPage from './features/inventory/views/products/ProductsPage';
+import CreateProductPage from './features/inventory/views/products/CreateProductPage';
+import ProductDetailPage from './features/inventory/views/products/ProductDetailPage';
 import Layout from './shared/components/Layout';
 import LoginPage from './features/auth/views/LoginPage';
 import { warehouseService } from './core/warehouses/services/warehouseService';
@@ -42,6 +45,14 @@ import InvoicesPage from './features/finance/views/InvoicesPage';
 import PriceListsPage from './features/finance/views/PriceListsPage';
 import CostingPage from './features/finance/views/CostingPage';
 import FinanceSuppliersPage from './features/finance/views/SuppliersPage';
+
+// Production views
+import ProductionDashboard from './features/production/views/ProductionDashboard';
+import PlannedOrdersPage from './features/production/views/planning/planned-orders/plannedOrdersPage';
+import PlannedOrdersCalendarPage from './features/production/views/planning/calender/plannedOrdersCalender';
+import ProductionOrdersPage from './features/production/views/production/orders/productionOrdersPage';
+import ReworkPage from './features/production/views/production/rework/reworkPage';
+import ProductionReportsPage from './features/production/views/reports/reports';
 
 /**
  * Main Application Component
@@ -268,6 +279,14 @@ function App() {
                       <BatchesPage activeWarehouse={activeWarehouse} />
                     }
                   />
+                  <Route
+                    path="/inventory/products"
+                    element={
+                      <ProductsPage />
+                    }
+                  />
+                  <Route path="/inventory/products/new" element={<CreateProductPage />} />
+                  <Route path="/inventory/products/:productId" element={<ProductDetailPage />} />
 
                   {/* Batch Detail */}
                   <Route
@@ -328,8 +347,15 @@ function App() {
                   <Route path="/finance/costing" element={<CostingPage />} />
                   <Route path="/finance/suppliers" element={<FinanceSuppliersPage />} />
 
+                  {/* Production Module */}
+                  <Route path="/production" element={<ProductionDashboard />} />
+                  <Route path="/production/planned-orders" element={<PlannedOrdersPage />} />
+                  <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
+                  <Route path="/production/orders" element={<ProductionOrdersPage />} />
+                  <Route path="/production/rework" element={<ReworkPage />} />
+                  <Route path="/production/reports" element={<ProductionReportsPage />} />
+
                   {/* Placeholder routes for other modules */}
-                  <Route path="/production" element={<div style={{ padding: '30px' }}>Production Module (Coming Soon)</div>} />
                   <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
                   <Route path="/settings" element={<div style={{ padding: '30px' }}>Settings (Coming Soon)</div>} />

@@ -17,6 +17,7 @@ export interface SidebarSectionItem {
   icon: LucideIcon;
   roles?: UserRole[];
   badgeKey?: string;
+  isActive?: (pathname: string) => boolean;
 }
 
 export interface SidebarSection {

@@ -125,6 +125,14 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
            (item.path !== '/' && location.pathname.startsWith(item.path));
   };
 
+  const isModuleItemActive = (path: string, isActive?: (pathname: string) => boolean) => {
+    if (isActive) {
+      return isActive(location.pathname);
+    }
+
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   // Toggle sidebar
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -216,7 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
                 }
 
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+                const isActive = isModuleItemActive(item.path, item.isActive);
                 const badgeCount = item.badgeKey ? badges[item.badgeKey] : undefined;
 
                 return (
