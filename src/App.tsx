@@ -41,6 +41,14 @@ import PriceListsPage from './features/finance/views/PriceListsPage';
 import CostingPage from './features/finance/views/CostingPage';
 import FinanceSuppliersPage from './features/finance/views/SuppliersPage';
 
+// Production views
+import ProductionDashboard from './features/production/views/ProductionDashboard';
+import PlannedOrdersPage from './features/production/views/planning/planned-orders/plannedOrdersPage';
+import PlannedOrdersCalendarPage from './features/production/views/planning/calender/plannedOrdersCalender';
+import ProductionOrdersPage from './features/production/views/production/orders/productionOrdersPage';
+import ReworkPage from './features/production/views/production/rework/reworkPage';
+import ProductionReportsPage from './features/production/views/reports/reports';
+
 /**
  * Main Application Component
  * 
@@ -329,8 +337,15 @@ function App() {
                   <Route path="/finance/costing" element={<CostingPage />} />
                   <Route path="/finance/suppliers" element={<FinanceSuppliersPage />} />
 
+                  {/* Production Module */}
+                  <Route path="/production" element={<ProductionDashboard />} />
+                  <Route path="/production/planned-orders" element={<PlannedOrdersPage />} />
+                  <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
+                  <Route path="/production/orders" element={<ProductionOrdersPage />} />
+                  <Route path="/production/rework" element={<ReworkPage />} />
+                  <Route path="/production/reports" element={<ProductionReportsPage />} />
+
                   {/* Placeholder routes for other modules */}
-                  <Route path="/production" element={<div style={{ padding: '30px' }}>Production Module (Coming Soon)</div>} />
                   <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
                   <Route path="/settings" element={<div style={{ padding: '30px' }}>Settings (Coming Soon)</div>} />

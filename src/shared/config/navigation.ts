@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Package,
   ClipboardList,
+  CalendarDays,
   ShoppingCart,
   DollarSign,
   BarChart3,
@@ -17,6 +18,9 @@ import {
   History,
   Database,
   Layers,
+  ListOrdered,
+  RefreshCcw,
+  FileBarChart2,
 } from 'lucide-react';
 import type { NavigationItem, ModuleSidebarConfig } from '../types/navigation';
 
@@ -266,6 +270,77 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'inventory-products', label: 'Products', path: '/inventory/products', icon: Package },
+        ],
+      },
+    ],
+  },
+  production: {
+    moduleId: 'production',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'production-dashboard',
+            label: 'Dashboard',
+            path: '/production',
+            icon: LayoutDashboard,
+            isActive: (pathname) => pathname === '/production',
+          },
+        ],
+      },
+      {
+        id: 'planning',
+        label: 'Planning',
+        items: [
+          {
+            id: 'planned-orders',
+            label: 'Planned Orders',
+            path: '/production/planned-orders',
+            icon: ListOrdered,
+            isActive: (pathname) => pathname.startsWith('/production/planned-orders'),
+          },
+          {
+            id: 'production-calendar',
+            label: 'Calendar',
+            path: '/production/calendar',
+            icon: CalendarDays,
+            isActive: (pathname) => pathname.startsWith('/production/calendar'),
+          },
+        ],
+      },
+      {
+        id: 'execution',
+        label: 'Production',
+        items: [
+          {
+            id: 'production-orders',
+            label: 'Orders',
+            path: '/production/orders',
+            icon: ClipboardList,
+            isActive: (pathname) => pathname.startsWith('/production/orders'),
+          },
+          {
+            id: 'production-rework',
+            label: 'Rework',
+            path: '/production/rework',
+            icon: RefreshCcw,
+            isActive: (pathname) => pathname.startsWith('/production/rework'),
+          },
+        ],
+      },
+      {
+        id: 'reports',
+        label: 'Reports',
+        items: [
+          {
+            id: 'production-reports',
+            label: 'Reports',
+            path: '/production/reports',
+            icon: FileBarChart2,
+            isActive: (pathname) => pathname.startsWith('/production/reports'),
+          },
         ],
       },
     ],
