@@ -70,105 +70,114 @@ const CreateProductPage: React.FC = () => {
 
   return (
     <div className="products-page">
-      <div className="products-sticky-stack">
-        <div className="products-page-header">
-          <div>
-            <button
-              className="btn-back"
-              onClick={() => navigate('/inventory/products')}
-              type="button"
-            >
-              <ArrowLeft size={18} /> Back
-            </button>
-            <h1>Create New Product</h1>
-            <p>Inventory / Products / New</p>
-          </div>
-        </div>
-      </div>
-
       <div className="products-content">
-        <div className="create-product-page">
+        <div className="products-form-layout">
+          <div className="products-page-header products-page-header--stacked">
+            <div className="products-page-header__left">
+              <button
+                className="btn btn-ghost products-back-link"
+                onClick={() => navigate('/inventory/products')}
+                type="button"
+              >
+                <ArrowLeft size={16} /> Back to Products
+              </button>
+              <h1>Create Product</h1>
+              <p className="products-page-header__breadcrumb">
+                Inventory / Products / New
+              </p>
+            </div>
+          </div>
+
           {formError && <div className="error-banner">{formError}</div>}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="form-card">
-              <h3 className="form-card__title">Product Information</h3>
+              <h2 className="form-card__title">Product Information</h2>
 
-              <div className="form-group">
-                <label>
-                  Product Name <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter product name"
-                  disabled={submitting}
-                />
-                {fieldErrors.name && <span className="field-error">{fieldErrors.name}</span>}
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="product-name">
+                    Product Name <span className="required">*</span>
+                  </label>
+                  <input
+                    id="product-name"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter product name"
+                    disabled={submitting}
+                  />
+                  {fieldErrors.name && <span className="field-error">{fieldErrors.name}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="product-category">
+                    Category <span className="required">*</span>
+                  </label>
+                  <input
+                    id="product-category"
+                    type="text"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    placeholder="e.g., Bakery, Ingredients, Packaging"
+                    disabled={submitting}
+                  />
+                  {fieldErrors.category && <span className="field-error">{fieldErrors.category}</span>}
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="product-unit">
+                    Unit of Measure <span className="required">*</span>
+                  </label>
+                  <select
+                    id="product-unit"
+                    name="unit_of_measure"
+                    value={formData.unit_of_measure}
+                    onChange={handleChange}
+                    disabled={submitting}
+                  >
+                    <option value="">Select Unit</option>
+                    {UNIT_OF_MEASURE.map((unit) => (
+                      <option key={unit} value={unit}>
+                        {unit}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldErrors.unit_of_measure && (
+                    <span className="field-error">{fieldErrors.unit_of_measure}</span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="product-shelf-life">
+                    Shelf Life (days) <span className="required">*</span>
+                  </label>
+                  <input
+                    id="product-shelf-life"
+                    type="number"
+                    name="shelf_life_days"
+                    value={formData.shelf_life_days}
+                    onChange={handleChange}
+                    placeholder="0"
+                    min="0"
+                    disabled={submitting}
+                  />
+                  {fieldErrors.shelf_life_days && (
+                    <span className="field-error">{fieldErrors.shelf_life_days}</span>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
-                <label>
-                  Category <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  placeholder="e.g., Bakery, Ingredients, Packaging"
-                  disabled={submitting}
-                />
-                {fieldErrors.category && <span className="field-error">{fieldErrors.category}</span>}
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Unit of Measure <span className="required">*</span>
-                </label>
-                <select
-                  name="unit_of_measure"
-                  value={formData.unit_of_measure}
-                  onChange={handleChange}
-                  disabled={submitting}
-                >
-                  <option value="">Select Unit</option>
-                  {UNIT_OF_MEASURE.map((unit) => (
-                    <option key={unit} value={unit}>
-                      {unit}
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.unit_of_measure && (
-                  <span className="field-error">{fieldErrors.unit_of_measure}</span>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Shelf Life (days) <span className="required">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="shelf_life_days"
-                  value={formData.shelf_life_days}
-                  onChange={handleChange}
-                  placeholder="0"
-                  min="0"
-                  disabled={submitting}
-                />
-                {fieldErrors.shelf_life_days && (
-                  <span className="field-error">{fieldErrors.shelf_life_days}</span>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label>
+                <label htmlFor="product-storage-condition">
                   Storage Conditions <span className="required">*</span>
                 </label>
                 <select
+                  id="product-storage-condition"
                   name="storage_conditions"
                   value={formData.storage_conditions}
                   onChange={handleChange}
@@ -187,8 +196,9 @@ const CreateProductPage: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label>Storage Notes</label>
+                <label htmlFor="product-storage-notes">Storage Notes</label>
                 <textarea
+                  id="product-storage-notes"
                   name="storage_notes"
                   value={formData.storage_notes}
                   onChange={handleChange}
@@ -202,13 +212,13 @@ const CreateProductPage: React.FC = () => {
             <div className="form-actions">
               <button
                 type="button"
-                className="btn-secondary"
+                className="btn btn-outline"
                 onClick={() => navigate('/inventory/products')}
                 disabled={submitting}
               >
                 Cancel
               </button>
-              <button type="submit" className="btn-primary" disabled={submitting}>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
                 {submitting ? 'Creating...' : 'Create Product'}
               </button>
             </div>

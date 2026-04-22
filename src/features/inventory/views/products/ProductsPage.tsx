@@ -44,17 +44,24 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="products-page">
-      <div className="products-page-header">
-        <div>
-          <h1>Products</h1>
-          <p>Manage product master data for your inventory</p>
-        </div>
-        <button className="btn-primary" onClick={handleCreateProduct}>
-          <Plus size={18} /> New Product
-        </button>
-      </div>
-
       <div className="products-sticky-stack">
+        <div className="products-page-header">
+          <div className="products-page-header__left">
+            <h1>Products</h1>
+            <p className="products-page-header__breadcrumb">
+              Inventory / Products
+            </p>
+          </div>
+          <div className="products-page-header__actions">
+            <button
+              className="btn btn-primary"
+              onClick={handleCreateProduct}
+              type="button"
+            >
+              <Plus size={18} /> New Product
+            </button>
+          </div>
+        </div>
         <ProductsToolbar
           searchTerm={searchLocal}
           onSearchChange={setSearchLocal}

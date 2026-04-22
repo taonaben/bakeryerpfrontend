@@ -66,7 +66,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   return (
     <div className="table-container">
-      <table className="products-table">
+      <table className="inventory-table products-table">
         <thead>
           <tr>
             <th>
@@ -158,7 +158,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
             <button
               onClick={() => onPageChange?.(currentPage - 1)}
               disabled={currentPage === 1 || isLoading}
-              className="pagination-btn"
+              className="pagination-btn pagination-btn--prev"
               type="button"
             >
               <ChevronLeft size={18} />
@@ -172,7 +172,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
             <button
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage === totalPages || isLoading}
-              className="pagination-btn"
+              className="pagination-btn pagination-btn--next"
               type="button"
             >
               <span>Next</span>

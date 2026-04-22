@@ -235,9 +235,11 @@ const ProductDetailPage: React.FC = () => {
     return (
       <div className="products-page">
         <div className="products-content">
-          <div className="loading-container">
-            <div className="spinner" />
-            <span>Loading product...</span>
+          <div className="products-form-layout">
+            <div className="loading-container">
+              <div className="spinner" />
+              <span>Loading product...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -246,257 +248,311 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="products-page">
-      <div className="products-sticky-stack">
-        <div className="products-page-header">
-          <div>
-            <button className="btn-back" type="button" onClick={() => navigate('/inventory/products')}>
-              <ArrowLeft size={18} /> Back
-            </button>
-            <h1>Edit Product</h1>
-            <p>Inventory / Products / {product?.sku || 'Detail'}</p>
-          </div>
-
-          <div className="detail-actions">
-            <button className="btn-danger" type="button" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="products-content">
-        <div className="create-product-page">
-          {error && <div className="error-banner">{error}</div>}
-
-          <div className="form-card">
-            <h3 className="form-card__title">Product Information</h3>
-            <div className="info-grid">
-              <div className="info-item">
-                <label>SKU</label>
-                <p>{product?.sku || 'N/A'}</p>
-              </div>
-              <div className="info-item">
-                <label>Reorder Policy</label>
-                <p>{product?.has_reorder_policy ? 'Configured' : 'Not configured'}</p>
-              </div>
-              <div className="info-item">
-                <label>Created</label>
-                <p>{createdAt}</p>
-              </div>
-              <div className="info-item">
-                <label>Last Updated</label>
-                <p>{lastUpdated}</p>
-              </div>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-card">
-              <h3 className="form-card__title">Edit Fields</h3>
-              <div className="form-group">
-                <label>Name</label>
-                <input name="name" value={formData.name} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label>Category</label>
-                <input name="category" value={formData.category} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label>Unit</label>
-                <select name="unit_of_measure" value={formData.unit_of_measure} onChange={handleChange}>
-                  <option value="">Select Unit</option>
-                  {UNIT_OF_MEASURE.map((unit) => (
-                    <option key={unit} value={unit}>
-                      {unit}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Shelf Life Days</label>
-                <input
-                  type="number"
-                  min="0"
-                  name="shelf_life_days"
-                  value={formData.shelf_life_days}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Storage Conditions</label>
-                <select
-                  name="storage_conditions"
-                  value={formData.storage_conditions}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Storage Condition</option>
-                  {STORAGE_CONDITIONS.map((condition) => (
-                    <option key={condition} value={condition}>
-                      {condition.charAt(0).toUpperCase() + condition.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Storage Notes</label>
-                <textarea
-                  rows={4}
-                  name="storage_notes"
-                  value={formData.storage_notes}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="form-actions">
+        <div className="products-form-layout">
+          <div className="products-page-header">
+            <div className="products-page-header__left">
               <button
+                className="btn btn-ghost products-back-link"
                 type="button"
-                className="btn-secondary"
                 onClick={() => navigate('/inventory/products')}
               >
-                Cancel
+                <ArrowLeft size={16} /> Back to Products
               </button>
-              <button type="submit" className="btn-primary" disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Changes'}
+              <h1>Edit Product</h1>
+              <p className="products-page-header__breadcrumb">
+                Inventory / Products / {product?.sku || 'Detail'}
+              </p>
+            </div>
+
+            <div className="products-page-header__actions">
+              <button
+                className="btn btn-danger"
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Product'}
               </button>
             </div>
-          </form>
+          </div>
 
-          <form onSubmit={handlePolicySubmit}>
-            <div className="form-card" id="reorder-policy-section">
-              <h3 className="form-card__title">Reorder Policy</h3>
-              {policyError && <div className="error-banner">{policyError}</div>}
-              {policyNotice && <div className="success-banner">{policyNotice}</div>}
-              {isPolicyLoading && (
-                <div className="loading-container">
-                  <div className="spinner" />
-                  <span>Loading reorder policy...</span>
-                </div>
-              )}
+          {error && <div className="error-banner">{error}</div>}
 
-              <div className="form-group">
-                <label>
-                  Warehouse <span className="required">*</span>
-                </label>
-                <input
-                  name="warehouse"
-                  value={policyForm.warehouse}
-                  onChange={handlePolicyChange}
-                  placeholder="Warehouse ID"
-                />
-                {policyFieldErrors.warehouse && (
-                  <span className="field-error">{policyFieldErrors.warehouse}</span>
-                )}
-              </div>
-
-              <div className="policy-grid">
-                <div className="form-group">
-                  <label>
-                    Min Stock Level <span className="required">*</span>
-                  </label>
-                  <input
-                    name="min_stock_level"
-                    value={policyForm.min_stock_level}
-                    onChange={handlePolicyChange}
-                  />
-                  {policyFieldErrors.min_stock_level && (
-                    <span className="field-error">{policyFieldErrors.min_stock_level}</span>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label>
-                    Reorder Qty <span className="required">*</span>
-                  </label>
-                  <input
-                    name="reorder_qty"
-                    value={policyForm.reorder_qty}
-                    onChange={handlePolicyChange}
-                  />
-                  {policyFieldErrors.reorder_qty && (
-                    <span className="field-error">{policyFieldErrors.reorder_qty}</span>
-                  )}
+          <div className="products-detail-grid">
+            <div className="products-detail-main">
+              <div className="form-card">
+                <h2 className="form-card__title">Product Information</h2>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>SKU</label>
+                    <p>{product?.sku || 'N/A'}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Reorder Policy</label>
+                    <p>{product?.has_reorder_policy ? 'Configured' : 'Not configured'}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Created</label>
+                    <p>{createdAt}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Last Updated</label>
+                    <p>{lastUpdated}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="policy-grid">
-                <div className="form-group">
-                  <label>
-                    Lead Time Days <span className="required">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="36500"
-                    name="lead_time_days"
-                    value={policyForm.lead_time_days}
-                    onChange={handlePolicyChange}
-                  />
-                  {policyFieldErrors.lead_time_days && (
-                    <span className="field-error">{policyFieldErrors.lead_time_days}</span>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label>Retrieval Method</label>
-                  <select
-                    name="retrieval_method"
-                    value={policyForm.retrieval_method}
-                    onChange={handlePolicyChange}
-                  >
-                    <option value="FIFO">FIFO</option>
-                    <option value="LIFO">LIFO</option>
-                    <option value="FEFO">FEFO</option>
-                  </select>
-                </div>
-              </div>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="form-card">
+                  <h2 className="form-card__title">Edit Fields</h2>
 
-              <div className="policy-grid">
-                <div className="form-group">
-                  <label>
-                    Safety Stock Qty <span className="required">*</span>
-                  </label>
-                  <input
-                    name="safety_stock_qty"
-                    value={policyForm.safety_stock_qty}
-                    onChange={handlePolicyChange}
-                  />
-                  {policyFieldErrors.safety_stock_qty && (
-                    <span className="field-error">{policyFieldErrors.safety_stock_qty}</span>
-                  )}
-                </div>
-                <div className="form-group policy-checkbox">
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="is_active"
-                      checked={policyForm.is_active}
-                      onChange={handlePolicyChange}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label htmlFor="edit-product-name">Name</label>
+                      <input
+                        id="edit-product-name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="edit-product-category">Category</label>
+                      <input
+                        id="edit-product-category"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label htmlFor="edit-product-unit">Unit</label>
+                      <select
+                        id="edit-product-unit"
+                        name="unit_of_measure"
+                        value={formData.unit_of_measure}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Unit</option>
+                        {UNIT_OF_MEASURE.map((unit) => (
+                          <option key={unit} value={unit}>
+                            {unit}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="edit-product-shelf-life">Shelf Life Days</label>
+                      <input
+                        id="edit-product-shelf-life"
+                        type="number"
+                        min="0"
+                        name="shelf_life_days"
+                        value={formData.shelf_life_days}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="edit-product-storage-condition">Storage Conditions</label>
+                    <select
+                      id="edit-product-storage-condition"
+                      name="storage_conditions"
+                      value={formData.storage_conditions}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Storage Condition</option>
+                      {STORAGE_CONDITIONS.map((condition) => (
+                        <option key={condition} value={condition}>
+                          {condition.charAt(0).toUpperCase() + condition.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="edit-product-storage-notes">Storage Notes</label>
+                    <textarea
+                      id="edit-product-storage-notes"
+                      rows={4}
+                      name="storage_notes"
+                      value={formData.storage_notes}
+                      onChange={handleChange}
                     />
-                    Policy is active
-                  </label>
-                </div>
-              </div>
+                  </div>
 
-              <div className="form-actions">
-                {activePolicy?.id && (
-                  <button
-                    type="button"
-                    className="btn-danger"
-                    onClick={handleDeletePolicy}
-                    disabled={isPolicyDeleting}
-                  >
-                    {isPolicyDeleting ? 'Deleting...' : 'Delete Policy'}
-                  </button>
-                )}
-                <button type="submit" className="btn-primary" disabled={isPolicySaving}>
-                  {isPolicySaving
-                    ? 'Saving...'
-                    : activePolicy?.id
-                      ? 'Update Policy'
-                      : 'Create Policy'}
-                </button>
-              </div>
+                  <div className="form-actions">
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => navigate('/inventory/products')}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={isSaving}>
+                      {isSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
-          </form>
+
+            <div className="products-detail-side">
+              <form onSubmit={handlePolicySubmit} noValidate>
+                <div className="form-card products-policy-card" id="reorder-policy-section">
+                  <div className="products-section-heading">
+                    <h2 className="form-card__title">Reorder Policy</h2>
+                    <p className="products-section-copy">
+                      Configure replenishment defaults for the active warehouse.
+                    </p>
+                  </div>
+
+                  {policyError && <div className="error-banner">{policyError}</div>}
+                  {policyNotice && <div className="success-banner">{policyNotice}</div>}
+                  {isPolicyLoading && (
+                    <div className="loading-container loading-container--compact">
+                      <div className="spinner" />
+                      <span>Loading reorder policy...</span>
+                    </div>
+                  )}
+
+                  <div className="form-group">
+                    <label htmlFor="policy-warehouse">
+                      Warehouse <span className="required">*</span>
+                    </label>
+                    <input
+                      id="policy-warehouse"
+                      name="warehouse"
+                      value={policyForm.warehouse}
+                      onChange={handlePolicyChange}
+                      placeholder="Warehouse ID"
+                    />
+                    {policyFieldErrors.warehouse && (
+                      <span className="field-error">{policyFieldErrors.warehouse}</span>
+                    )}
+                  </div>
+
+                  <div className="policy-grid">
+                    <div className="form-group">
+                      <label htmlFor="policy-min-stock">
+                        Min Stock Level <span className="required">*</span>
+                      </label>
+                      <input
+                        id="policy-min-stock"
+                        name="min_stock_level"
+                        value={policyForm.min_stock_level}
+                        onChange={handlePolicyChange}
+                      />
+                      {policyFieldErrors.min_stock_level && (
+                        <span className="field-error">{policyFieldErrors.min_stock_level}</span>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="policy-reorder-qty">
+                        Reorder Qty <span className="required">*</span>
+                      </label>
+                      <input
+                        id="policy-reorder-qty"
+                        name="reorder_qty"
+                        value={policyForm.reorder_qty}
+                        onChange={handlePolicyChange}
+                      />
+                      {policyFieldErrors.reorder_qty && (
+                        <span className="field-error">{policyFieldErrors.reorder_qty}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="policy-grid">
+                    <div className="form-group">
+                      <label htmlFor="policy-lead-time">
+                        Lead Time Days <span className="required">*</span>
+                      </label>
+                      <input
+                        id="policy-lead-time"
+                        type="number"
+                        min="0"
+                        max="36500"
+                        name="lead_time_days"
+                        value={policyForm.lead_time_days}
+                        onChange={handlePolicyChange}
+                      />
+                      {policyFieldErrors.lead_time_days && (
+                        <span className="field-error">{policyFieldErrors.lead_time_days}</span>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="policy-retrieval-method">Retrieval Method</label>
+                      <select
+                        id="policy-retrieval-method"
+                        name="retrieval_method"
+                        value={policyForm.retrieval_method}
+                        onChange={handlePolicyChange}
+                      >
+                        <option value="FIFO">FIFO</option>
+                        <option value="LIFO">LIFO</option>
+                        <option value="FEFO">FEFO</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="policy-grid">
+                    <div className="form-group">
+                      <label htmlFor="policy-safety-stock">
+                        Safety Stock Qty <span className="required">*</span>
+                      </label>
+                      <input
+                        id="policy-safety-stock"
+                        name="safety_stock_qty"
+                        value={policyForm.safety_stock_qty}
+                        onChange={handlePolicyChange}
+                      />
+                      {policyFieldErrors.safety_stock_qty && (
+                        <span className="field-error">{policyFieldErrors.safety_stock_qty}</span>
+                      )}
+                    </div>
+                    <div className="form-group policy-checkbox">
+                      <label htmlFor="policy-active">
+                        <input
+                          id="policy-active"
+                          type="checkbox"
+                          name="is_active"
+                          checked={policyForm.is_active}
+                          onChange={handlePolicyChange}
+                        />
+                        Policy is active
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-actions">
+                    {activePolicy?.id && (
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={handleDeletePolicy}
+                        disabled={isPolicyDeleting}
+                      >
+                        {isPolicyDeleting ? 'Deleting...' : 'Delete Policy'}
+                      </button>
+                    )}
+                    <button type="submit" className="btn btn-primary" disabled={isPolicySaving}>
+                      {isPolicySaving
+                        ? 'Saving...'
+                        : activePolicy?.id
+                          ? 'Update Policy'
+                          : 'Create Policy'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
