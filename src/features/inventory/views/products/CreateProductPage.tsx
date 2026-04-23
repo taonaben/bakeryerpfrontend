@@ -1,12 +1,15 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useUserStore } from '@/features/auth/stores/userStore';
+
 import { productService } from '../../services/productServices';
 import { UNIT_OF_MEASURE, STORAGE_CONDITIONS } from '../../constants/products';
 import '../../styles/products.css';
 
 const CreateProductPage: React.FC = () => {
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -50,10 +53,17 @@ const CreateProductPage: React.FC = () => {
 
     if (!validateForm()) return;
 
+    const companyId = user?.company;
+    if (!companyId) {
+      setFormError('Company not found in user session');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await productService.createProduct({
         name: formData.name,
+        company: companyId,
         category: formData.category,
         unit_of_measure: formData.unit_of_measure,
         shelf_life_days: Number(formData.shelf_life_days),
@@ -142,8 +152,8 @@ const CreateProductPage: React.FC = () => {
                   >
                     <option value="">Select Unit</option>
                     {UNIT_OF_MEASURE.map((unit) => (
-                      <option key={unit} value={unit}>
-                        {unit}
+                      <option key={unit.value} value={unit.value}>
+                        {unit.label}
                       </option>
                     ))}
                   </select>
@@ -185,8 +195,8 @@ const CreateProductPage: React.FC = () => {
                 >
                   <option value="">Select Storage Condition</option>
                   {STORAGE_CONDITIONS.map((condition) => (
-                    <option key={condition} value={condition}>
-                      {condition.charAt(0).toUpperCase() + condition.slice(1)}
+                    <option key={condition.value} value={condition.value}>
+                      {condition.label}
                     </option>
                   ))}
                 </select>

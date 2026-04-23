@@ -1,12 +1,16 @@
 import { grnApi } from '../api/grn_client';
 import { useUserStore } from '../../auth/stores/userStore';
+import { purchaseOrderService } from './purchase_orders_services';
 import type {
   GoodsReceipt,
   GoodsReceiptLineItem,
   CreateGoodsReceiptDTO,
   UpdateGoodsReceiptDTO,
   GoodsReceiptListFilters,
+  GoodsReceiptPurchaseOrderOption,
+  GoodsReceiptCreateLineForm,
 } from '../types/grn_models';
+import type { PurchaseOrderLineItem } from '../types/purchase_orders_models';
 
 export const DEFAULT_GRN_FILTERS: GoodsReceiptListFilters = {
   search: '',
@@ -70,6 +74,67 @@ export const grnService = {
       count: response.count,
       currentPage: apiParams.page || 1,
       totalPages,
+    };
+  },
+
+  async fetchPurchaseOrderOptions(
+    params?: Record<string, any>,
+  ): Promise<GoodsReceiptPurchaseOrderOption[]> {
+    const response = await purchaseOrderService.fetchOrders({
+      page: 1,
+      page_size: 200,
+      ordering: '-created_at',
+      ...params,
+    });
+
+    return response.data.map((order) => ({
+      id: order.id,
+      po_number: order.po_number,
+      supplier_name: order.supplier_name,
+      warehouse: order.warehouse,
+      warehouse_name: order.warehouse_name,
+      status: order.status,
+    }));
+  },
+
+  mapPOLineToCreateLine(line: PurchaseOrderLineItem): GoodsReceiptCreateLineForm {
+    const quantityOrdered = parseFloat(String(line.quantity)) || 0;
+    const quantityAlreadyReceived = parseFloat(String(line.quantity_received)) || 0;
+    const quantityRemaining = Math.max(0, quantityOrdered - quantityAlreadyReceived);
+
+    return {
+      po_line_item_id: line.id,
+      product_id: line.product,
+      product_name: line.product_name || '',
+      quantity_ordered: quantityOrdered,
+      quantity_already_received: quantityAlreadyReceived,
+      quantity_remaining: quantityRemaining,
+      quantity_received: '',
+      unit_of_measure: line.unit_of_measure || '',
+      supplier_batch_ref: '',
+      expiry_date: '',
+      manufacturing_date: '',
+      description: line.description || '',
+    };
+  },
+
+  async getCreateFormData(poId: string): Promise<{
+    purchaseOrderId: string;
+    warehouseId: string;
+    purchaseOrderNumber: string;
+    supplierName: string;
+    lines: GoodsReceiptCreateLineForm[];
+  }> {
+    if (!poId) throw new Error('Purchase order ID is required');
+    const order = await purchaseOrderService.fetchOrder(poId);
+    return {
+      purchaseOrderId: order.id,
+      warehouseId: order.warehouse,
+      purchaseOrderNumber: order.po_number,
+      supplierName: order.supplier_name,
+      lines: Array.isArray(order.line_items)
+        ? order.line_items.map((line) => this.mapPOLineToCreateLine(line))
+        : [],
     };
   },
 

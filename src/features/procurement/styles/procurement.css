@@ -330,6 +330,29 @@
   margin-top: 4px;
 }
 
+.form-group .field-warning {
+  color: #b45309;
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
+.form-group .input-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12);
+}
+
+.grn-readonly-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.88rem;
+  color: #334155;
+}
+
 /* ─── Line Items ──────────────────────────────── */
 .line-items-header {
   display: flex;
@@ -1152,6 +1175,35 @@
   color: var(--text-dark, #1e293b);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
+}
+
+/* ─── Goods Receipts — Table Cells ────────────── */
+.gr-number-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--marble-blue, #566d7e);
+  font-weight: 600;
+}
+
+.po-ref-cell {
+  color: var(--color-primary, #2563eb);
+  font-weight: 500;
+}
+
+.gr-supplier-cell {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.gr-received-by-cell {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+/* ─── Goods Receipts — Status Badges ──────────── */
+.badge.confirmed {
+  background: #dbeafe;
+  color: #1e40af;
 }
 
 @media (max-width: 768px) {

@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useUserStore } from '@/features/auth/stores/userStore';
+import { warehouseService } from '@/core/warehouses/services/warehouseService';
+import type { Warehouse } from '@/core/warehouses/types/models';
 import { UNIT_OF_MEASURE, STORAGE_CONDITIONS } from '../../constants/products';
 import { useProductDetailStore, useReorderPolicyStore } from '../../stores';
 import type { RetrievalMethod } from '../../types/reorderPolicyModel';
@@ -9,6 +12,7 @@ import '../../styles/products.css';
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
   const {
     product,
     isLoading,
@@ -52,6 +56,7 @@ const ProductDetailPage: React.FC = () => {
   });
   const [policyFieldErrors, setPolicyFieldErrors] = useState<Record<string, string>>({});
   const [policyNotice, setPolicyNotice] = useState<string | null>(null);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
   useEffect(() => {
     if (!productId) {
@@ -77,6 +82,34 @@ const ProductDetailPage: React.FC = () => {
       storage_notes: product.storage_notes || '',
     });
   }, [product]);
+
+  useEffect(() => {
+    const companyId = user?.company;
+    if (!companyId) {
+      setWarehouses([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadWarehouses = async () => {
+      try {
+        const warehouseList = await warehouseService.getWarehousesByCompany(companyId);
+        if (!isMounted) return;
+        setWarehouses(warehouseList);
+      } catch (loadError) {
+        if (!isMounted) return;
+        setWarehouses([]);
+        console.error('Failed to load warehouses:', loadError);
+      }
+    };
+
+    loadWarehouses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.company]);
 
   useEffect(() => {
     const savedWarehouse = localStorage.getItem('active_warehouse');
@@ -201,8 +234,11 @@ const ProductDetailPage: React.FC = () => {
       is_active: policyForm.is_active,
     };
 
-    if (activePolicy?.id) {
-      await updatePolicy(activePolicy.id, payload);
+    const currentProductPolicy =
+      activePolicy?.product === productId ? activePolicy : null;
+
+    if (currentProductPolicy?.id) {
+      await updatePolicy(currentProductPolicy.id, payload);
       setPolicyNotice('Reorder policy updated.');
       return;
     }
@@ -212,7 +248,7 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const handleDeletePolicy = async () => {
-    if (!activePolicy?.id) return;
+    if (!productId || activePolicy?.product !== productId || !activePolicy.id) return;
     const confirmed = window.confirm(
       'Delete this reorder policy? This action cannot be undone.',
     );
@@ -339,8 +375,8 @@ const ProductDetailPage: React.FC = () => {
                       >
                         <option value="">Select Unit</option>
                         {UNIT_OF_MEASURE.map((unit) => (
-                          <option key={unit} value={unit}>
-                            {unit}
+                          <option key={unit.value} value={unit.value}>
+                            {unit.label}
                           </option>
                         ))}
                       </select>
@@ -368,8 +404,8 @@ const ProductDetailPage: React.FC = () => {
                     >
                       <option value="">Select Storage Condition</option>
                       {STORAGE_CONDITIONS.map((condition) => (
-                        <option key={condition} value={condition}>
-                          {condition.charAt(0).toUpperCase() + condition.slice(1)}
+                        <option key={condition.value} value={condition.value}>
+                          {condition.label}
                         </option>
                       ))}
                     </select>
@@ -425,13 +461,19 @@ const ProductDetailPage: React.FC = () => {
                     <label htmlFor="policy-warehouse">
                       Warehouse <span className="required">*</span>
                     </label>
-                    <input
+                    <select
                       id="policy-warehouse"
                       name="warehouse"
                       value={policyForm.warehouse}
                       onChange={handlePolicyChange}
-                      placeholder="Warehouse ID"
-                    />
+                    >
+                      <option value="">Select warehouse</option>
+                      {warehouses.map((warehouse) => (
+                        <option key={warehouse.id} value={warehouse.id}>
+                          {warehouse.name}
+                        </option>
+                      ))}
+                    </select>
                     {policyFieldErrors.warehouse && (
                       <span className="field-error">{policyFieldErrors.warehouse}</span>
                     )}

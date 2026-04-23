@@ -28,11 +28,19 @@ import PurchaseOrdersPage from './features/procurement/views/purchase_orders/Pur
 import CreatePurchaseOrderPage from './features/procurement/views/purchase_orders/CreatePurchaseOrderPage';
 import PurchaseDetailPage from './features/procurement/views/purchase_orders/PurchaseDetailPage';
 import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsReceiptsPage';
+import CreateGoodsReceiptPage from './features/procurement/views/good_receipts/CreateGoodsReceiptPage';
+import GoodsReceiptDetailPage from './features/procurement/views/good_receipts/GoodsReceiptDetailPage';
 import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
+import CreateSupplierInvoicePage from './features/procurement/views/supplier_invoices/CreateSupplierInvoicePage';
+import SupplierInvoiceDetailPage from './features/procurement/views/supplier_invoices/SupplierInvoiceDetailPage';
+import EditSupplierInvoicePage from './features/procurement/views/supplier_invoices/EditSupplierInvoicePage';
 import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
 import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
 import EditSupplierPage from './features/procurement/views/suppliers/EditSupplierPage';
-import SupplierDetailPage from './features/procurement/views/supplier_invoices/SupplierDetailPage';
+import SupplierDetailPage from './features/procurement/views/suppliers/SupplierDetailPage';
+import FormulationPage from './features/formulation/views/formulationPage';
+import FormulaDetailPage from './features/formulation/views/FormulaDetailPage';
+import FormulaCreatePage from './features/formulation/views/FormulaCreatePage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -46,6 +54,8 @@ import ProductionDashboard from './features/production/views/ProductionDashboard
 import PlannedOrdersPage from './features/production/views/planning/planned-orders/plannedOrdersPage';
 import PlannedOrdersCalendarPage from './features/production/views/planning/calender/plannedOrdersCalender';
 import ProductionOrdersPage from './features/production/views/production/orders/productionOrdersPage';
+import CreateProductionOrderPage from './features/production/views/production/orders/CreateProductionOrderPage';
+import ProductionOrderDetailPage from './features/production/views/production/orders/ProductionOrderDetailPage';
 import CreatePlannedOrderPage from './features/production/views/planning/planned-orders/CreatePlannedOrderPage';
 import ReworkPage from './features/production/views/production/rework/reworkPage';
 import ProductionReportsPage from './features/production/views/reports/reports';
@@ -324,12 +334,22 @@ function App() {
                   <Route path="/procurement/purchase-orders/new" element={<CreatePurchaseOrderPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/purchase-orders/:orderId" element={<PurchaseDetailPage />} />
                   <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage activeWarehouse={activeWarehouse} />} />
-                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage />} />
-                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage />} />
+                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/new" element={<CreateGoodsReceiptPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/:id" element={<GoodsReceiptDetailPage />} />
+                  <Route path="/procurement/invoices/new" element={<CreateSupplierInvoicePage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/invoices/:invoiceId/edit" element={<EditSupplierInvoicePage />} />
+                  <Route path="/procurement/invoices/:invoiceId" element={<SupplierInvoiceDetailPage />} />
+                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />
                   <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />
                   <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
+
+                  {/* Formulation Module */}
+                  <Route path="/formulation" element={<FormulationPage />} />
+                  <Route path="/formulation/new" element={<FormulaCreatePage />} />
+                  <Route path="/formulation/:formulaId" element={<FormulaDetailPage />} />
 
                   {/* Finance Module */}
                   <Route path="/finance" element={<FinanceDashboard />} />
@@ -343,6 +363,8 @@ function App() {
                   <Route path="/production/planned-orders" element={<PlannedOrdersPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/planned-orders/new" element={<CreatePlannedOrderPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
+                  <Route path="/production/orders/new" element={<CreateProductionOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/orders/:orderId" element={<ProductionOrderDetailPage />} />
                   <Route path="/production/orders" element={<ProductionOrdersPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/rework" element={<ReworkPage />} />
                   <Route path="/production/reports" element={<ProductionReportsPage />} />
