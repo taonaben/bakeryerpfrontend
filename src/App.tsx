@@ -54,6 +54,8 @@ import ProductionDashboard from './features/production/views/ProductionDashboard
 import PlannedOrdersPage from './features/production/views/planning/planned-orders/plannedOrdersPage';
 import PlannedOrdersCalendarPage from './features/production/views/planning/calender/plannedOrdersCalender';
 import ProductionOrdersPage from './features/production/views/production/orders/productionOrdersPage';
+import CreateProductionOrderPage from './features/production/views/production/orders/CreateProductionOrderPage';
+import ProductionOrderDetailPage from './features/production/views/production/orders/ProductionOrderDetailPage';
 import ReworkPage from './features/production/views/production/rework/reworkPage';
 import ProductionReportsPage from './features/production/views/reports/reports';
 
@@ -359,7 +361,9 @@ function App() {
                   <Route path="/production" element={<ProductionDashboard />} />
                   <Route path="/production/planned-orders" element={<PlannedOrdersPage />} />
                   <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
-                  <Route path="/production/orders" element={<ProductionOrdersPage />} />
+                  <Route path="/production/orders/new" element={<CreateProductionOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/orders/:orderId" element={<ProductionOrderDetailPage />} />
+                  <Route path="/production/orders" element={<ProductionOrdersPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/rework" element={<ReworkPage />} />
                   <Route path="/production/reports" element={<ProductionReportsPage />} />
 
