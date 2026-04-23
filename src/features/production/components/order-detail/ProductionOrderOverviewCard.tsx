@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { RefreshCw } from 'lucide-react';
 import type {
   FinishProductionResponse,
   ProductionFinishExpectations,
@@ -18,6 +20,9 @@ interface ProductionOrderOverviewCardProps {
   isLoadingPlan: boolean;
   isLoadingExpectations: boolean;
   isLoadingSummary: boolean;
+  onRefreshPlan?: () => Promise<void> | void;
+  onRefreshExpectations?: () => Promise<void> | void;
+  onRefreshSummary?: () => Promise<void> | void;
 }
 
 const formatDate = (value: string | null) => {
@@ -43,9 +48,27 @@ const ResultPanel: React.FC<{
   children: React.ReactNode;
   hasContent: boolean;
   isLoading?: boolean;
-}> = ({ title, description, emptyText, children, hasContent, isLoading = false }) => (
+  onRefresh?: () => Promise<void> | void;
+}> = ({ title, description, emptyText, children, hasContent, isLoading = false, onRefresh }) => (
   <section className="detail-section">
-    <h2 className="section-title">{title}</h2>
+    <div className="production-section-header">
+      <div className="section-title-row">
+        <h2 className="section-title">{title}</h2>
+        {onRefresh ? (
+          <button
+            type="button"
+            className={`icon-btn${isLoading ? ' spinning' : ''}`}
+            onClick={() => void onRefresh()}
+            aria-label={`Refresh ${title}`}
+            title={`Refresh ${title}`}
+            disabled={isLoading}
+          >
+            <RefreshCw size={16} />
+          </button>
+        ) : null}
+      </div>
+      <div className="section-underline" />
+    </div>
     <p className="production-section-description">{description}</p>
     {isLoading ? (
       <div className="empty-state-card">Loading this section...</div>
@@ -67,7 +90,37 @@ const ProductionOrderOverviewCard: React.FC<ProductionOrderOverviewCardProps> = 
   isLoadingPlan,
   isLoadingExpectations,
   isLoadingSummary,
+  onRefreshPlan,
+  onRefreshExpectations,
+  onRefreshSummary,
 }) => {
+  const [formulaName, setFormulaName] = useState<string | null>(order.formula_name ?? null);
+  const [isLoadingFormula, setIsLoadingFormula] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadFormula = async () => {
+      if (!order.formula) return;
+      if (order.formula_name || (planResult && planResult.formula && (planResult.formula.name || planResult.formula.code))) return;
+      setIsLoadingFormula(true);
+      try {
+        const { formulationService } = await import('@/features/formulation/services/formulationService');
+        const f = await formulationService.fetchFormula(order.formula);
+        if (!mounted) return;
+        setFormulaName(f?.name ?? f?.code ?? f?.product_name ?? null);
+      } catch (err) {
+        // swallow errors; fallback to id
+      } finally {
+        if (mounted) setIsLoadingFormula(false);
+      }
+    };
+
+    loadFormula();
+    return () => {
+      mounted = false;
+    };
+  }, [order.formula, order.formula_name, planResult]);
+
   return (
     <>
       <section className="detail-section">
@@ -119,7 +172,17 @@ const ProductionOrderOverviewCard: React.FC<ProductionOrderOverviewCardProps> = 
 
             <div className="overview-item">
               <label className="overview-label">Formula</label>
-              <div className="overview-value">{order.formula || '--'}</div>
+              <div className="overview-value">
+                {order.formula ? (
+                  <Link to={`/formulation/${order.formula}`} className="link">
+                    {isLoadingFormula
+                      ? 'Loading...'
+                      : planResult?.formula?.name ?? order.formula_name ?? formulaName ?? order.formula}
+                  </Link>
+                ) : (
+                  '--'
+                )}
+              </div>
             </div>
 
             <div className="overview-item">
@@ -140,6 +203,7 @@ const ProductionOrderOverviewCard: React.FC<ProductionOrderOverviewCardProps> = 
         hasContent={!!planResult}
         emptyText="Planning details are not available for this order right now."
         isLoading={isLoadingPlan}
+        onRefresh={onRefreshPlan}
       >
         <div className="overview-card production-result-card">
           <div className="overview-grid">
@@ -179,6 +243,7 @@ const ProductionOrderOverviewCard: React.FC<ProductionOrderOverviewCardProps> = 
         hasContent={!!finishExpectations}
         emptyText="Expected output and waste are not available for this order right now."
         isLoading={isLoadingExpectations}
+        onRefresh={onRefreshExpectations}
       >
         <div className="overview-card production-result-card">
           <div className="overview-grid">
@@ -276,6 +341,7 @@ const ProductionOrderOverviewCard: React.FC<ProductionOrderOverviewCardProps> = 
         hasContent={!!summary}
         emptyText="This summary becomes available automatically once the order is completed and the backend can return completion data."
         isLoading={isLoadingSummary}
+        onRefresh={onRefreshSummary}
       >
         <div className="overview-card production-result-card">
           <div className="overview-grid">

@@ -148,7 +148,7 @@ const FormulaDetailPage: React.FC = () => {
   return (
     <div className="formula-detail-page">
       <div className="detail-header formula-detail-page__header">
-        <button onClick={() => navigate('/formulation')} className="back-button" aria-label="Go back">
+        <button onClick={() => navigate(-1)} className="back-button" aria-label="Go back">
           <ArrowLeft size={18} /> <span>Back</span>
         </button>
         <Breadcrumb items={breadcrumbItems} />

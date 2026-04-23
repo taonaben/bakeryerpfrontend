@@ -147,6 +147,19 @@ const ProductionOrderDetailPage: React.FC = () => {
             isLoadingPlan={isPlanning}
             isLoadingExpectations={isLoadingExpectations}
             isLoadingSummary={isLoadingSummary}
+            onRefreshPlan={async () => {
+              await planOrder(order.id);
+            }}
+            onRefreshExpectations={async () => {
+              await fetchFinishExpectations(order.id);
+            }}
+            onRefreshSummary={
+              order.status === 'completed'
+                ? async () => {
+                    await fetchSummary(order.id);
+                  }
+                : undefined
+            }
           />
         </main>
       </div>

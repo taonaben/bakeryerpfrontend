@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowRightCircle,
   CheckCircle2,
-  ClipboardCheck,
   Copy,
   Play,
-  Sparkles,
 } from 'lucide-react';
 import { useProductionOrderDetailStore } from '../../stores';
 import type { ProductionOrder } from '../../types/productionModels';
@@ -271,14 +268,10 @@ const ProductionOrderSidePanelActions: React.FC<ProductionOrderSidePanelActionsP
   const [showCopyModal, setShowCopyModal] = useState(false);
 
   const error = useProductionOrderDetailStore((state) => state.error);
-  const isPlanning = useProductionOrderDetailStore((state) => state.isPlanning);
   const isStarting = useProductionOrderDetailStore((state) => state.isStarting);
   const isFinishing = useProductionOrderDetailStore((state) => state.isFinishing);
   const isCopying = useProductionOrderDetailStore((state) => state.isCopying);
   const fetchOrder = useProductionOrderDetailStore((state) => state.fetchOrder);
-  const fetchSummary = useProductionOrderDetailStore((state) => state.fetchSummary);
-  const fetchFinishExpectations = useProductionOrderDetailStore((state) => state.fetchFinishExpectations);
-  const planOrder = useProductionOrderDetailStore((state) => state.planOrder);
   const startOrder = useProductionOrderDetailStore((state) => state.startOrder);
   const finishOrder = useProductionOrderDetailStore((state) => state.finishOrder);
   const copyOrder = useProductionOrderDetailStore((state) => state.copyOrder);
@@ -288,6 +281,8 @@ const ProductionOrderSidePanelActions: React.FC<ProductionOrderSidePanelActionsP
   };
 
   const statusClass = order.status.toLowerCase().replace(/_/g, '-');
+  const canStart = order.status !== 'completed' && order.status !== 'in_progress';
+  const canFinish = order.status !== 'completed';
 
   return (
     <>
@@ -340,7 +335,7 @@ const ProductionOrderSidePanelActions: React.FC<ProductionOrderSidePanelActionsP
 
         <div className="metadata-item">
           <label>Formula</label>
-          <div className="metadata-value">{order.formula || '--'}</div>
+          <div className="metadata-value">{order.formula_name || '--'}</div>
         </div>
 
         <div className="metadata-item">
@@ -352,73 +347,27 @@ const ProductionOrderSidePanelActions: React.FC<ProductionOrderSidePanelActionsP
       </div>
 
       <div className="side-panel__actions">
-        <button
-          type="button"
-          className="btn btn-secondary btn-block"
-          onClick={async () => {
-            try {
-              await planOrder(order.id);
-              await fetchOrder(order.id);
-            } catch {
-              // Store error state is already updated.
-            }
-          }}
-          disabled={isPlanning}
-        >
-          <Sparkles size={16} />
-          {isPlanning ? 'Planning...' : 'Plan'}
-        </button>
+        {canStart ? (
+          <button
+            type="button"
+            className="btn btn-primary btn-block"
+            onClick={() => setShowStartModal(true)}
+          >
+            <Play size={16} />
+            Start
+          </button>
+        ) : null}
 
-        <button
-          type="button"
-          className="btn btn-secondary btn-block"
-          onClick={async () => {
-            try {
-              await fetchFinishExpectations(order.id);
-            } catch {
-              // Store error state is already updated.
-            }
-          }}
-        >
-          <ClipboardCheck size={16} />
-          Get Expected Outcome
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-primary btn-block"
-          onClick={() => setShowStartModal(true)}
-          disabled={order.status === 'completed'}
-        >
-          <Play size={16} />
-          Start
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-primary btn-block"
-          onClick={() => setShowFinishModal(true)}
-          disabled={order.status === 'completed'}
-        >
-          <CheckCircle2 size={16} />
-          Finish
-        </button>
-
-        <button
-          type="button"
-          className="btn btn-secondary btn-block"
-          onClick={async () => {
-            try {
-              await fetchSummary(order.id);
-            } catch {
-              // Store error state is already updated.
-            }
-          }}
-          disabled={order.status !== 'completed'}
-        >
-          <ArrowRightCircle size={16} />
-          Summarise Order
-        </button>
+        {canFinish ? (
+          <button
+            type="button"
+            className="btn btn-primary btn-block"
+            onClick={() => setShowFinishModal(true)}
+          >
+            <CheckCircle2 size={16} />
+            Finish
+          </button>
+        ) : null}
 
         <button
           type="button"

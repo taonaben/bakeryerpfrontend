@@ -30,6 +30,7 @@ export interface ProductionOrder {
   warehouse: string;
   warehouse_name: string;
   formula: string | null;
+  formula_name: string | null;
   planned_order: string | null;
   planned_order_status: string | null;
 }
@@ -296,6 +297,8 @@ export interface ProductionOrderDetailState {
   isStarting: boolean;
   isFinishing: boolean;
   isCopying: boolean;
+  isLoadingSummary: boolean;
+  isLoadingExpectations: boolean;
   error: string | null;
   errorDetails: ProductionApiErrorResponse | null;
   fetchOrder: (id: string) => Promise<void>;
