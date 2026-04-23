@@ -44,11 +44,14 @@ export const useReorderPolicyStore = create<ReorderPolicyState>()(
             page: 1,
             page_size: 25,
           });
+          const matchingPolicies = result.data.filter((item) => item.product === productId);
 
           set((state) => {
-            state.policies = result.data;
+            state.policies = matchingPolicies;
             state.activePolicy =
-              result.data.find((item) => item.is_active) || result.data[0] || null;
+              matchingPolicies.find((item) => item.is_active) ||
+              matchingPolicies[0] ||
+              null;
             state.isLoading = false;
           });
         } catch (error: any) {

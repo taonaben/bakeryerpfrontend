@@ -30,12 +30,13 @@ export const productsApi = {
   },
 
   async createProduct(payload: CreateProductDTO): Promise<Product> {
+    console.log('Sending product payload:', payload);
     const { data } = await apiClient.post('/products', payload);
     return data;
   },
 
   async updateProduct(id: string, payload: UpdateProductDTO): Promise<Product> {
-    const { data } = await apiClient.put(`/products/${id}`, payload);
+    const { data } = await apiClient.patch(`/products/${id}`, payload);
     return data;
   },
 
