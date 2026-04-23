@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
-import type { PurchaseRequisition } from '../../types/models';
+import type { PurchaseRequisition } from '../types/models';
 
 interface RequisitionsTableProps {
   requisitions: PurchaseRequisition[];
