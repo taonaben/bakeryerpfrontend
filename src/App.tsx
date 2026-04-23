@@ -1,18 +1,64 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './features/dashboard/views/Dashboard';
-import InventoryPage from './features/inventory/views/InventoryPage';
-import PurchasingPage from './features/purchasing/views/PurchasingPage';
+import InventoryDashboard from './features/inventory/views/InventoryDashboard';
+import StockMovementsPage from './features/inventory/views/StockMovementsPage';
+import StockBalancesPage from './features/inventory/views/StockBalancesPage';
+import BatchesPage from './features/inventory/views/BatchesPage';
 import BatchDetailPage from './features/inventory/views/batches/BatchDetailPage';
 import StockMovementDetailPage from './features/inventory/views/stock_movements/StockMovementDetailPage';
+import ProductsPage from './features/inventory/views/products/ProductsPage';
+import CreateProductPage from './features/inventory/views/products/CreateProductPage';
+import ProductDetailPage from './features/inventory/views/products/ProductDetailPage';
 import Layout from './shared/components/Layout';
-// import type { User, Warehouse } from './shared/types/navigation';
 import LoginPage from './features/auth/views/LoginPage';
 import { warehouseService } from './core/warehouses/services/warehouseService';
 import { Company } from './core/companies/types/models';
 import { authService } from './features/auth/services/authService';
 import { User } from './features/auth/types/models';
 import { Warehouse } from './core/warehouses/types/models';
+
+// Procurement views
+import ProcurementDashboard from './features/procurement/views/dashboard/ProcurementDashboard';
+import RequisitionsPage from './features/procurement/views/requisitions/RequisitionsPage';
+import CreateRequisitionPage from './features/procurement/views/requisitions/CreateRequisitionPage';
+import RequisitionDetailPage from './features/procurement/views/requisitions/RequisitionDetailPage';
+import ConvertRequisitionPage from './features/procurement/views/requisitions/ConvertRequisitionPage';
+import PurchaseOrdersPage from './features/procurement/views/purchase_orders/PurchaseOrdersPage';
+import CreatePurchaseOrderPage from './features/procurement/views/purchase_orders/CreatePurchaseOrderPage';
+import PurchaseDetailPage from './features/procurement/views/purchase_orders/PurchaseDetailPage';
+import GoodsReceiptsPage from './features/procurement/views/good_receipts/GoodsReceiptsPage';
+import CreateGoodsReceiptPage from './features/procurement/views/good_receipts/CreateGoodsReceiptPage';
+import GoodsReceiptDetailPage from './features/procurement/views/good_receipts/GoodsReceiptDetailPage';
+import SupplierInvoicesPage from './features/procurement/views/supplier_invoices/SupplierInvoicesPage';
+import CreateSupplierInvoicePage from './features/procurement/views/supplier_invoices/CreateSupplierInvoicePage';
+import SupplierInvoiceDetailPage from './features/procurement/views/supplier_invoices/SupplierInvoiceDetailPage';
+import EditSupplierInvoicePage from './features/procurement/views/supplier_invoices/EditSupplierInvoicePage';
+import ProcurementSuppliersPage from './features/procurement/views/suppliers/SuppliersPage';
+import CreateSupplierPage from './features/procurement/views/suppliers/CreateSupplierPage';
+import EditSupplierPage from './features/procurement/views/suppliers/EditSupplierPage';
+import SupplierDetailPage from './features/procurement/views/suppliers/SupplierDetailPage';
+import FormulationPage from './features/formulation/views/formulationPage';
+import FormulaDetailPage from './features/formulation/views/FormulaDetailPage';
+import FormulaCreatePage from './features/formulation/views/FormulaCreatePage';
+
+// Finance views
+import FinanceDashboard from './features/finance/views/FinanceDashboard';
+import InvoicesPage from './features/finance/views/InvoicesPage';
+import PriceListsPage from './features/finance/views/PriceListsPage';
+import CostingPage from './features/finance/views/CostingPage';
+import FinanceSuppliersPage from './features/finance/views/SuppliersPage';
+
+// Production views
+import ProductionDashboard from './features/production/views/ProductionDashboard';
+import PlannedOrdersPage from './features/production/views/planning/planned-orders/plannedOrdersPage';
+import PlannedOrdersCalendarPage from './features/production/views/planning/calender/plannedOrdersCalender';
+import ProductionOrdersPage from './features/production/views/production/orders/productionOrdersPage';
+import CreateProductionOrderPage from './features/production/views/production/orders/CreateProductionOrderPage';
+import ProductionOrderDetailPage from './features/production/views/production/orders/ProductionOrderDetailPage';
+import CreatePlannedOrderPage from './features/production/views/planning/planned-orders/CreatePlannedOrderPage';
+import ReworkPage from './features/production/views/production/rework/reworkPage';
+import ProductionReportsPage from './features/production/views/reports/reports';
 
 /**
  * Main Application Component
@@ -214,19 +260,39 @@ function App() {
                     }
                   />
 
-                  {/* Inventory */}
+                  {/* Inventory Module */}
                   <Route
                     path="/inventory"
                     element={
-                      activeWarehouse ? (
-                        <InventoryPage activeWarehouse={activeWarehouse} />
-                      ) : (
-                        <div style={{ padding: '30px' }}>
-                          <p>Please select a warehouse to view inventory.</p>
-                        </div>
-                      )
+                      <InventoryDashboard activeWarehouse={activeWarehouse} />
                     }
                   />
+                  <Route
+                    path="/inventory/movements"
+                    element={
+                      <StockMovementsPage activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/balances"
+                    element={
+                      <StockBalancesPage activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/batches"
+                    element={
+                      <BatchesPage activeWarehouse={activeWarehouse} />
+                    }
+                  />
+                  <Route
+                    path="/inventory/products"
+                    element={
+                      <ProductsPage />
+                    }
+                  />
+                  <Route path="/inventory/products/new" element={<CreateProductPage />} />
+                  <Route path="/inventory/products/:productId" element={<ProductDetailPage />} />
 
                   {/* Batch Detail */}
                   <Route
@@ -256,12 +322,54 @@ function App() {
                     }
                   />
 
-                  {/* Purchasing */}
-                  <Route path="/purchasing" element={<PurchasingPage />} />
+                  {/* Purchasing → Finance redirect */}
+                  <Route path="/purchasing" element={<Navigate to="/finance" replace />} />
+
+                  {/* Procurement Module */}
+                  <Route path="/procurement" element={<ProcurementDashboard />} />
+                  <Route path="/procurement/requisitions" element={<RequisitionsPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/requisitions/new" element={<CreateRequisitionPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/requisitions/:requisitionId/convert" element={<ConvertRequisitionPage />} />
+                  <Route path="/procurement/requisitions/:requisitionId" element={<RequisitionDetailPage />} />
+                  <Route path="/procurement/purchase-orders/new" element={<CreatePurchaseOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/purchase-orders/:orderId" element={<PurchaseDetailPage />} />
+                  <Route path="/procurement/purchase-orders" element={<PurchaseOrdersPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts" element={<GoodsReceiptsPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/new" element={<CreateGoodsReceiptPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/goods-receipts/:id" element={<GoodsReceiptDetailPage />} />
+                  <Route path="/procurement/invoices/new" element={<CreateSupplierInvoicePage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/invoices/:invoiceId/edit" element={<EditSupplierInvoicePage />} />
+                  <Route path="/procurement/invoices/:invoiceId" element={<SupplierInvoiceDetailPage />} />
+                  <Route path="/procurement/invoices" element={<SupplierInvoicesPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/procurement/suppliers/new" element={<CreateSupplierPage />} />
+                  <Route path="/procurement/suppliers/:supplierId/edit" element={<EditSupplierPage />} />
+                  <Route path="/procurement/suppliers/:supplierId" element={<SupplierDetailPage />} />
+                  <Route path="/procurement/suppliers" element={<ProcurementSuppliersPage />} />
+
+                  {/* Formulation Module */}
+                  <Route path="/formulation" element={<FormulationPage />} />
+                  <Route path="/formulation/new" element={<FormulaCreatePage />} />
+                  <Route path="/formulation/:formulaId" element={<FormulaDetailPage />} />
+
+                  {/* Finance Module */}
+                  <Route path="/finance" element={<FinanceDashboard />} />
+                  <Route path="/finance/invoices" element={<InvoicesPage />} />
+                  <Route path="/finance/price-lists" element={<PriceListsPage />} />
+                  <Route path="/finance/costing" element={<CostingPage />} />
+                  <Route path="/finance/suppliers" element={<FinanceSuppliersPage />} />
+
+                  {/* Production Module */}
+                  <Route path="/production" element={<ProductionDashboard />} />
+                  <Route path="/production/planned-orders" element={<PlannedOrdersPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/planned-orders/new" element={<CreatePlannedOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
+                  <Route path="/production/orders/new" element={<CreateProductionOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/orders/:orderId" element={<ProductionOrderDetailPage />} />
+                  <Route path="/production/orders" element={<ProductionOrdersPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/rework" element={<ReworkPage />} />
+                  <Route path="/production/reports" element={<ProductionReportsPage />} />
 
                   {/* Placeholder routes for other modules */}
-                  <Route path="/procurement" element={<div style={{ padding: '30px' }}>Procurement Module (Coming Soon)</div>} />
-                  <Route path="/production" element={<div style={{ padding: '30px' }}>Production Module (Coming Soon)</div>} />
                   <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
                   <Route path="/settings" element={<div style={{ padding: '30px' }}>Settings (Coming Soon)</div>} />
