@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList } from 'lucide-react';
-import type { ProductionOrder } from '../types/productionModels';
+import { RefreshCcw } from 'lucide-react';
+import type { ReworkOrder } from '../types/productionModels';
 
-interface ProductionOrdersTableProps {
-  orders: ProductionOrder[];
+interface ReworkOrdersTableProps {
+  orders: ReworkOrder[];
   isLoading?: boolean;
 }
 
@@ -34,10 +34,7 @@ const formatQuantity = (value: number | string) => {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 3 }).format(num);
 };
 
-const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
-  orders = [],
-  isLoading = false,
-}) => {
+const ReworkOrdersTable: React.FC<ReworkOrdersTableProps> = ({ orders = [], isLoading = false }) => {
   const navigate = useNavigate();
 
   const rowIds = useMemo(() => orders.map((o, i) => o.id || String(i)), [orders]);
@@ -63,11 +60,11 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
       <div className="table-container">
         <div className="empty-state">
           <div className="empty-state__icon">
-            <ClipboardList size={48} />
+            <RefreshCcw size={48} />
           </div>
-          <h3 className="empty-state__title">No production orders found</h3>
+          <h3 className="empty-state__title">No rework orders found</h3>
           <p className="empty-state__description">
-            There are no production orders matching your filters. Try adjusting your search or create a new production order.
+            There are no rework orders matching your filters. Create a rework order to start tracking inputs and recovered output.
           </p>
         </div>
       </div>
@@ -79,7 +76,7 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
       <div className="table-container">
         <div className="loading-container">
           <div className="spinner" />
-          <span>Loading production orders...</span>
+          <span>Loading rework orders...</span>
         </div>
       </div>
     );
@@ -95,16 +92,16 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleAll}
-                aria-label="Select all production orders"
+                aria-label="Select all rework orders"
               />
             </th>
             <th>Order</th>
-            <th>Product</th>
-            <th className="quantity-cell">Qty</th>
+            <th>Target Product</th>
+            <th className="quantity-cell">Qty Requested</th>
             <th>Status</th>
             <th>Warehouse</th>
-            <th>Scheduled Start</th>
-            <th>Scheduled End</th>
+            <th>Created</th>
+            <th>Completed</th>
           </tr>
         </thead>
         <tbody>
@@ -115,7 +112,7 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
                 key={rowId}
                 onClick={(e) => {
                   if ((e.target as HTMLElement).tagName !== 'INPUT') {
-                    navigate(`/production/orders/${order.id}`);
+                    navigate(`/production/rework/${order.id}`);
                   }
                 }}
                 style={{ cursor: 'pointer' }}
@@ -125,25 +122,25 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
                     type="checkbox"
                     checked={selectedIds.has(rowId)}
                     onChange={() => toggleRow(rowId)}
-                    aria-label={`Select production order ${order.id}`}
+                    aria-label={`Select rework order ${order.id}`}
                   />
                 </td>
                 <td>{order.id}</td>
                 <td>
                   <div className="production-order-product">
-                    <span className="production-order-product__name">{order.product_name || '—'}</span>
-                    <span className="production-order-product__meta">Product ID: {order.product}</span>
+                    <span className="production-order-product__name">{order.target_product_name || '—'}</span>
+                    <span className="production-order-product__meta">Product ID: {order.target_product}</span>
                   </div>
                 </td>
-                <td className="quantity-cell">{formatQuantity(order.quantity)}</td>
+                <td className="quantity-cell">{formatQuantity(order.quantity_requested)}</td>
                 <td>
                   <span className={`production-status-badge ${toBadgeClass(order.status)}`}>
                     {order.status?.replace(/_/g, ' ') || '—'}
                   </span>
                 </td>
                 <td>{order.warehouse_name || '—'}</td>
-                <td className="text-muted">{formatDateTime(order.scheduled_start)}</td>
-                <td className="text-muted">{formatDateTime(order.scheduled_end)}</td>
+                <td className="text-muted">{formatDateTime(order.created_at)}</td>
+                <td className="text-muted">{formatDateTime(order.completed_at)}</td>
               </tr>
             );
           })}
@@ -153,4 +150,4 @@ const ProductionOrdersTable: React.FC<ProductionOrdersTableProps> = ({
   );
 };
 
-export default ProductionOrdersTable;
+export default ReworkOrdersTable;
