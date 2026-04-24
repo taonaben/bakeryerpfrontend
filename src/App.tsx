@@ -61,6 +61,8 @@ import ReworkPage from './features/production/views/production/rework/reworkPage
 import CreateReworkOrderPage from './features/production/views/production/rework/CreateReworkOrderPage';
 import ReworkOrderDetailPage from './features/production/views/production/rework/ReworkOrderDetailPage';
 import ProductionReportsPage from './features/production/views/reports/reports';
+import ProductionBatchListPage from './features/production/views/production/batches/ProductionBatchListPage';
+import ProductionBatchDetailPage from './features/production/views/production/batches/ProductionBatchDetailPage';
 
 /**
  * Main Application Component
@@ -365,12 +367,15 @@ function App() {
                   <Route path="/production/planned-orders" element={<PlannedOrdersPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/planned-orders/new" element={<CreatePlannedOrderPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/calendar" element={<PlannedOrdersCalendarPage />} />
-                                    <Route path="/production/orders/new" element={<CreateProductionOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/orders/new" element={<CreateProductionOrderPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/orders/:orderId/batches/:batchId" element={<ProductionBatchDetailPage />} />
+                  <Route path="/production/orders/:orderId/batches" element={<ProductionBatchListPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/orders/:orderId" element={<ProductionOrderDetailPage />} />
                   <Route path="/production/orders" element={<ProductionOrdersPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/rework/new" element={<CreateReworkOrderPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/rework/:orderId" element={<ReworkOrderDetailPage />} />
                   <Route path="/production/rework" element={<ReworkPage activeWarehouse={activeWarehouse} />} />
+                  <Route path="/production/batches" element={<ProductionBatchListPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/reports" element={<ProductionReportsPage />} />
 
                   {/* Placeholder routes for other modules */}

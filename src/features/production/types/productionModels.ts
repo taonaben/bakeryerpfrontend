@@ -7,6 +7,12 @@ import type {
 
 export type DecimalValue = number | string;
 
+export type BatchStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+
+export interface BatchQueryParams {
+  status?: string;
+}
+
 export interface ProductionQueryParams {
   warehouse_id?: string;
   status?: string;
@@ -72,7 +78,7 @@ export interface ProductionBatch {
   production_order: string;
   batch_number: string;
   quantity_produced: DecimalValue;
-  status: string;
+  status: BatchStatus;
   started_at: string | null;
   completed_at: string | null;
 }
@@ -354,3 +360,21 @@ export interface ReworkOrderDetailState {
 }
 
 export type ProductionInventoryBatch = BatchDetailResponse;
+
+export interface BatchListState {
+  batches: ProductionBatch[];
+  isLoading: boolean;
+  error: string | null;
+  orderId: string | null;
+  fetchBatches: (orderId: string, params?: BatchQueryParams) => Promise<void>;
+  fetchBatchesForWarehouse: (warehouseId: string) => Promise<void>;
+  clearBatches: () => void;
+}
+
+export interface BatchDetailState {
+  batch: ProductionBatchDetail | null;
+  isLoading: boolean;
+  error: string | null;
+  fetchBatch: (orderId: string, batchId: string) => Promise<void>;
+  clearBatch: () => void;
+}

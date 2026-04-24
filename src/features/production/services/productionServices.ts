@@ -1,5 +1,6 @@
 import productionClient from '../api/productionClient';
 import type {
+  BatchQueryParams,
   CopyProductionOrderPayload,
   CreateProductionOrderPayload,
   CreateReworkOrderPayload,
@@ -7,6 +8,8 @@ import type {
   FinishProductionResponse,
   FinishReworkPayload,
   FinishReworkResponse,
+  ProductionBatch,
+  ProductionBatchDetail,
   ProductionFinishExpectations,
   ProductionOrder,
   ProductionOrderSummary,
@@ -206,6 +209,22 @@ export const productionService = {
       return await productionClient.finishReworkOrder(id, payload);
     } catch (error) {
       throw toProductionServiceError(error, 'Failed to finish rework order');
+    }
+  },
+
+  async fetchBatches(orderId: string, params: BatchQueryParams = {}): Promise<ProductionBatch[]> {
+    try {
+      return await productionClient.listBatches(orderId, params);
+    } catch (error) {
+      throw toProductionServiceError(error, 'Failed to fetch production batches');
+    }
+  },
+
+  async fetchBatch(orderId: string, batchId: string): Promise<ProductionBatchDetail> {
+    try {
+      return await productionClient.getBatch(orderId, batchId);
+    } catch (error) {
+      throw toProductionServiceError(error, 'Failed to fetch production batch');
     }
   },
 };

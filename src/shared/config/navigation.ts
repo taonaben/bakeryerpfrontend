@@ -330,6 +330,15 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
             icon: RefreshCcw,
             isActive: (pathname) => pathname.startsWith('/production/rework'),
           },
+          {
+            id: 'production-batches',
+            label: 'Batches',
+            path: '/production/batches',
+            icon: Layers,
+            isActive: (pathname) =>
+              pathname.startsWith('/production/batches') ||
+              (pathname.startsWith('/production/orders') && pathname.includes('/batches')),
+          },
         ],
       },
       {
