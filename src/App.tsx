@@ -64,6 +64,19 @@ import ProductionReportsPage from './features/production/views/reports/reports';
 import ProductionBatchListPage from './features/production/views/production/batches/ProductionBatchListPage';
 import ProductionBatchDetailPage from './features/production/views/production/batches/ProductionBatchDetailPage';
 
+// Costing views
+import CostingDashboard from './features/costing/views/dashboard/CostingDashboard';
+import CostingEntriesPage from './features/costing/views/costing_entries/CostingEntriesPage';
+import CostingEntryDetailPage from './features/costing/views/costing_entries/CostingEntryDetailPage';
+import StandardCostsPage from './features/costing/views/standard_cost/StandardCostsPage';
+import StandardCostDetailPage from './features/costing/views/standard_cost/StandardCostDetailPage';
+import OverheadRatesPage from './features/costing/views/overhead_rates/OverheadRatesPage';
+import ProductCostingPage from './features/costing/views/product_costing/ProductCostingPage';
+import PricingRulesPage from './features/costing/views/pricing_rules/PricingRulesPage';
+import VarianceAnalysisPage from './features/costing/views/variance_analysis/VarianceAnalysisPage';
+import CostingReportsPage from './features/costing/views/costing_reports/CostingReportsPage';
+import CogsPostingPage from './features/costing/views/cogs/CogsPostingPage';
+
 /**
  * Main Application Component
  * 
@@ -377,6 +390,19 @@ function App() {
                   <Route path="/production/rework" element={<ReworkPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/batches" element={<ProductionBatchListPage activeWarehouse={activeWarehouse} />} />
                   <Route path="/production/reports" element={<ProductionReportsPage />} />
+
+                  {/* Costing Module */}
+                  <Route path="/costing" element={<CostingDashboard />} />
+                  <Route path="/costing/entries" element={<CostingEntriesPage />} />
+                  <Route path="/costing/entries/:entryId" element={<CostingEntryDetailPage />} />
+                  <Route path="/costing/standard-costs" element={<StandardCostsPage />} />
+                  <Route path="/costing/standard-costs/:costId" element={<StandardCostDetailPage />} />
+                  <Route path="/costing/overhead-rates" element={<OverheadRatesPage />} />
+                  <Route path="/costing/product-costing" element={<ProductCostingPage />} />
+                  <Route path="/costing/pricing-rules" element={<PricingRulesPage />} />
+                  <Route path="/costing/variance-analysis" element={<VarianceAnalysisPage />} />
+                  <Route path="/costing/reports" element={<CostingReportsPage />} />
+                  <Route path="/costing/cogs-posting" element={<CogsPostingPage />} />
 
                   {/* Placeholder routes for other modules */}
                   <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />

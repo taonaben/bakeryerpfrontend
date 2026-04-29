@@ -22,6 +22,9 @@ import {
   ListOrdered,
   RefreshCcw,
   FileBarChart2,
+  BookOpen,
+  Percent,
+  TrendingUp,
 } from 'lucide-react';
 import type { NavigationItem, ModuleSidebarConfig } from '../types/navigation';
 
@@ -137,6 +140,20 @@ export const navigationItems: NavigationItem[] = [
       'owner_director',
     ],
     isActive: (pathname) => pathname.startsWith('/production'),
+  },
+  {
+    id: 'costing',
+    label: 'Costing',
+    path: '/costing',
+    icon: Calculator,
+    roles: [
+      'accountant',
+      'planner',
+      'manager',
+      'owner_director',
+      'system_admin',
+    ],
+    isActive: (pathname) => pathname.startsWith('/costing'),
   },
   {
     id: 'sales',
@@ -381,6 +398,104 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
+        ],
+      },
+    ],
+  },
+  costing: {
+    moduleId: 'costing',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'costing-dashboard',
+            label: 'Dashboard',
+            path: '/costing',
+            icon: LayoutDashboard,
+            isActive: (pathname) => pathname === '/costing',
+          },
+        ],
+      },
+      {
+        id: 'cost-management',
+        label: 'Cost Management',
+        items: [
+          {
+            id: 'costing-entries',
+            label: 'Costing Entries',
+            path: '/costing/entries',
+            icon: FileText,
+            isActive: (pathname) => pathname.startsWith('/costing/entries'),
+          },
+          {
+            id: 'standard-costs',
+            label: 'Standard Costs',
+            path: '/costing/standard-costs',
+            icon: BookOpen,
+            isActive: (pathname) => pathname.startsWith('/costing/standard-costs'),
+          },
+          {
+            id: 'overhead-rates',
+            label: 'Overhead Rates',
+            path: '/costing/overhead-rates',
+            icon: Percent,
+            isActive: (pathname) => pathname.startsWith('/costing/overhead-rates'),
+          },
+        ],
+      },
+      {
+        id: 'product-costing',
+        label: 'Product Costing',
+        items: [
+          {
+            id: 'product-costing',
+            label: 'Product Costing',
+            path: '/costing/product-costing',
+            icon: Package,
+            isActive: (pathname) => pathname.startsWith('/costing/product-costing'),
+          },
+          {
+            id: 'pricing-rules',
+            label: 'Product Pricing Rules',
+            path: '/costing/pricing-rules',
+            icon: Tag,
+            isActive: (pathname) => pathname.startsWith('/costing/pricing-rules'),
+          },
+        ],
+      },
+      {
+        id: 'analysis',
+        label: 'Analysis',
+        items: [
+          {
+            id: 'variance-analysis',
+            label: 'Variance Analysis',
+            path: '/costing/variance-analysis',
+            icon: TrendingUp,
+            isActive: (pathname) => pathname.startsWith('/costing/variance-analysis'),
+          },
+          {
+            id: 'costing-reports',
+            label: 'Reports & Analytics',
+            path: '/costing/reports',
+            icon: BarChart3,
+            isActive: (pathname) => pathname.startsWith('/costing/reports'),
+          },
+        ],
+      },
+      {
+        id: 'postings',
+        label: 'Postings',
+        items: [
+          {
+            id: 'cogs-posting',
+            label: 'COGS Posting',
+            path: '/costing/cogs-posting',
+            icon: ShoppingBag,
+            isActive: (pathname) => pathname.startsWith('/costing/cogs-posting'),
+          },
         ],
       },
     ],
