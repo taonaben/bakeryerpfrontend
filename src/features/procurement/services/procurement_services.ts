@@ -68,6 +68,16 @@ export const requisitionService = {
     return this.normalizeRequisition(created);
   },
 
+  // ─── Create & Submit (atomic) ────────────────
+  async createAndSubmitRequisition(dto: CreateRequisitionDTO): Promise<PurchaseRequisition> {
+    this.validateRequisition(dto);
+    const created = await requisitionApi.createAndSubmitRequisition({
+      ...dto,
+      submitted_by: this._getCurrentUserId(),
+    });
+    return this.normalizeRequisition(created);
+  },
+
   // ─── Full Update (PUT) ──────────────────────
   async updateRequisition(
     id: string,

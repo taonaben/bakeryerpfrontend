@@ -320,42 +320,81 @@ const CostingReportsPage: React.FC = () => {
   // ── Derived ───────────────────────────────────────
 
   // Cost trend chart data
-  const trendChartData = trendData.map((d) => ({
-    name: fmtDate(d.computed_at),
+  const trendChartData = (Array.isArray(trendData) ? trendData : []).map((d) => ({
+    name: d.computed_at ? fmtDate(d.computed_at) : '—',
     'Cost / Unit': parseFloat(d.cost_per_unit) || 0,
-    batch: d.batch_number,
+    batch: d.batch_number ?? '',
   }));
   const trendKpi = (() => {
-    if (trendData.length < 2) return undefined;
+    if (!Array.isArray(trendData) || trendData.length < 2) return undefined;
     const first = parseFloat(trendData[0].cost_per_unit) || 0;
     const last = parseFloat(trendData[trendData.length - 1].cost_per_unit) || 0;
-    const pct = first > 0 ? Math.abs(((last - first) / first) * 100).toFixed(1) : null;
-    return { label: 'latest cost / unit', value: fmt(last), delta: pct ? `${pct}%` : undefined, deltaUp: last > first };
+    const pct = first > 0 ? Math.abs(((last - first) / first) * 100) : null;
+    return {
+      label: 'latest cost / unit',
+      value: fmt(last),
+      delta: pct != null && isFinite(pct) ? `${pct.toFixed(1)}%` : undefined,
+      deltaUp: last > first,
+    };
   })();
 
   // Variance bar chart
-  const varChartData = varData.slice(0, 8).map((d) => ({
-    name: d.product_name.length > 12 ? d.product_name.slice(0, 12) + '…' : d.product_name,
-    Favourable: parseFloat(d.total_variance) <= 0 ? Math.abs(parseFloat(d.total_variance)) : 0,
-    Adverse: parseFloat(d.total_variance) > 0 ? parseFloat(d.total_variance) : 0,
-  }));
+  const varChartData = (Array.isArray(varData) ? varData : []).slice(0, 8).map((d) => {
+    const name = d.product_name ?? d.product_id ?? '—';
+    return {
+      name: name.length > 12 ? name.slice(0, 12) + '…' : name,
+      Favourable: parseFloat(d.total_variance) <= 0 ? Math.abs(parseFloat(d.total_variance) || 0) : 0,
+      Adverse: parseFloat(d.total_variance) > 0 ? (parseFloat(d.total_variance) || 0) : 0,
+    };
+  });
 
   // Margin bar chart
-  const marginChartData = marginData.slice(0, 8).map((d) => ({
-    name: d.product_name.length > 12 ? d.product_name.slice(0, 12) + '…' : d.product_name,
-    'Std Cost': parseFloat(d.standard_cost_per_unit) || 0,
-    'Rec. Price': parseFloat(d.recommended_selling_price) || 0,
-  }));
+  const marginChartData = (Array.isArray(marginData) ? marginData : []).slice(0, 8).map((d) => {
+    const name = d.product_name ?? d.product_id ?? '—';
+    return {
+      name: name.length > 12 ? name.slice(0, 12) + '…' : name,
+      'Std Cost': parseFloat(d.standard_cost_per_unit) || 0,
+      'Rec. Price': parseFloat(d.recommended_selling_price) || 0,
+    };
+  });
 
   // Ingredient donut
-  const ingTotal = ingData.reduce((s, d) => s + (parseFloat(d.cost_per_unit) || 0), 0);
-  const ingPieData = ingData
-    .map((d) => ({ name: d.product_name, value: parseFloat(d.cost_per_unit) || 0, pct: ingTotal > 0 ? ((parseFloat(d.cost_per_unit) || 0) / ingTotal) * 100 : 0 }))
+  const safeIngData = Array.isArray(ingData) ? ingData : [];
+  const ingTotal = safeIngData.reduce((s, d) => s + (parseFloat(d.cost_per_unit) || 0), 0);
+  const ingPieData = safeIngData
+    .map((d) => {
+      const raw = d as any;
+      // Try every field name the server might use for the ingredient name
+      const name: string =
+        raw.ingredient_name ??
+        raw.product_name ??
+        raw.name ??
+        raw.ingredient ??
+        raw.material_name ??
+        raw.item_name ??
+        raw.product_id ??
+        '—';
+
+      const value = parseFloat(d.cost_per_unit) || 0;
+
+      // Prefer server-computed percentage; fall back to calculating it
+      const serverPct = parseFloat(raw.cost_percentage ?? raw.percentage ?? '');
+      const pct = isFinite(serverPct) && serverPct > 0
+        ? serverPct
+        : ingTotal > 0 ? (value / ingTotal) * 100 : 0;
+
+      return { name, value, pct: isFinite(pct) ? pct : 0 };
+    })
     .sort((a, b) => b.value - a.value)
     .slice(0, 6);
 
-  const ingKpi = ingPieData[0]
-    ? { label: 'top ingredient', value: ingPieData[0].name, delta: `${ingPieData[0].pct.toFixed(1)}% of cost`, deltaUp: false }
+  const ingKpi = ingPieData[0] && ingPieData[0].name !== '—'
+    ? {
+        label: 'top ingredient',
+        value: ingPieData[0].name,
+        delta: `${ingPieData[0].pct.toFixed(1)}% of cost`,
+        deltaUp: false,
+      }
     : undefined;
 
   return (
@@ -478,7 +517,7 @@ const CostingReportsPage: React.FC = () => {
                   <span className="rpt2-legend__item"><span style={{ background: P.primary }} />Rec. Price</span>
                 </div>
                 {/* Margin squeeze alerts */}
-                {marginData.some((d) => {
+                {(Array.isArray(marginData) ? marginData : []).some((d) => {
                   const cost = parseFloat(d.standard_cost_per_unit) || 0;
                   const price = parseFloat(d.recommended_selling_price) || 0;
                   const target = parseFloat(d.target_gross_margin_percentage) || 0;

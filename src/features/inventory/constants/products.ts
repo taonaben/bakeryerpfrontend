@@ -13,3 +13,11 @@ export const STORAGE_CONDITIONS = [
   { value: 'refrigerated', label: 'Refrigerated' },
   { value: 'frozen', label: 'Frozen' },
 ] as const;
+
+export const PRODUCT_CATEGORIES = [
+  { value: 'ingredients', label: 'Ingredients' },
+  { value: 'packaging', label: 'Packaging' },
+  { value: 'byproduct', label: 'Byproduct' },
+  { value: 'waste', label: 'Waste' },
+  { value: 'machinery', label: 'Machinery' },
+] as const;

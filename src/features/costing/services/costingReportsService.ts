@@ -19,23 +19,43 @@ export const costingReportsService = {
     productId: string,
     filters?: CostTrendFilters,
   ): Promise<CostTrendDataPoint[]> {
-    if (!productId) throw new Error('Product ID is required');
-    return costingReportsApi.getCostTrend(productId, filters);
+    if (!productId) return [];
+    try {
+      const result = await costingReportsApi.getCostTrend(productId, filters);
+      return Array.isArray(result) ? result : [];
+    } catch {
+      return [];
+    }
   },
 
   async getVarianceAnalysis(
     filters?: VarianceAnalysisReportFilters,
   ): Promise<VarianceAnalysisReport[]> {
-    return costingReportsApi.getVarianceAnalysis(filters);
+    try {
+      const result = await costingReportsApi.getVarianceAnalysis(filters);
+      return Array.isArray(result) ? result : [];
+    } catch {
+      return [];
+    }
   },
 
   async getMarginReport(filters?: MarginReportFilters): Promise<MarginReportItem[]> {
-    return costingReportsApi.getMarginReport(filters);
+    try {
+      const result = await costingReportsApi.getMarginReport(filters);
+      return Array.isArray(result) ? result : [];
+    } catch {
+      return [];
+    }
   },
 
   async getIngredientCostBreakdown(
     filters?: IngredientCostBreakdownFilters,
   ): Promise<IngredientCostBreakdownItem[]> {
-    return costingReportsApi.getIngredientCostBreakdown(filters);
+    try {
+      const result = await costingReportsApi.getIngredientCostBreakdown(filters);
+      return Array.isArray(result) ? result : [];
+    } catch {
+      return [];
+    }
   },
 };

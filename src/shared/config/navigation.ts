@@ -224,7 +224,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'procurement-dashboard', label: 'Dashboard', path: '/procurement', icon: LayoutDashboard },
+          { id: 'procurement-dashboard', label: 'Overview', path: '/procurement', icon: LayoutDashboard },
         ],
       },
       {
@@ -248,6 +248,13 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'procurement-suppliers', label: 'Suppliers', path: '/procurement/suppliers', icon: Users },
+          {
+            id: 'supplier-products',
+            label: 'Supplier Products',
+            path: '/procurement/supplier-products',
+            icon: Tag,
+            isActive: (pathname) => pathname.startsWith('/procurement/supplier-products'),
+          },
         ],
       },
     ],
@@ -259,7 +266,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'inventory-dashboard', label: 'Dashboard', path: '/inventory', icon: LayoutDashboard },
+          { id: 'inventory-dashboard', label: 'Overview', path: '/inventory', icon: LayoutDashboard },
         ],
       },
       {
@@ -287,7 +294,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'formulation-dashboard', label: 'Dashboard', path: '/formulation', icon: LayoutDashboard },
+          { id: 'formulation-dashboard', label: 'Overview', path: '/formulation', icon: LayoutDashboard },
         ],
       },
     ],
@@ -302,7 +309,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         items: [
           {
             id: 'production-dashboard',
-            label: 'Dashboard',
+            label: 'Overview',
             path: '/production',
             icon: LayoutDashboard,
             isActive: (pathname) => pathname === '/production',
@@ -381,7 +388,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'finance-dashboard', label: 'Dashboard', path: '/finance', icon: LayoutDashboard },
+          { id: 'finance-dashboard', label: 'Overview', path: '/finance', icon: LayoutDashboard },
         ],
       },
       {
@@ -411,7 +418,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         items: [
           {
             id: 'costing-dashboard',
-            label: 'Dashboard',
+            label: 'Overview',
             path: '/costing',
             icon: LayoutDashboard,
             isActive: (pathname) => pathname === '/costing',

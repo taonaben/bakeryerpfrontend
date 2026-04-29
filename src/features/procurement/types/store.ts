@@ -1,4 +1,4 @@
-import type { PurchaseRequisition, UpdateRequisitionDTO, Supplier, UpdateSupplierDTO, AddProductToSupplierDTO, CreateContactDTO, UpdateContactDTO, CreateDocumentDTO, UpdateDocumentDTO } from './models';
+import type { PurchaseRequisition, UpdateRequisitionDTO, Supplier, UpdateSupplierDTO, AddProductToSupplierDTO, CreateContactDTO, UpdateContactDTO, CreateDocumentDTO, UpdateDocumentDTO, SupplierProduct, SupplierProductQueryParams, CreateSupplierProductDTO, UpdateSupplierProductDTO } from './models';
 import type { PurchaseOrder, UpdatePurchaseOrderDTO } from './purchase_orders_models';
 import type { GoodsReceipt, UpdateGoodsReceiptDTO, GoodsReceiptListFilters } from './grn_models';
 import type {
@@ -262,4 +262,42 @@ export interface SupplierInvoiceListState {
   invalidateCache: () => void;
   notifyMutation: () => void;
   setError: (error: string | null) => void;
+}
+
+// ──────────────────────────────────────────────
+// Supplier Products Store State
+// ──────────────────────────────────────────────
+
+export interface SupplierProductsState {
+  /** Flat list of supplier-product links for the current query */
+  items: SupplierProduct[];
+
+  /** The active query params used for the last fetch */
+  queryParams: SupplierProductQueryParams;
+
+  /** Single record being viewed/edited */
+  selected: SupplierProduct | null;
+
+  isLoading: boolean;
+  isSaving: boolean;
+  isDeactivating: boolean;
+  error: string | null;
+
+  /** Fetch list — requires at least product_id or supplier_id */
+  fetchSupplierProducts: (params: SupplierProductQueryParams) => Promise<void>;
+
+  /** Fetch a single record by its own ID */
+  fetchSupplierProduct: (id: string) => Promise<void>;
+
+  /** Add a supplier to a product's catalogue */
+  createSupplierProduct: (productId: string, dto: CreateSupplierProductDTO) => Promise<SupplierProduct>;
+
+  /** Update price, lead time, preferred flag, or active flag */
+  updateSupplierProduct: (id: string, dto: UpdateSupplierProductDTO) => Promise<SupplierProduct>;
+
+  /** Soft-deactivate a supplier-product link */
+  deactivateSupplierProduct: (id: string) => Promise<SupplierProduct>;
+
+  /** Clear list and selected record */
+  clearSupplierProducts: () => void;
 }
