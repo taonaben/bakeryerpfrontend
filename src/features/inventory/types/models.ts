@@ -20,7 +20,7 @@ export interface BatchRegistry extends Timestamp {
 }
 
 export interface StockMovementBatchDetail {
-  batch: BatchRegistry;
+  batch: BatchRegistry & { product_name?: string; warehouse_name?: string };
   quantity: number | string;
 }
 export interface StockMovement extends Timestamp {

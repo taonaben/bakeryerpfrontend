@@ -25,6 +25,8 @@ import {
   BookOpen,
   Percent,
   TrendingUp,
+  Wallet,
+  AlertCircle,
 } from 'lucide-react';
 import type { NavigationItem, ModuleSidebarConfig } from '../types/navigation';
 
@@ -502,6 +504,111 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
             path: '/costing/cogs-posting',
             icon: ShoppingBag,
             isActive: (pathname) => pathname.startsWith('/costing/cogs-posting'),
+          },
+        ],
+      },
+    ],
+  },
+
+  sales: {
+    moduleId: 'sales',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'sales-dashboard',
+            label: 'Overview',
+            path: '/sales',
+            icon: LayoutDashboard,
+            isActive: (pathname) => pathname === '/sales',
+          },
+        ],
+      },
+      {
+        id: 'orders',
+        label: 'Orders',
+        items: [
+          {
+            id: 'sales-orders',
+            label: 'Sales Orders',
+            path: '/sales/orders',
+            icon: ShoppingCart,
+            isActive: (pathname) => pathname.startsWith('/sales/orders'),
+          },
+        ],
+      },
+      {
+        id: 'fulfilment',
+        label: 'Fulfilment',
+        items: [
+          {
+            id: 'sales-deliveries',
+            label: 'Deliveries',
+            path: '/sales/deliveries',
+            icon: Truck,
+            isActive: (pathname) => pathname.startsWith('/sales/deliveries'),
+          },
+        ],
+      },
+      {
+        id: 'billing',
+        label: 'Billing',
+        items: [
+          {
+            id: 'sales-invoices',
+            label: 'Invoices',
+            path: '/sales/invoices',
+            icon: Receipt,
+            isActive: (pathname) => pathname.startsWith('/sales/invoices'),
+          },
+          {
+            id: 'sales-payments',
+            label: 'Payments',
+            path: '/sales/payments',
+            icon: Wallet,
+            isActive: (pathname) => pathname.startsWith('/sales/payments'),
+          },
+        ],
+      },
+      {
+        id: 'customers',
+        label: 'Customers',
+        items: [
+          {
+            id: 'sales-customers',
+            label: 'Customers',
+            path: '/sales/customers',
+            icon: Users,
+            isActive: (pathname) => pathname.startsWith('/sales/customers'),
+          },
+          {
+            id: 'sales-price-agreements',
+            label: 'Pricing Agreements',
+            path: '/sales/price-agreements',
+            icon: FileText,
+            isActive: (pathname) => pathname.startsWith('/sales/price-agreements'),
+          },
+        ],
+      },
+      {
+        id: 'reports',
+        label: 'Reports & Analytics',
+        items: [
+          {
+            id: 'sales-reports',
+            label: 'Sales Reports',
+            path: '/sales/reports',
+            icon: BarChart3,
+            isActive: (pathname) => pathname.startsWith('/sales/reports'),
+          },
+          {
+            id: 'sales-debtors',
+            label: 'Debtor Management',
+            path: '/sales/debtors',
+            icon: AlertCircle,
+            isActive: (pathname) => pathname.startsWith('/sales/debtors'),
           },
         ],
       },

@@ -79,6 +79,15 @@ import VarianceAnalysisPage from './features/costing/views/variance_analysis/Var
 import CostingReportsPage from './features/costing/views/costing_reports/CostingReportsPage';
 import CogsPostingPage from './features/costing/views/cogs/CogsPostingPage';
 
+// Sales views
+import SalesOrdersPage from './features/sales/views/sales_orders/SalesOrdersPage';
+import DeliveriesPage from './features/sales/views/deliveries/DeliveriesPage';
+import SalesInvoicesPage from './features/sales/views/invoices/InvoicesPage';
+import PaymentsPage from './features/sales/views/payments/PaymentsPage';
+import CustomersPage from './features/sales/views/customers/CustomersPage';
+import PriceAgreementsPage from './features/sales/views/price_agreements/PriceAgreementsPage';
+import DebtorManagementPage from './features/sales/views/debtor_management/DebtorManagementPage';
+
 /**
  * Main Application Component
  * 
@@ -408,8 +417,16 @@ function App() {
                   <Route path="/costing/reports" element={<CostingReportsPage />} />
                   <Route path="/costing/cogs-posting" element={<CogsPostingPage />} />
 
-                  {/* Placeholder routes for other modules */}
-                  <Route path="/sales" element={<div style={{ padding: '30px' }}>Sales Module (Coming Soon)</div>} />
+                  {/* Sales Module */}
+                  <Route path="/sales" element={<SalesOrdersPage />} />
+                  <Route path="/sales/orders" element={<SalesOrdersPage />} />
+                  <Route path="/sales/deliveries" element={<DeliveriesPage />} />
+                  <Route path="/sales/invoices" element={<SalesInvoicesPage />} />
+                  <Route path="/sales/payments" element={<PaymentsPage />} />
+                  <Route path="/sales/customers" element={<CustomersPage />} />
+                  <Route path="/sales/price-agreements" element={<PriceAgreementsPage />} />
+                  <Route path="/sales/reports" element={<div style={{ padding: '30px' }}>Sales Reports (Coming Soon)</div>} />
+                  <Route path="/sales/debtors" element={<DebtorManagementPage />} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
                   <Route path="/settings" element={<div style={{ padding: '30px' }}>Settings (Coming Soon)</div>} />
 
