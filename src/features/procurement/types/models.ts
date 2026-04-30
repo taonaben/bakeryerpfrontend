@@ -117,10 +117,9 @@ export interface ConvertRequisitionDTO {
 
 export type SupplierType =
   | 'MANUFACTURER'
-  | 'WHOLESALER'
   | 'DISTRIBUTOR'
-  | 'RETAILER'
-  | 'SERVICE_PROVIDER';
+  | 'AGENT'
+  | 'INDIVIDUAL';
 
 export type PaymentTerms =
   | 'NET_30'
