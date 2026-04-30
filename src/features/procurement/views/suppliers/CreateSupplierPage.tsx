@@ -18,10 +18,9 @@ import '../../styles/procurement.css';
 
 const SUPPLIER_TYPE_OPTIONS: { value: SupplierType; label: string }[] = [
   { value: 'MANUFACTURER', label: 'Manufacturer' },
-  { value: 'WHOLESALER', label: 'Wholesaler' },
   { value: 'DISTRIBUTOR', label: 'Distributor' },
-  { value: 'RETAILER', label: 'Retailer' },
-  { value: 'SERVICE_PROVIDER', label: 'Service Provider' },
+  { value: 'AGENT', label: 'Agent' },
+  { value: 'INDIVIDUAL', label: 'Individual' },
 ];
 
 const PAYMENT_TERMS_OPTIONS: { value: PaymentTerms; label: string }[] = [
