@@ -113,7 +113,7 @@ export const useCustomersStore = create<CustomersState>()(
         try {
           const created = await customersService.create(dto);
           set((d) => {
-            d.items = [created, ...d.items];
+            d.items = [created, ...(Array.isArray(d.items) ? d.items : [])];
             d.detailMap[created.id] = created;
             d.isSubmitting = false;
             d.lastFetched = null;

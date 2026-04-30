@@ -81,10 +81,14 @@ import CogsPostingPage from './features/costing/views/cogs/CogsPostingPage';
 
 // Sales views
 import SalesOrdersPage from './features/sales/views/sales_orders/SalesOrdersPage';
+import CreateSalesOrderPage from './features/sales/views/sales_orders/CreateSalesOrderPage';
+import SalesOrderDetailPage from './features/sales/views/sales_orders/SalesOrderDetailPage';
 import DeliveriesPage from './features/sales/views/deliveries/DeliveriesPage';
 import SalesInvoicesPage from './features/sales/views/invoices/InvoicesPage';
 import PaymentsPage from './features/sales/views/payments/PaymentsPage';
 import CustomersPage from './features/sales/views/customers/CustomersPage';
+import CustomerDetailPage from './features/sales/views/customers/CustomerDetailPage';
+import CreateCustomerPage from './features/sales/views/customers/CreateCustomerPage';
 import PriceAgreementsPage from './features/sales/views/price_agreements/PriceAgreementsPage';
 import DebtorManagementPage from './features/sales/views/debtor_management/DebtorManagementPage';
 
@@ -418,12 +422,17 @@ function App() {
                   <Route path="/costing/cogs-posting" element={<CogsPostingPage />} />
 
                   {/* Sales Module */}
-                  <Route path="/sales" element={<SalesOrdersPage />} />
-                  <Route path="/sales/orders" element={<SalesOrdersPage />} />
+                  <Route path="/sales" element={<SalesOrdersPage activeWarehouse={activeWarehouse ?? undefined} />} />
+                  <Route path="/sales/orders/new" element={<CreateSalesOrderPage activeWarehouse={activeWarehouse ?? undefined} />} />
+                  <Route path="/sales/orders" element={<SalesOrdersPage activeWarehouse={activeWarehouse ?? undefined} />} />
+                  <Route path="/sales/orders/:orderId" element={<SalesOrderDetailPage />} />
                   <Route path="/sales/deliveries" element={<DeliveriesPage />} />
                   <Route path="/sales/invoices" element={<SalesInvoicesPage />} />
                   <Route path="/sales/payments" element={<PaymentsPage />} />
+                  {/* IMPORTANT: Static routes MUST come before param routes */}
+                  <Route path="/sales/customers/new" element={<CreateCustomerPage />} />
                   <Route path="/sales/customers" element={<CustomersPage />} />
+                  <Route path="/sales/customers/:customerId" element={<CustomerDetailPage />} />
                   <Route path="/sales/price-agreements" element={<PriceAgreementsPage />} />
                   <Route path="/sales/reports" element={<div style={{ padding: '30px' }}>Sales Reports (Coming Soon)</div>} />
                   <Route path="/sales/debtors" element={<DebtorManagementPage />} />

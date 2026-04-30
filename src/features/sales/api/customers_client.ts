@@ -18,7 +18,8 @@ const BASE = '/sales/customers';
 export const customersApi = {
   getAll: async (params?: Record<string, any>): Promise<Customer[]> => {
     const { data } = await apiClient.get(BASE, { params });
-    return data;
+    // DRF returns paginated { count, results: [...] } — unwrap if needed
+    return Array.isArray(data) ? data : (data?.results ?? []);
   },
 
   getById: async (id: string): Promise<CustomerDetail> => {

@@ -11,7 +11,7 @@ const BASE = '/sales/deliveries';
 export const deliveriesApi = {
   getAll: async (params?: Record<string, any>): Promise<Delivery[]> => {
     const { data } = await apiClient.get(BASE, { params });
-    return data;
+    return Array.isArray(data) ? data : (data?.results ?? []);
   },
 
   getById: async (id: string): Promise<DeliveryDetail> => {
