@@ -135,7 +135,7 @@ const CreateProductPage: React.FC = () => {
                   >
                     <option value="">Select Category</option>
                     {PRODUCT_CATEGORIES.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
+                      <option key={cat.value} value={cat.value} title={cat.hint}>
                         {cat.label}
                       </option>
                     ))}

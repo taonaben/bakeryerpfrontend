@@ -45,6 +45,8 @@ const ProductDetailPage: React.FC = () => {
     storage_conditions: '',
     storage_notes: '',
   });
+  const [isDirty, setIsDirty] = useState(false);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [policyForm, setPolicyForm] = useState({
     warehouse: '',
     min_stock_level: '',
@@ -154,6 +156,7 @@ const ProductDetailPage: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setIsDirty(true);
   };
 
   const handlePolicyChange = (
@@ -207,6 +210,7 @@ const ProductDetailPage: React.FC = () => {
       storage_conditions: formData.storage_conditions,
       storage_notes: formData.storage_notes || undefined,
     });
+    setIsDirty(false);
   };
 
   const handleDelete = async () => {
@@ -267,6 +271,29 @@ const ProductDetailPage: React.FC = () => {
     }));
   };
 
+  const handleBack = () => {
+    if (isDirty) {
+      setShowUnsavedModal(true);
+    } else {
+      navigate('/inventory/products');
+    }
+  };
+
+  const handleSaveAndBack = async () => {
+    if (!productId) return;
+    await updateProduct(productId, {
+      name: formData.name,
+      category: formData.category,
+      unit_of_measure: formData.unit_of_measure,
+      shelf_life_days: Number(formData.shelf_life_days || 0),
+      storage_conditions: formData.storage_conditions,
+      storage_notes: formData.storage_notes || undefined,
+    });
+    setIsDirty(false);
+    setShowUnsavedModal(false);
+    navigate('/inventory/products');
+  };
+
   if (isLoading && !product) {
     return (
       <div className="products-page">
@@ -291,7 +318,7 @@ const ProductDetailPage: React.FC = () => {
               <button
                 className="btn btn-ghost products-back-link"
                 type="button"
-                onClick={() => navigate('/inventory/products')}
+                onClick={handleBack}
               >
                 <ArrowLeft size={16} /> Back to Products
               </button>
@@ -363,7 +390,7 @@ const ProductDetailPage: React.FC = () => {
                       >
                         <option value="">Select Category</option>
                         {PRODUCT_CATEGORIES.map((cat) => (
-                          <option key={cat.value} value={cat.value}>
+                          <option key={cat.value} value={cat.value} title={cat.hint}>
                             {cat.label}
                           </option>
                         ))}
@@ -433,7 +460,7 @@ const ProductDetailPage: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-outline"
-                      onClick={() => navigate('/inventory/products')}
+                      onClick={handleBack}
                     >
                       Cancel
                     </button>
@@ -604,6 +631,42 @@ const ProductDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Unsaved changes modal */}
+      {showUnsavedModal && (
+        <div className="modal-overlay" onClick={() => setShowUnsavedModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Unsaved Changes</h3>
+            <p>You have unsaved changes to this product. What would you like to do?</p>
+            <div className="modal-actions">
+              <button
+                className="btn btn-outline"
+                onClick={() => setShowUnsavedModal(false)}
+              >
+                Stay
+              </button>
+              <button
+                className="btn btn-outline"
+                style={{ color: '#ef4444', borderColor: '#fecaca' }}
+                onClick={() => {
+                  setShowUnsavedModal(false);
+                  setIsDirty(false);
+                  navigate('/inventory/products');
+                }}
+              >
+                Discard & Go Back
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleSaveAndBack}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Saving…' : 'Save & Go Back'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
