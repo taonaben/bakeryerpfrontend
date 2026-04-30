@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useUserStore } from '@/features/auth/stores/userStore';
 import { warehouseService } from '@/core/warehouses/services/warehouseService';
 import type { Warehouse } from '@/core/warehouses/types/models';
-import { UNIT_OF_MEASURE, STORAGE_CONDITIONS } from '../../constants/products';
+import { UNIT_OF_MEASURE, STORAGE_CONDITIONS, PRODUCT_CATEGORIES } from '../../constants/products';
 import { useProductDetailStore, useReorderPolicyStore } from '../../stores';
 import type { RetrievalMethod } from '../../types/reorderPolicyModel';
 import '../../styles/products.css';
@@ -355,12 +355,19 @@ const ProductDetailPage: React.FC = () => {
                     </div>
                     <div className="form-group">
                       <label htmlFor="edit-product-category">Category</label>
-                      <input
+                      <select
                         id="edit-product-category"
                         name="category"
                         value={formData.category}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="">Select Category</option>
+                        {PRODUCT_CATEGORIES.map((cat) => (
+                          <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 

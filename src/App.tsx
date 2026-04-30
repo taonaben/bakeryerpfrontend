@@ -92,6 +92,7 @@ import CustomersPage from './features/sales/views/customers/CustomersPage';
 import CustomerDetailPage from './features/sales/views/customers/CustomerDetailPage';
 import CreateCustomerPage from './features/sales/views/customers/CreateCustomerPage';
 import EditCustomerPage from './features/sales/views/customers/EditCustomerPage';
+import SalesReportsPage from './features/sales/views/reports/SalesReports';
 import PriceAgreementsPage from './features/sales/views/price_agreements/PriceAgreementsPage';
 import DebtorManagementPage from './features/sales/views/debtor_management/DebtorManagementPage';
 
@@ -440,7 +441,7 @@ function App() {
                   <Route path="/sales/customers/:customerId/edit" element={<EditCustomerPage />} />
                   <Route path="/sales/customers/:customerId" element={<CustomerDetailPage />} />
                   <Route path="/sales/price-agreements" element={<PriceAgreementsPage />} />
-                  <Route path="/sales/reports" element={<div style={{ padding: '30px' }}>Sales Reports (Coming Soon)</div>} />
+                  <Route path="/sales/reports" element={<SalesReportsPage />} />
                   <Route path="/sales/debtors" element={<DebtorManagementPage />} />
                   <Route path="/reports" element={<div style={{ padding: '30px' }}>Reports Module (Coming Soon)</div>} />
                   <Route path="/settings" element={<div style={{ padding: '30px' }}>Settings (Coming Soon)</div>} />

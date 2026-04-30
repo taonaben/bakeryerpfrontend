@@ -1874,3 +1874,305 @@
   padding-top: 12px;
   flex-wrap: wrap;
 }
+
+/* ═══════════════════════════════════════════════
+   Price Agreements Page — filter row
+   ═══════════════════════════════════════════════ */
+.pa-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
+.pa-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 7px 10px;
+  background: var(--bg-secondary, #fff);
+  color: #94a3b8;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.pa-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--text-dark, #1e293b);
+  width: 100%;
+}
+
+.pa-search input::placeholder {
+  color: #94a3b8;
+}
+
+.pa-filter-select {
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--bg-secondary, #fff);
+  color: var(--text-dark, #1e293b);
+  cursor: pointer;
+}
+
+.pa-filter-select:focus {
+  outline: none;
+  border-color: var(--marble-blue, #566d7e);
+}
+
+/* ═══════════════════════════════════════════════
+   Sales Reports Page
+   ═══════════════════════════════════════════════ */
+
+/* KPI strip */
+.sr-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .sr-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+}
+
+.sr-kpi {
+  background: var(--bg-secondary, #fff);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sr-kpi__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sr-kpi__value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-dark, #1e293b);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section */
+.sr-section {
+  margin-bottom: 32px;
+}
+
+.sr-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.sr-section__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dark, #1e293b);
+}
+
+.sr-section__title-row h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sr-section__title-row svg {
+  color: var(--marble-blue, #566d7e);
+  flex-shrink: 0;
+}
+
+/* Margin % badge */
+.sr-margin-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sr-margin-badge.low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Tooltip (reused from costing) */
+.rpt-tooltip {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #f8fafc;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  min-width: 140px;
+}
+
+.rpt-tooltip__label {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.rpt-tooltip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.rpt-tooltip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rpt-tooltip__name {
+  flex: 1;
+  color: #cbd5e1;
+}
+
+.rpt-tooltip__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════
+   Debtor Management Page
+   ═══════════════════════════════════════════════ */
+
+/* KPI strip */
+.dm-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .dm-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+}
+
+.dm-kpi {
+  padding: 16px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dm-kpi--danger  { background: #fef2f2; border-color: #fecaca; }
+.dm-kpi--warning { background: #fff7ed; border-color: #fed7aa; }
+.dm-kpi--red     { background: #fef2f2; border-color: #fca5a5; }
+.dm-kpi--amber   { background: #fefce8; border-color: #fde68a; }
+
+.dm-kpi__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dm-kpi__value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-dark, #1e293b);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Filter row */
+.dm-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* Row actions */
+.dm-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* Payment panel summary */
+.dm-payment-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.dm-payment-summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Statement modal KPIs */
+.dm-stmt-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.dm-stmt-kpi {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dm-stmt-kpi__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dm-stmt-kpi__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark, #1e293b);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Spin animation for refresh icon */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 0.8s linear infinite;
+}
