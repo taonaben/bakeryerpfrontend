@@ -34,7 +34,12 @@ export interface CreateCustomerDTO {
   tax_number?: string;
 }
 
-export type UpdateCustomerDTO = Partial<Omit<CreateCustomerDTO, 'customer_type'> & { is_active: boolean }>;
+export type UpdateCustomerDTO = Partial<
+  Omit<CreateCustomerDTO, 'customer_type' | 'credit_limit'> & {
+    credit_limit: string | null;
+    is_active: boolean;
+  }
+>;
 
 export interface CustomerFilters {
   customer_type?: CustomerType;

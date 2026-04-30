@@ -10,6 +10,8 @@ export interface Payment {
   invoice_number: string;
   customer: string;
   customer_name: string;
+  warehouse?: string;
+  warehouse_name?: string;
   amount: string;
   payment_method: PaymentMethod;
   payment_date: string;
@@ -21,6 +23,7 @@ export interface Payment {
 export interface RecordPaymentDTO {
   amount: string;
   payment_method: PaymentMethod;
+  payment_date?: string;
   reference?: string;
   notes?: string;
   allow_overpayment?: boolean;
@@ -28,6 +31,7 @@ export interface RecordPaymentDTO {
 
 export interface PaymentFilters {
   customer_id?: string;
+  warehouse_id?: string;
   payment_method?: PaymentMethod;
   date_from?: string;
   date_to?: string;

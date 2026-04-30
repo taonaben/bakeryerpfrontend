@@ -1,75 +1,268 @@
-import React from 'react';
-import { ShoppingCart, Plus, Filter, Search } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, MoreHorizontal, Download, AlertTriangle, ShoppingCart } from 'lucide-react';
+import { useOrdersStore } from '../../stores/ordersStore';
+import type { OrderStatus } from '../../types/shared';
+import ProcurementToolbar from '../../../procurement/components/toolbar';
+import type { StatusTabConfig } from '../../../procurement/components/toolbar';
+import '../../styles/sales.css';
+import '../../../procurement/styles/procurement.css';
 
-const SalesOrdersPage: React.FC = () => {
-  return (
-    <div style={{ padding: '30px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: '10px',
-            background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <ShoppingCart size={22} color="#10b981" />
+// ──────────────────────────────────────────────
+// Sales Order status tabs
+// ──────────────────────────────────────────────
+const ORDER_STATUS_TABS: StatusTabConfig[] = [
+  { label: 'All', value: '' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Confirmed', value: 'confirmed' },
+  { label: 'Cancelled', value: 'cancelled' },
+];
+
+interface SalesOrdersPageProps {
+  activeWarehouse?: { id: string; name: string } | null;
+}
+
+const SalesOrdersPage: React.FC<SalesOrdersPageProps> = ({ activeWarehouse }) => {
+  const navigate = useNavigate();
+  const {
+    items: orders,
+    isLoading,
+    error,
+    fetchAll,
+  } = useOrdersStore();
+
+  // Filters
+  const [activeStatus, setActiveStatus] = useState<OrderStatus | ''>('');
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Summary stats
+  const [stats, setStats] = useState({
+    totalToday: 0,
+    pendingConfirmation: 0,
+    awaitingDispatch: 0,
+    overdue: 0,
+  });
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Fetch orders
+  const fetchData = useCallback(async () => {
+    const filters: any = {};
+    if (activeStatus) filters.status = activeStatus;
+    if (activeWarehouse?.id) filters.warehouse_id = activeWarehouse.id;
+    if (debouncedSearch) {
+      // Backend doesn't have search param in docs, but we'll filter client-side
+    }
+    await fetchAll(filters, true);
+  }, [activeStatus, activeWarehouse?.id, debouncedSearch, fetchAll]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Compute stats from orders
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const totalToday = orders.filter((o) => o.order_date.startsWith(today)).length;
+    const pendingConfirmation = orders.filter((o) => o.status === 'draft').length;
+    const awaitingDispatch = orders.filter((o) => o.status === 'confirmed').length;
+    // Overdue: confirmed but expected_delivery_date is past
+    const overdue = 0; // Would need expected_delivery_date in list response
+
+    setStats({ totalToday, pendingConfirmation, awaitingDispatch, overdue });
+  }, [orders]);
+
+  // Client-side search filter
+  const filteredOrders = debouncedSearch
+    ? orders.filter((o) =>
+        [o.order_number, o.customer_name, o.warehouse_name]
+          .join(' ')
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase()),
+      )
+    : orders;
+
+  // Guard — require warehouse
+  if (!activeWarehouse?.id) {
+    return (
+      <div className="procurement-page" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <div className="empty-state" style={{ paddingTop: 100 }}>
+          <div className="empty-state__icon">
+            <AlertTriangle size={48} color="#f59e0b" />
           </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 700 }}>Sales Orders</h1>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#6b7280' }}>
-              Create and manage B2B and POS sales orders
+          <h3 className="empty-state__title">No Warehouse Selected</h3>
+          <p className="empty-state__description">
+            Please select a warehouse from the sidebar to view sales orders.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="procurement-page">
+      <div className="procurement-sticky-stack">
+        {/* Page Header */}
+        <div className="procurement-page-header">
+          <div className="procurement-page-header__left">
+            <h1>Sales Orders</h1>
+            <p className="procurement-page-header__breadcrumb">Sales / Orders</p>
+          </div>
+          <div className="procurement-page-header__actions">
+            <button className="btn btn-outline" type="button" title="Export">
+              <Download size={18} />
+              Export
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate('/sales/orders/new')}
+              type="button"
+            >
+              <Plus size={18} />
+              New Order
+            </button>
+            <button
+              className="btn btn-outline"
+              type="button"
+              aria-label="More actions"
+              title="More actions"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Toolbar — status tabs + search */}
+        <ProcurementToolbar
+          searchTerm={searchInput}
+          onSearchChange={setSearchInput}
+          activeStatus={activeStatus}
+          onStatusChange={(s) => setActiveStatus(s as OrderStatus | '')}
+          placeholder="Search order #, customer…"
+          tabs={ORDER_STATUS_TABS}
+        />
+
+        {/* Summary Cards */}
+        <div className="sales-summary-cards">
+          <div className="sales-summary-card">
+            <div className="sales-summary-card__label">Total Orders Today</div>
+            <div className="sales-summary-card__value">{stats.totalToday}</div>
+          </div>
+          <div className="sales-summary-card">
+            <div className="sales-summary-card__label">Pending Confirmation</div>
+            <div className="sales-summary-card__value sales-summary-card__value--warning">
+              {stats.pendingConfirmation}
+            </div>
+          </div>
+          <div className="sales-summary-card">
+            <div className="sales-summary-card__label">Awaiting Dispatch</div>
+            <div className="sales-summary-card__value sales-summary-card__value--info">
+              {stats.awaitingDispatch}
+            </div>
+          </div>
+          <div className="sales-summary-card">
+            <div className="sales-summary-card__label">Overdue</div>
+            <div className="sales-summary-card__value sales-summary-card__value--danger">
+              {stats.overdue}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="procurement-content">
+        {error && (
+          <div className="error-banner">
+            {error}
+            <button onClick={fetchData} type="button">
+              Retry
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="loading-container">
+            <div className="spinner" />
+            <span>Loading sales orders…</span>
+          </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state__icon">
+              <ShoppingCart size={48} />
+            </div>
+            <h3 className="empty-state__title">No sales orders found</h3>
+            <p className="empty-state__description">
+              {debouncedSearch
+                ? 'Try adjusting your search or filters'
+                : 'Create your first order to get started'}
             </p>
           </div>
-        </div>
-        <button style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          padding: '9px 16px', background: '#10b981', color: '#fff',
-          border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem',
-        }}>
-          <Plus size={16} /> New Order
-        </button>
-      </div>
-
-      {/* Filters bar */}
-      <div style={{
-        display: 'flex', gap: '10px', marginBottom: '20px',
-        padding: '14px 16px', background: 'var(--bg-secondary, #fff)',
-        border: '1px solid var(--border-color, #e5e7eb)', borderRadius: '10px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1,
-          border: '1px solid #e5e7eb', borderRadius: '6px', padding: '6px 10px' }}>
-          <Search size={15} color="#9ca3af" />
-          <input placeholder="Search orders…" style={{ border: 'none', outline: 'none', fontSize: '0.875rem', width: '100%', background: 'transparent' }} />
-        </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
-          border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.875rem' }}>
-          <Filter size={14} /> Filters
-        </button>
-      </div>
-
-      {/* Placeholder table */}
-      <div style={{
-        background: 'var(--bg-secondary, #fff)',
-        border: '1px solid var(--border-color, #e5e7eb)',
-        borderRadius: '10px', overflow: 'hidden',
-      }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-              {['Order #', 'Customer', 'Warehouse', 'Type', 'Status', 'Date', 'Total', ''].map((h) => (
-                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontWeight: 600, color: '#374151', fontSize: '0.8rem' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={8} style={{ padding: '48px', textAlign: 'center', color: '#9ca3af' }}>
-                <ShoppingCart size={32} style={{ marginBottom: '10px', opacity: 0.4 }} />
-                <div style={{ fontWeight: 500 }}>No sales orders yet</div>
-                <div style={{ fontSize: '0.82rem', marginTop: '4px' }}>Create your first order to get started</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        ) : (
+          <div className="sales-table-container">
+            <table className="sales-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Warehouse</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order) => (
+                  <tr
+                    key={order.id}
+                    onClick={() => navigate(`/sales/orders/${order.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <span className="table-link">{order.order_number}</span>
+                    </td>
+                    <td>{order.customer_name}</td>
+                    <td>{order.warehouse_name}</td>
+                    <td>
+                      <span className={`badge badge-${order.order_type}`}>
+                        {order.order_type === 'pos' ? 'POS' : 'B2B'}
+                      </span>
+                    </td>
+                    <td>{new Date(order.order_date).toLocaleDateString()}</td>
+                    <td className="table-amount">
+                      ${parseFloat(order.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td>
+                      <span className={`badge badge-${order.status}`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="btn-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/sales/orders/${order.id}`);
+                        }}
+                        aria-label="View order"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

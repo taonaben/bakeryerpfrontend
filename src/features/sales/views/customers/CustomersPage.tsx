@@ -1,79 +1,212 @@
-import React from 'react';
-import { Users, Plus, Search, Filter } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, MoreHorizontal, Download, AlertTriangle, Users } from 'lucide-react';
+import { useCustomersStore } from '../../stores/customersStore';
+import type { CustomerType } from '../../types/shared';
+import ProcurementToolbar from '../../../procurement/components/toolbar';
+import type { StatusTabConfig } from '../../../procurement/components/toolbar';
+import '../../../procurement/styles/procurement.css';
+import '../../styles/sales.css';
+
+// ──────────────────────────────────────────────
+// Customer type tabs
+// ──────────────────────────────────────────────
+const CUSTOMER_TYPE_TABS: StatusTabConfig[] = [
+  { label: 'All', value: '' },
+  { label: 'Retail', value: 'retail' },
+  { label: 'Business', value: 'business' },
+];
 
 const CustomersPage: React.FC = () => {
+  const navigate = useNavigate();
+  const {
+    items: customers,
+    isLoading,
+    error,
+    fetchAll,
+  } = useCustomersStore();
+
+  // Filters
+  const [activeType, setActiveType] = useState<CustomerType | ''>('');
+  const [activeStatus, setActiveStatus] = useState<boolean | undefined>(undefined);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Fetch customers
+  const fetchData = useCallback(async () => {
+    const filters: any = {};
+    if (activeType) filters.customer_type = activeType;
+    if (activeStatus !== undefined) filters.is_active = activeStatus;
+    if (debouncedSearch) filters.search = debouncedSearch;
+    await fetchAll(filters, true);
+  }, [activeType, activeStatus, debouncedSearch, fetchAll]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Ensure customers is an array
+  const customersList = Array.isArray(customers) ? customers : [];
+
   return (
-    <div style={{ padding: '30px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: '10px',
-            background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Users size={22} color="#f97316" />
+    <div className="procurement-page">
+      <div className="procurement-sticky-stack">
+        {/* Page Header */}
+        <div className="procurement-page-header">
+          <div className="procurement-page-header__left">
+            <h1>Customers</h1>
+            <p className="procurement-page-header__breadcrumb">Sales / Customers</p>
           </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 700 }}>Customers</h1>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#6b7280' }}>
-              Manage retail and business customers, credit limits, and pricing agreements
+          <div className="procurement-page-header__actions">
+            <button className="btn btn-outline" type="button" title="Export">
+              <Download size={18} />
+              Export
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate('/sales/customers/new')}
+              type="button"
+            >
+              <Plus size={18} />
+              New Customer
+            </button>
+            <button
+              className="btn btn-outline"
+              type="button"
+              aria-label="More actions"
+              title="More actions"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Toolbar — type tabs + search */}
+        <ProcurementToolbar
+          searchTerm={searchInput}
+          onSearchChange={setSearchInput}
+          activeStatus={activeType}
+          onStatusChange={(t) => setActiveType(t as CustomerType | '')}
+          placeholder="Search customers…"
+          tabs={CUSTOMER_TYPE_TABS}
+        />
+
+        {/* Active/Inactive filter */}
+        <div style={{ display: 'flex', gap: '8px', paddingBottom: '0.5rem' }}>
+          <button
+            onClick={() => setActiveStatus(undefined)}
+            className={`status-tab ${activeStatus === undefined ? 'active' : ''}`}
+          >
+            All Status
+          </button>
+          <button
+            onClick={() => setActiveStatus(true)}
+            className={`status-tab ${activeStatus === true ? 'active' : ''}`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setActiveStatus(false)}
+            className={`status-tab ${activeStatus === false ? 'active' : ''}`}
+          >
+            Inactive
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="procurement-content">
+        {error && (
+          <div className="error-banner">
+            {error}
+            <button onClick={fetchData} type="button">
+              Retry
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="loading-container">
+            <div className="spinner" />
+            <span>Loading customers…</span>
+          </div>
+        ) : customersList.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state__icon">
+              <Users size={48} />
+            </div>
+            <h3 className="empty-state__title">No customers found</h3>
+            <p className="empty-state__description">
+              {debouncedSearch
+                ? 'Try adjusting your search or filters'
+                : 'Add your first customer to get started'}
             </p>
           </div>
-        </div>
-        <button style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          padding: '9px 16px', background: '#f97316', color: '#fff',
-          border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem',
-        }}>
-          <Plus size={16} /> New Customer
-        </button>
-      </div>
-
-      {/* Type tabs + search */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', alignItems: 'center' }}>
-        {['All', 'Retail', 'Business'].map((t) => (
-          <button key={t} style={{
-            padding: '6px 16px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 500,
-            border: t === 'All' ? '1.5px solid #f97316' : '1px solid #e5e7eb',
-            background: t === 'All' ? '#fff7ed' : '#fff',
-            color: t === 'All' ? '#f97316' : '#6b7280', cursor: 'pointer',
-          }}>{t}</button>
-        ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px',
-          border: '1px solid #e5e7eb', borderRadius: '6px', padding: '6px 10px' }}>
-          <Search size={14} color="#9ca3af" />
-          <input placeholder="Search customers…" style={{ border: 'none', outline: 'none', fontSize: '0.82rem', background: 'transparent', width: 180 }} />
-        </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
-          border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.82rem' }}>
-          <Filter size={13} /> Filter
-        </button>
-      </div>
-
-      {/* Placeholder table */}
-      <div style={{
-        background: 'var(--bg-secondary, #fff)',
-        border: '1px solid var(--border-color, #e5e7eb)',
-        borderRadius: '10px', overflow: 'hidden',
-      }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-              {['Name', 'Type', 'Phone', 'Email', 'Company', 'Payment Terms', 'Status', ''].map((h) => (
-                <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontWeight: 600, color: '#374151', fontSize: '0.8rem' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={8} style={{ padding: '48px', textAlign: 'center', color: '#9ca3af' }}>
-                <Users size={32} style={{ marginBottom: '10px', opacity: 0.4 }} />
-                <div style={{ fontWeight: 500 }}>No customers yet</div>
-                <div style={{ fontSize: '0.82rem', marginTop: '4px' }}>Add your first retail or business customer</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        ) : (
+          <div className="sales-table-container">
+            <table className="sales-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Company</th>
+                  <th>Payment Terms</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {customersList.map((customer) => (
+                  <tr
+                    key={customer.id}
+                    onClick={() => navigate(`/sales/customers/${customer.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <span className="table-link">{customer.name}</span>
+                    </td>
+                    <td>
+                      <span className={`badge badge-${customer.customer_type}`}>
+                        {customer.customer_type === 'retail' ? 'Retail' : 'Business'}
+                      </span>
+                    </td>
+                    <td>{customer.phone}</td>
+                    <td>{customer.email}</td>
+                    <td>{customer.company_name || '—'}</td>
+                    <td>{customer.payment_terms || '—'}</td>
+                    <td>
+                      <span className={`badge badge-${customer.is_active ? 'active' : 'inactive'}`}>
+                        {customer.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="btn-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/sales/customers/${customer.id}`);
+                        }}
+                        aria-label="View customer"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

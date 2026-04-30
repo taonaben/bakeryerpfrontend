@@ -13,7 +13,7 @@ const BASE = '/sales/invoices';
 export const invoicesApi = {
   getAll: async (params?: Record<string, any>): Promise<Invoice[]> => {
     const { data } = await apiClient.get(BASE, { params });
-    return data;
+    return Array.isArray(data) ? data : (data?.results ?? []);
   },
 
   getById: async (id: string): Promise<InvoiceDetail> => {

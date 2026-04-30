@@ -21,7 +21,7 @@ const PRICING_BASE = '/sales/pricing';
 export const ordersApi = {
   getAll: async (params?: Record<string, any>): Promise<SalesOrder[]> => {
     const { data } = await apiClient.get(BASE, { params });
-    return data;
+    return Array.isArray(data) ? data : (data?.results ?? []);
   },
 
   getById: async (id: string): Promise<SalesOrderDetail> => {
