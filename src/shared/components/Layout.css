@@ -1,0 +1,46 @@
+/* LAYOUT STYLES */
+.erp-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.main-container {
+  flex: 1;
+  margin-left: 260px; /* Width of expanded sidebar */
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+.main-container.sidebar-collapsed {
+  margin-left: 70px; /* Width of collapsed sidebar */
+}
+
+/* PAGE CONTENT */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 24px;
+  background-color: #f8fafc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-container {
+    margin-left: 70px;
+  }
+  
+  .main-container.sidebar-collapsed {
+    margin-left: 70px;
+  }
+
+  .page-content {
+    padding: 20px 15px;
+  }
+}

@@ -12,3 +12,5 @@ yarn-error.log*
 # environment variables
 .env
 .env.local
+
+.kiro/
