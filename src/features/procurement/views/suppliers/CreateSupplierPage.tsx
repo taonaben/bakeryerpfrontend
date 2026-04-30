@@ -18,10 +18,9 @@ import '../../styles/procurement.css';
 
 const SUPPLIER_TYPE_OPTIONS: { value: SupplierType; label: string }[] = [
   { value: 'MANUFACTURER', label: 'Manufacturer' },
-  { value: 'WHOLESALER', label: 'Wholesaler' },
   { value: 'DISTRIBUTOR', label: 'Distributor' },
-  { value: 'RETAILER', label: 'Retailer' },
-  { value: 'SERVICE_PROVIDER', label: 'Service Provider' },
+  { value: 'AGENT', label: 'Agent' },
+  { value: 'INDIVIDUAL', label: 'Individual' },
 ];
 
 const PAYMENT_TERMS_OPTIONS: { value: PaymentTerms; label: string }[] = [
@@ -35,8 +34,8 @@ const PAYMENT_TERMS_OPTIONS: { value: PaymentTerms; label: string }[] = [
 
 const DELIVERY_METHOD_OPTIONS: { value: DeliveryMethod; label: string }[] = [
   { value: 'OWN_TRANSPORT', label: 'Own Transport' },
-  { value: 'THIRD_PARTY', label: 'Third-Party Courier' },
-  { value: 'PICKUP', label: 'Pickup' },
+  { value: 'COURIER', label: 'Courier' },
+  { value: 'COLLECT', label: 'Collect' },
 ];
 
 const DELIVERY_DAYS: DeliveryDay[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];

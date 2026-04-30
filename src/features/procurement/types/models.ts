@@ -75,6 +75,11 @@ export interface CreateRequisitionDTO {
   lines: CreateRequisitionLineDTO[];
 }
 
+/** POST /purchasing/purchase-requisitions/create-and-submit/ — atomic create + submit */
+export interface CreateAndSubmitRequisitionDTO extends CreateRequisitionDTO {
+  submitted_by: string;
+}
+
 /** PUT / PATCH body – partial updates. */
 export type UpdateRequisitionDTO = Partial<CreateRequisitionDTO>;
 
@@ -112,10 +117,9 @@ export interface ConvertRequisitionDTO {
 
 export type SupplierType =
   | 'MANUFACTURER'
-  | 'WHOLESALER'
   | 'DISTRIBUTOR'
-  | 'RETAILER'
-  | 'SERVICE_PROVIDER';
+  | 'AGENT'
+  | 'INDIVIDUAL';
 
 export type PaymentTerms =
   | 'NET_30'
@@ -136,8 +140,8 @@ export type DeliveryDay =
 
 export type DeliveryMethod =
   | 'OWN_TRANSPORT'
-  | 'THIRD_PARTY'
-  | 'PICKUP';
+  | 'COURIER'
+  | 'COLLECT';
 
 export type DocumentType =
   | 'CONTRACT'
@@ -273,6 +277,33 @@ export interface SupplierProduct extends Timestamp {
   lead_time_days: number;
   is_preferred: boolean;
   is_active: boolean;
+}
+
+// ──────────────────────────────────────────────
+// Supplier Product Catalogue  (/purchasing/supplier-products/)
+// ──────────────────────────────────────────────
+
+/** Query params for GET /purchasing/supplier-products/ */
+export interface SupplierProductQueryParams {
+  product_id?: string;
+  supplier_id?: string;
+  company_id?: string;
+}
+
+/** POST /purchasing/supplier-products/?product_id=<uuid> request body */
+export interface CreateSupplierProductDTO {
+  supplier_id: string;
+  price: string;
+  lead_time_days?: number;
+  is_preferred?: boolean;
+}
+
+/** PATCH /purchasing/supplier-products/<id>/ request body — all fields optional */
+export interface UpdateSupplierProductDTO {
+  price?: string;
+  lead_time_days?: number;
+  is_preferred?: boolean;
+  is_active?: boolean;
 }
 
 // ──────────────────────────────────────────────

@@ -4,7 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useUserStore } from '@/features/auth/stores/userStore';
 
 import { productService } from '../../services/productServices';
-import { UNIT_OF_MEASURE, STORAGE_CONDITIONS } from '../../constants/products';
+import { UNIT_OF_MEASURE, STORAGE_CONDITIONS, PRODUCT_CATEGORIES } from '../../constants/products';
+import type { ProductUnitOfMeasure, ProductStorageCondition } from '../../types/productModel';
 import '../../styles/products.css';
 
 const CreateProductPage: React.FC = () => {
@@ -65,9 +66,9 @@ const CreateProductPage: React.FC = () => {
         name: formData.name,
         company: companyId,
         category: formData.category,
-        unit_of_measure: formData.unit_of_measure,
+        unit_of_measure: formData.unit_of_measure as ProductUnitOfMeasure,
         shelf_life_days: Number(formData.shelf_life_days),
-        storage_conditions: formData.storage_conditions,
+        storage_conditions: formData.storage_conditions as ProductStorageCondition,
         storage_notes: formData.storage_notes || undefined,
       });
       navigate('/inventory/products');
@@ -125,15 +126,20 @@ const CreateProductPage: React.FC = () => {
                   <label htmlFor="product-category">
                     Category <span className="required">*</span>
                   </label>
-                  <input
+                  <select
                     id="product-category"
-                    type="text"
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    placeholder="e.g., Bakery, Ingredients, Packaging"
                     disabled={submitting}
-                  />
+                  >
+                    <option value="">Select Category</option>
+                    {PRODUCT_CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value} title={cat.hint}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
                   {fieldErrors.category && <span className="field-error">{fieldErrors.category}</span>}
                 </div>
               </div>

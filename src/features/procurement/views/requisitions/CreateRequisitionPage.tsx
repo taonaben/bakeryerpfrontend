@@ -74,6 +74,7 @@ const CreateRequisitionPage: React.FC<CreateRequisitionPageProps> = ({ activeWar
 
   // ─── Submission state ───────────────────────
   const [submitting, setSubmitting] = useState(false);
+  const [submitMode, setSubmitMode] = useState<'draft' | 'submit'>('draft');
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -144,7 +145,11 @@ const CreateRequisitionPage: React.FC<CreateRequisitionPageProps> = ({ activeWar
         ),
       };
 
-      await requisitionService.createRequisition(dto);
+      if (submitMode === 'submit') {
+        await requisitionService.createAndSubmitRequisition(dto);
+      } else {
+        await requisitionService.createRequisition(dto);
+      }
       navigate('/procurement/requisitions');
     } catch (err: any) {
       setFormError(err.message || 'Failed to create requisition');
@@ -362,10 +367,19 @@ const CreateRequisitionPage: React.FC<CreateRequisitionPageProps> = ({ activeWar
               </button>
               <button
                 type="submit"
+                className="btn btn-secondary"
+                disabled={submitting || refLoading}
+                onClick={() => setSubmitMode('draft')}
+              >
+                {submitting && submitMode === 'draft' ? 'Saving…' : 'Save as Draft'}
+              </button>
+              <button
+                type="submit"
                 className="btn btn-primary"
                 disabled={submitting || refLoading}
+                onClick={() => setSubmitMode('submit')}
               >
-                {submitting ? 'Creating…' : 'Create Requisition'}
+                {submitting && submitMode === 'submit' ? 'Submitting…' : 'Create & Submit'}
               </button>
             </div>
           </form>

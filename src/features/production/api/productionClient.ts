@@ -1,5 +1,6 @@
 import apiClient from '@/shared/services/api';
 import type {
+  BatchQueryParams,
   CopyProductionOrderPayload,
   CreateProductionOrderPayload,
   CreateReworkOrderPayload,
@@ -7,6 +8,8 @@ import type {
   FinishProductionResponse,
   FinishReworkPayload,
   FinishReworkResponse,
+  ProductionBatch,
+  ProductionBatchDetail,
   ProductionFinishExpectations,
   ProductionOrder,
   ProductionOrderSummary,
@@ -152,6 +155,16 @@ export const productionClient = {
     payload: FinishReworkPayload,
   ): Promise<FinishReworkResponse> {
     const { data } = await apiClient.post(`/production/rework/${id}/finish`, payload);
+    return data;
+  },
+
+  async listBatches(orderId: string, params: BatchQueryParams = {}): Promise<ProductionBatch[]> {
+    const { data } = await apiClient.get(`/production/orders/${orderId}/batches`, { params });
+    return toList<ProductionBatch>(data);
+  },
+
+  async getBatch(orderId: string, batchId: string): Promise<ProductionBatchDetail> {
+    const { data } = await apiClient.get(`/production/orders/${orderId}/batches/${batchId}`);
     return data;
   },
 };

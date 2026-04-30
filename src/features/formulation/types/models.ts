@@ -56,7 +56,10 @@ export interface CreateFormulaDTO {
   status: FormulaStatus;
 }
 
-export type UpdateFormulaDTO = Partial<CreateFormulaDTO>;
+export interface UpdateFormulaDTO extends Partial<CreateFormulaDTO> {
+  is_active?: boolean;
+  lines?: CreateFormulaLineDTO[];
+}
 
 export interface CreateFormulaLineDTO {
   id?: string;

@@ -22,6 +22,11 @@ import {
   ListOrdered,
   RefreshCcw,
   FileBarChart2,
+  BookOpen,
+  Percent,
+  TrendingUp,
+  Wallet,
+  AlertCircle,
 } from 'lucide-react';
 import type { NavigationItem, ModuleSidebarConfig } from '../types/navigation';
 
@@ -139,6 +144,20 @@ export const navigationItems: NavigationItem[] = [
     isActive: (pathname) => pathname.startsWith('/production'),
   },
   {
+    id: 'costing',
+    label: 'Costing',
+    path: '/costing',
+    icon: Calculator,
+    roles: [
+      'accountant',
+      'planner',
+      'manager',
+      'owner_director',
+      'system_admin',
+    ],
+    isActive: (pathname) => pathname.startsWith('/costing'),
+  },
+  {
     id: 'sales',
     label: 'Sales & Dist.',
     path: '/sales',
@@ -207,7 +226,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'procurement-dashboard', label: 'Dashboard', path: '/procurement', icon: LayoutDashboard },
+          { id: 'procurement-dashboard', label: 'Overview', path: '/procurement', icon: LayoutDashboard },
         ],
       },
       {
@@ -231,6 +250,13 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'procurement-suppliers', label: 'Suppliers', path: '/procurement/suppliers', icon: Users },
+          {
+            id: 'supplier-products',
+            label: 'Supplier Products',
+            path: '/procurement/supplier-products',
+            icon: Tag,
+            isActive: (pathname) => pathname.startsWith('/procurement/supplier-products'),
+          },
         ],
       },
     ],
@@ -242,7 +268,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'inventory-dashboard', label: 'Dashboard', path: '/inventory', icon: LayoutDashboard },
+          { id: 'inventory-dashboard', label: 'Overview', path: '/inventory', icon: LayoutDashboard },
         ],
       },
       {
@@ -270,7 +296,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'formulation-dashboard', label: 'Dashboard', path: '/formulation', icon: LayoutDashboard },
+          { id: 'formulation-dashboard', label: 'Overview', path: '/formulation', icon: LayoutDashboard },
         ],
       },
     ],
@@ -285,7 +311,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         items: [
           {
             id: 'production-dashboard',
-            label: 'Dashboard',
+            label: 'Overview',
             path: '/production',
             icon: LayoutDashboard,
             isActive: (pathname) => pathname === '/production',
@@ -330,6 +356,15 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
             icon: RefreshCcw,
             isActive: (pathname) => pathname.startsWith('/production/rework'),
           },
+          {
+            id: 'production-batches',
+            label: 'Batches',
+            path: '/production/batches',
+            icon: Layers,
+            isActive: (pathname) =>
+              pathname.startsWith('/production/batches') ||
+              (pathname.startsWith('/production/orders') && pathname.includes('/batches')),
+          },
         ],
       },
       {
@@ -355,7 +390,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         id: 'overview',
         label: 'Overview',
         items: [
-          { id: 'finance-dashboard', label: 'Dashboard', path: '/finance', icon: LayoutDashboard },
+          { id: 'finance-dashboard', label: 'Overview', path: '/finance', icon: LayoutDashboard },
         ],
       },
       {
@@ -372,6 +407,209 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Master Data',
         items: [
           { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
+        ],
+      },
+    ],
+  },
+  costing: {
+    moduleId: 'costing',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'costing-dashboard',
+            label: 'Overview',
+            path: '/costing',
+            icon: LayoutDashboard,
+            isActive: (pathname) => pathname === '/costing',
+          },
+        ],
+      },
+      {
+        id: 'cost-management',
+        label: 'Cost Management',
+        items: [
+          {
+            id: 'costing-entries',
+            label: 'Costing Entries',
+            path: '/costing/entries',
+            icon: FileText,
+            isActive: (pathname) => pathname.startsWith('/costing/entries'),
+          },
+          {
+            id: 'standard-costs',
+            label: 'Standard Costs',
+            path: '/costing/standard-costs',
+            icon: BookOpen,
+            isActive: (pathname) => pathname.startsWith('/costing/standard-costs'),
+          },
+          {
+            id: 'overhead-rates',
+            label: 'Overhead Rates',
+            path: '/costing/overhead-rates',
+            icon: Percent,
+            isActive: (pathname) => pathname.startsWith('/costing/overhead-rates'),
+          },
+        ],
+      },
+      {
+        id: 'product-costing',
+        label: 'Product Costing',
+        items: [
+          {
+            id: 'product-costing',
+            label: 'Product Costing',
+            path: '/costing/product-costing',
+            icon: Package,
+            isActive: (pathname) => pathname.startsWith('/costing/product-costing'),
+          },
+          {
+            id: 'pricing-rules',
+            label: 'Product Pricing Rules',
+            path: '/costing/pricing-rules',
+            icon: Tag,
+            isActive: (pathname) => pathname.startsWith('/costing/pricing-rules'),
+          },
+        ],
+      },
+      {
+        id: 'analysis',
+        label: 'Analysis',
+        items: [
+          {
+            id: 'variance-analysis',
+            label: 'Variance Analysis',
+            path: '/costing/variance-analysis',
+            icon: TrendingUp,
+            isActive: (pathname) => pathname.startsWith('/costing/variance-analysis'),
+          },
+          {
+            id: 'costing-reports',
+            label: 'Reports & Analytics',
+            path: '/costing/reports',
+            icon: BarChart3,
+            isActive: (pathname) => pathname.startsWith('/costing/reports'),
+          },
+        ],
+      },
+      {
+        id: 'postings',
+        label: 'Postings',
+        items: [
+          {
+            id: 'cogs-posting',
+            label: 'COGS Posting',
+            path: '/costing/cogs-posting',
+            icon: ShoppingBag,
+            isActive: (pathname) => pathname.startsWith('/costing/cogs-posting'),
+          },
+        ],
+      },
+    ],
+  },
+
+  sales: {
+    moduleId: 'sales',
+    sections: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'sales-dashboard',
+            label: 'Overview',
+            path: '/sales',
+            icon: LayoutDashboard,
+            isActive: (pathname) => pathname === '/sales',
+          },
+        ],
+      },
+      {
+        id: 'orders',
+        label: 'Orders',
+        items: [
+          {
+            id: 'sales-orders',
+            label: 'Sales Orders',
+            path: '/sales/orders',
+            icon: ShoppingCart,
+            isActive: (pathname) => pathname.startsWith('/sales/orders'),
+          },
+        ],
+      },
+      {
+        id: 'fulfilment',
+        label: 'Fulfilment',
+        items: [
+          {
+            id: 'sales-deliveries',
+            label: 'Deliveries',
+            path: '/sales/deliveries',
+            icon: Truck,
+            isActive: (pathname) => pathname.startsWith('/sales/deliveries'),
+          },
+        ],
+      },
+      {
+        id: 'billing',
+        label: 'Billing',
+        items: [
+          {
+            id: 'sales-invoices',
+            label: 'Invoices',
+            path: '/sales/invoices',
+            icon: Receipt,
+            isActive: (pathname) => pathname.startsWith('/sales/invoices'),
+          },
+          {
+            id: 'sales-payments',
+            label: 'Payments',
+            path: '/sales/payments',
+            icon: Wallet,
+            isActive: (pathname) => pathname.startsWith('/sales/payments'),
+          },
+        ],
+      },
+      {
+        id: 'customers',
+        label: 'Customers',
+        items: [
+          {
+            id: 'sales-customers',
+            label: 'Customers',
+            path: '/sales/customers',
+            icon: Users,
+            isActive: (pathname) => pathname.startsWith('/sales/customers'),
+          },
+          {
+            id: 'sales-price-agreements',
+            label: 'Pricing Agreements',
+            path: '/sales/price-agreements',
+            icon: FileText,
+            isActive: (pathname) => pathname.startsWith('/sales/price-agreements'),
+          },
+        ],
+      },
+      {
+        id: 'reports',
+        label: 'Reports & Analytics',
+        items: [
+          {
+            id: 'sales-reports',
+            label: 'Sales Reports',
+            path: '/sales/reports',
+            icon: BarChart3,
+            isActive: (pathname) => pathname.startsWith('/sales/reports'),
+          },
+          {
+            id: 'sales-debtors',
+            label: 'Debtor Management',
+            path: '/sales/debtors',
+            icon: AlertCircle,
+            isActive: (pathname) => pathname.startsWith('/sales/debtors'),
+          },
         ],
       },
     ],

@@ -11,6 +11,10 @@ export interface product{
 
 export interface productDTO{
     name: string;
+    company: string;
     category: string;
     unit_of_measure: string;
+    shelf_life_days?: number;
+    storage_conditions?: string;
+    storage_notes?: string;
 }
