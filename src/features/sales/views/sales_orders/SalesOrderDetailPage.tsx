@@ -139,7 +139,7 @@ const SalesOrderDetailPage: React.FC = () => {
           <div className="sales-page-header__left" style={{ flex: 1 }}>
             <button
               className="btn btn-outline"
-              onClick={() => navigate('/sales/orders')}
+              onClick={() => navigate(-1)}
               type="button"
               style={{ marginBottom: 8, alignSelf: 'flex-start' }}
             >

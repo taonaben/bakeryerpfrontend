@@ -9,7 +9,7 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
-export type PaymentMethod = 'cash' | 'bank_transfer' | 'mobile_money' | 'cheque';
+export type PaymentMethod = 'cash' | 'card' | 'bank_transfer' | 'mobile_money' | 'cheque';
 export type CustomerType = 'retail' | 'business';
 export type OrderType = 'pos' | 'b2b';
 export type OrderStatus = 'draft' | 'confirmed' | 'cancelled';

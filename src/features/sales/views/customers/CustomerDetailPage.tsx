@@ -272,8 +272,9 @@ const CustomerDetailPage: React.FC = () => {
           {/* Actions */}
           <div className="side-panel__actions">
             <button
+              type="button"
               className="btn btn-secondary btn-block"
-              onClick={() => navigate(`/sales/customers/${customer.id}/edit`)}
+              onClick={() => navigate(`/sales/customers/${customerId}/edit`)}
             >
               <Edit2 size={15} />
               Edit Customer
