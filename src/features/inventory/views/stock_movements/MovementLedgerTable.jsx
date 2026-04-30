@@ -87,12 +87,23 @@ const MovementLedgerTable = ({
     };
 
     const getProductName = (movement) => {
+        // The list endpoint doesn't return a top-level product field.
+        // Product name is denormalized onto the first batch in batches_detail.
+        if (Array.isArray(movement?.batches_detail) && movement.batches_detail.length > 0) {
+            const firstBatch = movement.batches_detail[0]?.batch;
+            const name =
+                firstBatch?.product_name ||
+                firstBatch?.product?.name ||
+                firstBatch?.product?.product_name;
+            if (name) return name;
+        }
+        // Fallback: top-level fields some endpoints may include
         return (
-            movement?.product?.name ||
             movement?.product_name ||
+            movement?.product?.name ||
             movement?.product?.product_name ||
             movement?.product?.title ||
-            '---'
+            '—'
         );
     };
 

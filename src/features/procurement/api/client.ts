@@ -3,6 +3,7 @@ import type {
   PaginatedResponse,
   PurchaseRequisition,
   CreateRequisitionDTO,
+  CreateAndSubmitRequisitionDTO,
   UpdateRequisitionDTO,
   SubmitRequisitionDTO,
   ApproveRequisitionDTO,
@@ -30,6 +31,20 @@ export const requisitionApi = {
   /** POST /purchasing/purchase-requisitions/ */
   createRequisition: async (dto: CreateRequisitionDTO): Promise<PurchaseRequisition> => {
     const { data } = await apiClient.post('/purchasing/purchase-requisitions/', dto);
+    return data;
+  },
+
+  /**
+   * POST /purchasing/purchase-requisitions/create-and-submit/
+   * Atomic create + submit — returns a Submitted requisition in one request.
+   */
+  createAndSubmitRequisition: async (
+    dto: CreateAndSubmitRequisitionDTO,
+  ): Promise<PurchaseRequisition> => {
+    const { data } = await apiClient.post(
+      '/purchasing/purchase-requisitions/create-and-submit/',
+      dto,
+    );
     return data;
   },
 

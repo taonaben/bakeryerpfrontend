@@ -35,8 +35,8 @@ const PAYMENT_TERMS_OPTIONS: { value: PaymentTerms; label: string }[] = [
 
 const DELIVERY_METHOD_OPTIONS: { value: DeliveryMethod; label: string }[] = [
   { value: 'OWN_TRANSPORT', label: 'Own Transport' },
-  { value: 'THIRD_PARTY', label: 'Third-Party Courier' },
-  { value: 'PICKUP', label: 'Pickup' },
+  { value: 'COURIER', label: 'Courier' },
+  { value: 'COLLECT', label: 'Collect' },
 ];
 
 const DELIVERY_DAYS: DeliveryDay[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];

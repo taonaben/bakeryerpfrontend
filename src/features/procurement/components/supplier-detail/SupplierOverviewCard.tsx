@@ -12,8 +12,8 @@ const PAYMENT_TERMS_LABELS: Record<PaymentTerms, string> = {
 
 const DELIVERY_METHOD_LABELS: Record<DeliveryMethod, string> = {
   OWN_TRANSPORT: 'Own Transport',
-  THIRD_PARTY: 'Third Party',
-  PICKUP: 'Pickup',
+  COURIER: 'Courier',
+  COLLECT: 'Collect',
 };
 
 const DELIVERY_DAY_LABELS: Record<string, string> = {
