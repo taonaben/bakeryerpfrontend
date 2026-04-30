@@ -1,10 +1,11 @@
 import React from 'react';
-import { Archive, PauseCircle, PlayCircle, PowerOff, Trash2 } from 'lucide-react';
+import { Archive, Pencil, PauseCircle, PlayCircle, PowerOff, Trash2 } from 'lucide-react';
 import type { Formula } from '../types/models';
 
 interface FormulaDetailHeaderProps {
   formula: Formula;
   isBusy?: boolean;
+  onEdit: () => void;
   onActivate: () => void;
   onArchive: () => void;
   onDeactivate: () => void;
@@ -18,6 +19,7 @@ const statusLabel = (status: string) => status.replace(/_/g, ' ');
 const FormulaDetailHeader: React.FC<FormulaDetailHeaderProps> = ({
   formula,
   isBusy = false,
+  onEdit,
   onActivate,
   onArchive,
   onDeactivate,
@@ -56,6 +58,12 @@ const FormulaDetailHeader: React.FC<FormulaDetailHeaderProps> = ({
       </div>
 
       <div className="formula-detail-summary__actions">
+        {formula.status === 'draft' && (
+          <button type="button" className="btn btn-primary" onClick={onEdit} disabled={isBusy}>
+            <Pencil size={16} />
+            Edit
+          </button>
+        )}
         {formula.status !== 'active' && (
           <button type="button" className="btn btn-outline" onClick={onActivate} disabled={isBusy}>
             <PlayCircle size={16} />

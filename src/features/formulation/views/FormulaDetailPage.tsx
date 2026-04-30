@@ -166,6 +166,7 @@ const FormulaDetailPage: React.FC = () => {
       <FormulaDetailHeader
         formula={formula}
         isBusy={busy}
+        onEdit={() => navigate(`/formulation/${formula.id}/edit`)}
         onActivate={() => activateFormula(formula.id)}
         onArchive={() => archiveFormula(formula.id)}
         onDeactivate={() => deactivateFormula(formula.id)}
