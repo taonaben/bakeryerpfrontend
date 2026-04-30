@@ -24,6 +24,8 @@ interface FormulaLineEditorTableProps {
   onDragOver: (event: React.DragEvent<HTMLTableRowElement>, overLineId: string) => void;
   onDrop: () => void;
   onDragEnd: () => void;
+  /** When true all inputs are disabled and add/remove actions are hidden */
+  readOnly?: boolean;
 }
 
 const LINE_TYPE_OPTIONS: FormulaLineType[] = ['TEXT', 'INSTRUCTION', 'MATERIAL', 'BYPRODUCT', 'PROCESS'];
@@ -40,6 +42,7 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
   onDragOver,
   onDrop,
   onDragEnd,
+  readOnly = false,
 }) => {
   return (
     <section className="formula-entry-grid-card">
@@ -84,17 +87,20 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                         className="formula-drag-handle"
                         aria-label={`Reorder line ${line.sequence}`}
                         title="Drag to reorder"
+                        disabled={readOnly}
                       >
                         <GripVertical size={16} />
                       </button>
-                      <button
-                        type="button"
-                        className="formula-row-icon-btn"
-                        onClick={() => onRemoveLine(line.localId)}
-                        title="Remove line"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {!readOnly && (
+                        <button
+                          type="button"
+                          className="formula-row-icon-btn"
+                          onClick={() => onRemoveLine(line.localId)}
+                          title="Remove line"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                   <td>
@@ -103,12 +109,14 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                       min="1"
                       value={line.sequence}
                       onChange={(e) => onUpdateLine(line.localId, 'sequence', Number(e.target.value))}
+                      disabled={readOnly}
                     />
                   </td>
                   <td>
                     <select
                       value={line.line_type}
                       onChange={(e) => onUpdateLine(line.localId, 'line_type', e.target.value)}
+                      disabled={readOnly}
                     >
                       {LINE_TYPE_OPTIONS.map((option) => (
                         <option key={option} value={option}>
@@ -122,7 +130,7 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                       <select
                         value={line.product}
                         onChange={(e) => onUpdateLine(line.localId, 'product', e.target.value)}
-                        disabled={!itemKeyEnabled}
+                        disabled={!itemKeyEnabled || readOnly}
                       >
                         <option value="">
                           {itemKeyEnabled ? 'Select item' : 'Not used for this line'}
@@ -142,6 +150,7 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                       value={line.text}
                       onChange={(e) => onUpdateLine(line.localId, 'text', e.target.value)}
                       placeholder="Line text"
+                      disabled={readOnly}
                     />
                   </td>
                   <td>
@@ -151,6 +160,7 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                         value={line.location}
                         onChange={(e) => onUpdateLine(line.localId, 'location', e.target.value)}
                         placeholder="01"
+                        disabled={readOnly}
                       />
                       <Search size={16} />
                     </div>
@@ -162,6 +172,7 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
                       step="0.000001"
                       value={line.quantity}
                       onChange={(e) => onUpdateLine(line.localId, 'quantity', e.target.value)}
+                      disabled={readOnly}
                     />
                   </td>
                 </tr>
@@ -172,10 +183,12 @@ const FormulaLineEditorTable: React.FC<FormulaLineEditorTableProps> = ({
       </div>
 
       <div className="formula-entry-grid-footer">
-        <button type="button" className="btn btn-outline formula-entry-add-line-btn" onClick={onAddLine}>
-          <Plus size={16} />
-          Add Line
-        </button>
+        {!readOnly && (
+          <button type="button" className="btn btn-outline formula-entry-add-line-btn" onClick={onAddLine}>
+            <Plus size={16} />
+            Add Line
+          </button>
+        )}
       </div>
     </section>
   );

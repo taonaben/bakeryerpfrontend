@@ -43,6 +43,7 @@ import SupplierProductDetailPage from './features/procurement/views/supplier_pro
 import FormulationPage from './features/formulation/views/formulationPage';
 import FormulaDetailPage from './features/formulation/views/FormulaDetailPage';
 import FormulaCreatePage from './features/formulation/views/FormulaCreatePage';
+import EditFormulaPage from './features/formulation/views/EditFormulaPage';
 
 // Finance views
 import FinanceDashboard from './features/finance/views/FinanceDashboard';
@@ -387,6 +388,7 @@ function App() {
                   {/* Formulation Module */}
                   <Route path="/formulation" element={<FormulationPage />} />
                   <Route path="/formulation/new" element={<FormulaCreatePage />} />
+                  <Route path="/formulation/:id/edit" element={<EditFormulaPage />} />
                   <Route path="/formulation/:formulaId" element={<FormulaDetailPage />} />
 
                   {/* Finance Module */}
