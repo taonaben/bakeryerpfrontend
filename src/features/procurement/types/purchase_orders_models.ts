@@ -68,9 +68,11 @@ export interface PurchaseOrder extends Timestamp {
 
 export interface CreatePurchaseOrderLineDTO {
   product_id: string;
+  supplier_id: string;     // which supplier this line is sourced from
   quantity: string;
   unit_of_measure: string;
-  unit_price: string;
+  quoted_price: string;    // supplier catalogue price (pre-filled reference)
+  unit_price: string;      // actual agreed price for this order (editable)
   description?: string;
 }
 

@@ -201,12 +201,28 @@ export const requisitionService = {
   /** Convert an approved requisition to a purchase order */
   async convertRequisition(id: string, dto: ConvertRequisitionDTO): Promise<any> {
     if (!id) throw new Error('Requisition ID is required');
-    if (!dto.supplier_id) throw new Error('Supplier is required');
-    if (!dto.lines || dto.lines.length === 0) throw new Error('At least one line item is required');
+    const normalizedDto = this.normalizeConvertRequisitionDto(dto);
+    if (!normalizedDto.supplier_id) throw new Error('Supplier is required');
+    if (!normalizedDto.lines || normalizedDto.lines.length === 0) {
+      throw new Error('At least one line item is required');
+    }
+    normalizedDto.lines.forEach((line, i) => {
+      if (!line.supplier_id) throw new Error(`Line ${i + 1}: Supplier is required`);
+    });
     return requisitionApi.convertRequisition(id, {
-      ...dto,
+      ...normalizedDto,
       created_by: this._getCurrentUserId(),
     });
+  },
+
+  normalizeConvertRequisitionDto(dto: ConvertRequisitionDTO): ConvertRequisitionDTO {
+    return {
+      ...dto,
+      lines: dto.lines.map((line) => ({
+        ...line,
+        supplier_id: line.supplier_id || dto.supplier_id,
+      })),
+    };
   },
 
   // ─── Supplier ───────────────────────────────
