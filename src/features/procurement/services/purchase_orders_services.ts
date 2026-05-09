@@ -62,8 +62,9 @@ export const purchaseOrderService = {
 
   // ─── Create ──────────────────────────────────
   async createOrder(dto: CreatePurchaseOrderDTO): Promise<PurchaseOrder> {
-    this.validateOrder(dto);
-    const created = await purchaseOrderApi.createOrder(dto);
+    const normalizedDto = this.normalizeCreateOrderDto(dto);
+    this.validateOrder(normalizedDto);
+    const created = await purchaseOrderApi.createOrder(normalizedDto);
     return this.normalizeOrder(created);
   },
 
@@ -129,6 +130,16 @@ export const purchaseOrderService = {
     };
   },
 
+  normalizeCreateOrderDto(dto: CreatePurchaseOrderDTO): CreatePurchaseOrderDTO {
+    return {
+      ...dto,
+      lines: dto.lines.map((line) => ({
+        ...line,
+        supplier_id: line.supplier_id || dto.supplier_id,
+      })),
+    };
+  },
+
   // ─── Validation ─────────────────────────────
   validateOrder(dto: CreatePurchaseOrderDTO): void {
     if (!dto.supplier_id) throw new Error('Supplier is required');
@@ -138,6 +149,7 @@ export const purchaseOrderService = {
       throw new Error('At least one line item is required');
     }
     dto.lines.forEach((line, i) => {
+      if (!line.supplier_id) throw new Error(`Line ${i + 1}: Supplier is required`);
       if (!line.product_id) throw new Error(`Line ${i + 1}: Product is required`);
       if (!line.quantity || parseFloat(line.quantity) <= 0) {
         throw new Error(`Line ${i + 1}: Valid quantity is required`);

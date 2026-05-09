@@ -1211,3 +1211,23 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── PO Create — Quoted price loading state ─────── */
+.po-price-loading {
+  color: #94a3b8;
+  font-style: italic;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ─── PO Create — Price diff hint ────────────────── */
+.po-price-diff-hint {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}

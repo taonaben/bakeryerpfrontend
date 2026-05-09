@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, Cell, PieChart, Pie,
+  Tooltip, ResponsiveContainer, Cell, PieChart, Pie,
 } from 'recharts';
 import { TrendingUp, BarChart3, DollarSign, Package, RefreshCw, Download, ChevronDown } from 'lucide-react';
 import { costingReportsService } from '../../services/costingReportsService';
@@ -98,7 +98,7 @@ const GhostBarChart: React.FC<{ legend?: string[] }> = ({ legend = ['Variance'] 
 };
 
 const GhostPieChart: React.FC<{ legend?: string[] }> = ({ legend = ['Ingredient A', 'Ingredient B', 'Ingredient C', 'Other'] }) => {
-  const ghostSlices = legend.map((_, i) => ({ value: 1 }));
+  const ghostSlices = legend.map(() => ({ value: 1 }));
   return (
     <div className="rpt-ghost-wrap">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -285,7 +285,9 @@ const CostingReportsPage: React.FC = () => {
       .catch(() => {});
   }, [user?.company]);
 
-  const productList = products.map((p) => ({ id: p.id, name: p.name }));
+  const productList = products
+    .filter((p) => (p.category ?? '').toLowerCase() === 'finished_good')
+    .map((p) => ({ id: p.id, name: p.name }));
 
   const loadTrend = useCallback(async () => {
     if (!trendF.product_id) { setTrendData([]); return; }

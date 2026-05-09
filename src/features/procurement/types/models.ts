@@ -102,6 +102,8 @@ export interface RejectRequisitionDTO {
 
 export interface ConvertLineDTO {
   pr_line_item_id: string;
+  supplier_id: string;    // per-line supplier
+  quoted_price: string;   // catalogue reference price
   unit_price: string;
 }
 
