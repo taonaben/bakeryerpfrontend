@@ -102,7 +102,7 @@ const BatchesTable: React.FC<{
               </td>
               <td>
                 <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
-                  {batch.production_order}
+                  {batch.production_order || '—'}
                 </span>
               </td>
               <td className="quantity-cell">{formatQuantity(batch.quantity_produced)}</td>

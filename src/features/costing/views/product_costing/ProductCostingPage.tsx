@@ -159,6 +159,7 @@ const EMPTY: ProductData = { standardCost: null, pricingRule: null, costTrend: [
 
 const ProductCostingPage: React.FC = () => {
   const { products, loading: productsLoading, fetchProducts } = useProductStore();
+  const finishedProducts = products.filter((p) => (p.category ?? '').toLowerCase() === 'finished_good');
   const [selected, setSelected] = useState<product | null>(null);
   const [data, setData] = useState<ProductData>(EMPTY);
   const [dataLoading, setDataLoading] = useState(false);
@@ -236,7 +237,7 @@ const ProductCostingPage: React.FC = () => {
         <div className="pc-selector-card">
           <div className="pc-selector-card__label">Select a product to analyse</div>
           <ProductSearch
-            products={products}
+            products={finishedProducts}
             selected={selected}
             onSelect={handleSelect}
             isLoading={productsLoading}
