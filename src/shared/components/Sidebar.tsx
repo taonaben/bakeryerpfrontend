@@ -114,6 +114,26 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
+  const getMostSpecificChildMatchId = (
+    items: Array<{ id: string; path: string; isActive?: (pathname: string) => boolean }>
+  ) => {
+    let bestMatchId: string | null = null;
+    let bestMatchLength = -1;
+
+    for (const item of items) {
+      const matches = item.isActive
+        ? item.isActive(location.pathname)
+        : isModuleItemActive(item.path);
+
+      if (matches && item.path.length > bestMatchLength) {
+        bestMatchId = item.id;
+        bestMatchLength = item.path.length;
+      }
+    }
+
+    return bestMatchId;
+  };
+
   const toggleModule = (moduleId: string) => {
     setExpandedModules((prev) => {
       const next = new Set(prev);
@@ -199,6 +219,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
           const isExpanded = expandedModules.has(item.id);
           const isActive = isNavActive(item);
           const Icon = item.icon;
+          const visibleChildren = moduleConfig
+            ? moduleConfig.sections.flatMap((section) =>
+                section.items.filter((child) => !child.roles || (user && child.roles.includes(user.role)))
+              )
+            : [];
+          const activeChildId = getMostSpecificChildMatchId(visibleChildren);
 
           return (
             <div key={item.id} className="nav-group">
@@ -233,7 +259,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
                       <div className="nav-section-header">{section.label}</div>
                       {section.items.map((child) => {
                         if (child.roles && user && !child.roles.includes(user.role)) return null;
-                        const isChildActive = isModuleItemActive(child.path, child.isActive);
+                        const isChildActive = child.isActive
+                          ? child.isActive(location.pathname)
+                          : activeChildId === child.id;
                         const badgeCount = child.badgeKey ? badges[child.badgeKey] : undefined;
                         return (
                           <div
@@ -305,7 +333,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
               <div className="sidebar-flyout-section-header">{section.label}</div>
               {section.items.map((child) => {
                 if (child.roles && user && !child.roles.includes(user.role)) return null;
-                const isChildActive = isModuleItemActive(child.path, child.isActive);
+                const isChildActive = child.isActive
+                  ? child.isActive(location.pathname)
+                  : activeChildId === child.id;
                 const badgeCount = child.badgeKey ? badges[child.badgeKey] : undefined;
                 const ChildIcon = child.icon;
                 return (

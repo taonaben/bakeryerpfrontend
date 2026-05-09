@@ -343,7 +343,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #cbd5e1;
-  opacity: 0.8;
+  opacity: 0.9;
   user-select: none;
 }
 
@@ -356,8 +356,8 @@
   cursor: pointer;
   color: #64748b;
   opacity: 1;
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-size: 0.9rem;
+  font-weight: 500;
   transition: background-color 0.15s, color 0.15s;
   user-select: none;
 }
