@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Factory, ChevronLeft, ChevronRight, ArrowLeft, ChevronDown, LogOut } from 'lucide-react';
+import { Factory, ChevronLeft, ChevronRight, ChevronDown, LogOut } from 'lucide-react';
 import {
   navigationItems,
   settingsItem,
@@ -23,44 +23,32 @@ interface SidebarProps {
   badges?: Record<string, number>;
 }
 
-/**
- * SIDEBAR COMPONENT
- * 
- * Context-aware navigation sidebar with two modes:
- * 
- * 1. MODULE LIST MODE (default / dashboard):
- *    Shows top-level modules filtered by user role
- * 
- * 2. MODULE SIDEBAR MODE (inside a module):
- *    Shows section-grouped sub-navigation for the active module
- *    with a back button to return to the module list
- * 
- * Features:
- * - Collapsible with hover tooltips / flyout menus
- * - Badge support for notification counts
- * - Role-based filtering
- * - Route-derived module context (auto-detects from URL)
- * - Warehouse selector (top)
- * - User info & logout (bottom)
- */
 const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, onWarehouseChange, onLogout, badges = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Collapsed state - persisted in localStorage
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebar_collapsed');
     return saved === 'true';
   });
 
-  // Company name state
   const [companyName, setCompanyName] = useState<string>('');
-
-  // Warehouse dropdown state
   const [showWhDropdown, setShowWhDropdown] = useState(false);
-  const whDropdownRef = useRef<HTMLDivElement>(null);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [flyoutModuleId, setFlyoutModuleId] = useState<string | null>(null);
 
-  // Click outside to close warehouse dropdown
+  const whDropdownRef = useRef<HTMLDivElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
+
+  // Auto-expand module matching current route
+  useEffect(() => {
+    const moduleId = getActiveModuleFromPath(location.pathname);
+    if (moduleId) {
+      setExpandedModules((prev) => new Set([...prev, moduleId]));
+    }
+  }, [location.pathname]);
+
+  // Close warehouse dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (whDropdownRef.current && !whDropdownRef.current.contains(event.target as Node)) {
@@ -73,27 +61,26 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showWhDropdown]);
 
-  // User initials for avatar
-  const initials = user
-    ? `${user.first_name?.[0] || '?'}${user.last_name?.[0] || '?'}`.toUpperCase()
-    : '??';
+  // Close flyout on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (flyoutRef.current && !flyoutRef.current.contains(event.target as Node)) {
+        setFlyoutModuleId(null);
+      }
+    };
+    if (flyoutModuleId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [flyoutModuleId]);
 
-  // Derive active module from current path
-  const activeModuleId = getActiveModuleFromPath(location.pathname);
-  const moduleConfig = activeModuleId ? getModuleSidebarConfig(activeModuleId) : null;
-
-  // Find the module's nav item for label/icon
-  const activeModuleNav = activeModuleId
-    ? navigationItems.find((item) => item.id === activeModuleId)
-    : null;
-
-  // Persist collapsed state
+  // Persist collapsed state and notify layout
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', String(isCollapsed));
     window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { isCollapsed } }));
   }, [isCollapsed]);
 
-  // Fetch company name when user changes
+  // Fetch company name
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
@@ -106,192 +93,70 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
         setCompanyName('');
       }
     };
-
     fetchCompanyName();
   }, [user?.company]);
 
-  // Filter navigation items by user role
-  const visibleNavItems = user ? getNavigationForRole(user.role) : [];
+  const initials = user
+    ? `${user.first_name?.[0] || '?'}${user.last_name?.[0] || '?'}`.toUpperCase()
+    : '??';
 
-  // Check if settings item should be visible
+  const visibleNavItems = user ? getNavigationForRole(user.role) : [];
   const canSeeSettings = user && settingsItem.roles.includes(user.role);
 
-  // Determine if a nav item is active
   const isNavActive = (item: typeof navigationItems[0]) => {
-    if (item.isActive) {
-      return item.isActive(location.pathname);
-    }
+    if (item.isActive) return item.isActive(location.pathname);
     return location.pathname === item.path ||
-           (item.path !== '/' && location.pathname.startsWith(item.path));
+      (item.path !== '/' && location.pathname.startsWith(item.path));
   };
 
   const isModuleItemActive = (path: string, isActive?: (pathname: string) => boolean) => {
-    if (isActive) {
-      return isActive(location.pathname);
-    }
-
+    if (isActive) return isActive(location.pathname);
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Toggle sidebar
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules((prev) => {
+      const next = new Set(prev);
+      if (next.has(moduleId)) {
+        next.delete(moduleId);
+      } else {
+        next.add(moduleId);
+      }
+      return next;
+    });
+  };
+
   const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+    setIsCollapsed((prev) => !prev);
+    setFlyoutModuleId(null);
   };
 
-  // Handle back button — return to dashboard
-  const handleBack = () => {
-    navigate('/');
-  };
+  const flyoutConfig = flyoutModuleId ? getModuleSidebarConfig(flyoutModuleId) : null;
+  const flyoutNavItem = flyoutModuleId ? navigationItems.find((i) => i.id === flyoutModuleId) : null;
 
-  // ─── MODULE SIDEBAR MODE ───
-  if (moduleConfig && activeModuleNav) {
-    return (
-      <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-        {/* Module Header */}
-        <div className="sidebar-logo">
-          <Factory size={24} />
-          {!isCollapsed && (
-            <div className="sidebar-logo-text">
-              <span className="sidebar-company-name">{companyName}</span>
-              <span className="sidebar-module-name">{activeModuleNav.label}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Warehouse Selector */}
-        <div className="sidebar-warehouse" ref={whDropdownRef}>
-          <div
-            className="sidebar-warehouse-tag"
-            onClick={() => setShowWhDropdown(!showWhDropdown)}
-            data-tooltip={isCollapsed ? (activeWarehouse?.name || 'Select Warehouse') : undefined}
-          >
-            <Factory size={16} />
-            {!isCollapsed && (
-              <>
-                <span>{activeWarehouse ? activeWarehouse.name : 'Select Warehouse'}</span>
-                <ChevronDown size={14} className={`wh-chevron ${showWhDropdown ? 'open' : ''}`} />
-              </>
-            )}
-          </div>
-          {showWhDropdown && (
-            <div className={`sidebar-warehouse-dropdown ${isCollapsed ? 'flyout' : ''}`}>
-              {warehouses.length > 0 ? (
-                warehouses.map((wh) => (
-                  <div
-                    key={wh.id}
-                    className={`sidebar-wh-item ${activeWarehouse?.id === wh.id ? 'active' : ''}`}
-                    onClick={() => { onWarehouseChange(wh); setShowWhDropdown(false); }}
-                  >
-                    <div className="sidebar-wh-item-title">{wh.name}</div>
-                    <div className="sidebar-wh-item-subtitle">Code: {wh.id.substring(0, 8)}</div>
-                  </div>
-                ))
-              ) : (
-                <div className="sidebar-wh-item empty">No warehouses available</div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Toggle Button */}
-        <button className="sidebar-toggle" onClick={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
-
-        {/* Back Button */}
-        <div
-          className="sidebar-back-btn"
-          onClick={handleBack}
-          data-tooltip={isCollapsed ? 'Back to modules' : undefined}
-        >
-          <ArrowLeft size={18} />
-          {!isCollapsed && <span>Back to modules</span>}
-        </div>
-
-        <nav className="sidebar-nav">
-          {moduleConfig.sections.map((section) => (
-            <div key={section.id} className="sidebar-section">
-              <div
-                className="sidebar-section-header"
-                data-tooltip={isCollapsed ? section.label : undefined}
-              >
-                {!isCollapsed && section.label}
-              </div>
-              {section.items.map((item) => {
-                // If item has role restrictions, check them
-                if (item.roles && user && !item.roles.includes(user.role)) {
-                  return null;
-                }
-
-                const Icon = item.icon;
-                const isActive = isModuleItemActive(item.path, item.isActive);
-                const badgeCount = item.badgeKey ? badges[item.badgeKey] : undefined;
-
-                return (
-                  <div
-                    key={item.id}
-                    className={`nav-item ${isActive ? 'active' : ''}`}
-                    onClick={() => navigate(item.path)}
-                    data-tooltip={isCollapsed ? item.label : undefined}
-                  >
-                    <Icon size={20} />
-                    {!isCollapsed && <span>{item.label}</span>}
-                    {badgeCount != null && badgeCount > 0 && (
-                      <span className="nav-badge">{badgeCount}</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-
-          {/* Settings Item (at bottom) */}
-          {canSeeSettings && (
-            <div
-              className={`nav-item settings-item ${isNavActive(settingsItem) ? 'active' : ''}`}
-              onClick={() => navigate(settingsItem.path)}
-              data-tooltip={isCollapsed ? settingsItem.label : undefined}
-            >
-              <settingsItem.icon size={20} />
-              {!isCollapsed && <span>{settingsItem.label}</span>}
-            </div>
-          )}
-
-          {/* User Section (at very bottom) */}
-          <div className="sidebar-user-section">
-            <div className="sidebar-user-profile" data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}>
-              <div className="sidebar-avatar">{initials}</div>
-              {!isCollapsed && (
-                <div className="sidebar-user-info">
-                  <span className="sidebar-user-name">{user?.username || 'Unknown User'}</span>
-                  <span className="sidebar-user-role">{user?.role || 'No Role'}</span>
-                </div>
-              )}
-            </div>
-            <button
-              className="sidebar-logout-btn"
-              onClick={onLogout}
-              data-tooltip={isCollapsed ? 'Logout' : undefined}
-            >
-              <LogOut size={18} />
-              {!isCollapsed && <span>Logout</span>}
-            </button>
-          </div>
-        </nav>
-      </aside>
-    );
-  }
-
-  // ─── MODULE LIST MODE (Dashboard / default) ───
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      {/* Logo */}
-      <div className="sidebar-logo" onClick={() => navigate('/')}>
-        <Factory size={24} />
-        {!isCollapsed && <span>{companyName} ERP</span>}
+
+      {/* ─── HEADER ─── */}
+      <div className="sidebar-logo">
+        {!isCollapsed && (
+          <>
+            <Factory size={20} className="sidebar-logo-icon" />
+            <span className="sidebar-app-name" onClick={() => navigate('/')}>
+              {companyName} ERP
+            </span>
+          </>
+        )}
+        <button
+          className="sidebar-toggle"
+          onClick={toggleSidebar}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
       </div>
 
-      {/* Warehouse Selector */}
+      {/* ─── WAREHOUSE SELECTOR ─── */}
       <div className="sidebar-warehouse" ref={whDropdownRef}>
         <div
           className="sidebar-warehouse-tag"
@@ -326,31 +191,72 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
         )}
       </div>
 
-      {/* Toggle Button */}
-      <button className="sidebar-toggle" onClick={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-        {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-      </button>
-
+      {/* ─── NAVIGATION ─── */}
       <nav className="sidebar-nav">
-        {/* Main Navigation Items */}
         {visibleNavItems.map((item) => {
+          const moduleConfig = getModuleSidebarConfig(item.id);
+          const hasChildren = !!moduleConfig;
+          const isExpanded = expandedModules.has(item.id);
+          const isActive = isNavActive(item);
           const Icon = item.icon;
-          const active = isNavActive(item);
 
           return (
-            <div
-              key={item.id}
-              className={`nav-item ${active ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
-              data-tooltip={isCollapsed ? item.label : undefined}
-            >
-              <Icon size={20} />
-              {!isCollapsed && <span>{item.label}</span>}
+            <div key={item.id} className="nav-group">
+              {/* Parent row */}
+              <div
+                className={`nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => {
+                  if (isCollapsed && hasChildren) {
+                    setFlyoutModuleId(flyoutModuleId === item.id ? null : item.id);
+                  } else {
+                    navigate(item.path);
+                    if (hasChildren) toggleModule(item.id);
+                  }
+                }}
+                data-tooltip={isCollapsed ? item.label : undefined}
+              >
+                <Icon size={20} />
+                {!isCollapsed && <span>{item.label}</span>}
+                {!isCollapsed && hasChildren && (
+                  <ChevronDown
+                    size={15}
+                    className={`nav-chevron ${isExpanded ? 'open' : ''}`}
+                  />
+                )}
+              </div>
+
+              {/* Children (expanded sidebar only) */}
+              {!isCollapsed && hasChildren && isExpanded && (
+                <div className="nav-children">
+                  {moduleConfig.sections.map((section) => (
+                    <div key={section.id} className="nav-section">
+                      <div className="nav-section-header">{section.label}</div>
+                      {section.items.map((child) => {
+                        if (child.roles && user && !child.roles.includes(user.role)) return null;
+                        const isChildActive = isModuleItemActive(child.path, child.isActive);
+                        const badgeCount = child.badgeKey ? badges[child.badgeKey] : undefined;
+                        return (
+                          <div
+                            key={child.id}
+                            className={`nav-child ${isChildActive ? 'active' : ''}`}
+                            onClick={(e) => { e.stopPropagation(); navigate(child.path); }}
+                          >
+                            <span>{child.label}</span>
+                            {badgeCount != null && badgeCount > 0 && (
+                              <span className="nav-badge">{badgeCount}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
 
-        {/* Settings Item (at bottom) */}
+        {/* Settings */}
         {canSeeSettings && (
           <div
             className={`nav-item settings-item ${isNavActive(settingsItem) ? 'active' : ''}`}
@@ -362,9 +268,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
           </div>
         )}
 
-        {/* User Section (at very bottom) */}
+        {/* User section */}
         <div className="sidebar-user-section">
-          <div className="sidebar-user-profile" data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}>
+          <div
+            className="sidebar-user-profile"
+            data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}
+          >
             <div className="sidebar-avatar">{initials}</div>
             {!isCollapsed && (
               <div className="sidebar-user-info">
@@ -383,6 +292,40 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
           </button>
         </div>
       </nav>
+
+      {/* ─── FLYOUT PANEL (collapsed mode, modules with children) ─── */}
+      {isCollapsed && flyoutConfig && flyoutNavItem && (
+        <div className="sidebar-flyout" ref={flyoutRef}>
+          <div className="sidebar-flyout-header">
+            <flyoutNavItem.icon size={16} />
+            <span>{flyoutNavItem.label}</span>
+          </div>
+          {flyoutConfig.sections.map((section) => (
+            <div key={section.id} className="sidebar-flyout-section">
+              <div className="sidebar-flyout-section-header">{section.label}</div>
+              {section.items.map((child) => {
+                if (child.roles && user && !child.roles.includes(user.role)) return null;
+                const isChildActive = isModuleItemActive(child.path, child.isActive);
+                const badgeCount = child.badgeKey ? badges[child.badgeKey] : undefined;
+                const ChildIcon = child.icon;
+                return (
+                  <div
+                    key={child.id}
+                    className={`sidebar-flyout-item ${isChildActive ? 'active' : ''}`}
+                    onClick={() => { navigate(child.path); setFlyoutModuleId(null); }}
+                  >
+                    <ChildIcon size={15} />
+                    <span>{child.label}</span>
+                    {badgeCount != null && badgeCount > 0 && (
+                      <span className="nav-badge">{badgeCount}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
     </aside>
   );
 };
