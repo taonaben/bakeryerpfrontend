@@ -153,6 +153,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
 
   const flyoutConfig = flyoutModuleId ? getModuleSidebarConfig(flyoutModuleId) : null;
   const flyoutNavItem = flyoutModuleId ? navigationItems.find((i) => i.id === flyoutModuleId) : null;
+  const flyoutVisibleChildren = flyoutConfig
+    ? flyoutConfig.sections.flatMap((section) =>
+        section.items.filter((child) => !child.roles || (user && child.roles.includes(user.role)))
+      )
+    : [];
+  const flyoutActiveChildId = getMostSpecificChildMatchId(flyoutVisibleChildren);
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -335,7 +341,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
                 if (child.roles && user && !child.roles.includes(user.role)) return null;
                 const isChildActive = child.isActive
                   ? child.isActive(location.pathname)
-                  : activeChildId === child.id;
+                  : flyoutActiveChildId === child.id;
                 const badgeCount = child.badgeKey ? badges[child.badgeKey] : undefined;
                 const ChildIcon = child.icon;
                 return (

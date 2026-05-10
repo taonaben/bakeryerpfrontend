@@ -23,7 +23,7 @@ const createLine = (sequence: number): FormulaEntryLine => ({
 const PRODUCT_LINE_TYPES: FormulaLineType[] = ['MATERIAL', 'BYPRODUCT'];
 
 const FormulaCreatePage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const [products, setProducts] = useState<product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -85,6 +85,16 @@ const FormulaCreatePage: React.FC = () => {
   );
 
   const totalVolume = useMemo(() => totalWeight, [totalWeight]);
+
+  const headerProducts = useMemo(
+    () => products.filter((p) => p.category === 'finished_good'),
+    [products],
+  );
+
+  const lineProducts = useMemo(
+    () => products.filter((p) => p.category !== 'finished_good'),
+    [products],
+  );
 
   const updateHeader = (key: keyof typeof header, value: string) => {
     setHeader((prev) => ({ ...prev, [key]: value }));
@@ -273,7 +283,7 @@ const FormulaCreatePage: React.FC = () => {
                 disabled={loadingProducts}
               >
                 <option value="">Select product</option>
-                {products.map((item) => (
+                {headerProducts.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.sku} - {item.name}
                   </option>
@@ -357,7 +367,7 @@ const FormulaCreatePage: React.FC = () => {
 
         <FormulaLineEditorTable
           lines={lines}
-          products={products}
+          products={lineProducts}
           draggingLineId={draggingLineId}
           onAddLine={addLine}
           onRemoveLine={removeLine}
