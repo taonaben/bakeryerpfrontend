@@ -33,6 +33,12 @@ const fmtPct = (v: string | number) => {
 
 // ── Inline sparkline bar ──────────────────────────
 
+const allocationLabel = (method?: string) => {
+  if (method === 'labor_minutes') return 'Labor minutes';
+  if (method === 'unit_rate') return 'Unit rate fallback';
+  return 'â€”';
+};
+
 const SparkBar: React.FC<{ value: number; max: number; currency: string }> = ({ value, max, currency }) => {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
@@ -300,6 +306,12 @@ const ProductCostingPage: React.FC = () => {
                     <div className="pc-stat-row">
                       <span className="pc-stat-label">Overhead</span>
                       <span className="pc-stat-value">{fmt(data.standardCost.overhead_cost_per_unit, currency)}</span>
+                    </div>
+                    <div className="pc-stat-row">
+                      <span className="pc-stat-label">Overhead method</span>
+                      <span className="pc-stat-value">
+                        {allocationLabel(data.standardCost.overhead_allocation_method)}
+                      </span>
                     </div>
                     <div className="pc-stat-row" style={{ borderTop: '1px solid #e5e7eb', marginTop: 8, paddingTop: 8 }}>
                       <span className="pc-stat-label">Formula Rev.</span>

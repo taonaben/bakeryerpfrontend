@@ -56,6 +56,7 @@ function normalizeList(raw: any): StandardCost {
     total_standard_cost_per_unit: raw.total_standard_cost_per_unit ?? '0',
     material_cost_per_unit: raw.material_cost_per_unit ?? '0',
     overhead_cost_per_unit: raw.overhead_cost_per_unit ?? '0',
+    overhead_allocation_method: raw.overhead_allocation_method || undefined,
   };
 }
 

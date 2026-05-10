@@ -34,13 +34,13 @@ const FormulaCreatePage: React.FC = () => {
   const [header, setHeader] = useState({
     formulaKey: '',
     formulaDescription: '',
-    revision: '0000000001',
     dateTimeRevised: new Date().toLocaleString(),
     costMethod: 'STANDARD',
     viewMode: 'By Quantity',
     product: '',
     batchSize: '',
     yieldPercentage: '100',
+    laborMinutesPerBatch: '',
     status: 'draft' as FormulaStatus,
   });
 
@@ -169,9 +169,11 @@ const FormulaCreatePage: React.FC = () => {
     const payload: CreateFormulaWithLinesDTO = {
       name: header.formulaKey,
       product: header.product,
-      revision: Number(header.revision),
       batch_size: Number(header.batchSize),
       yield_percentage: Number(header.yieldPercentage),
+      labor_minutes_per_batch: header.laborMinutesPerBatch
+        ? Number(header.laborMinutesPerBatch)
+        : undefined,
       status: header.status,
       is_active: header.status === 'active',
       lines: syncSequences(lines).map((line) => ({
@@ -228,14 +230,6 @@ const FormulaCreatePage: React.FC = () => {
                 value={header.formulaDescription}
                 onChange={(e) => updateHeader('formulaDescription', e.target.value)}
                 placeholder="Bread loaves preparation"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="formula-revision">Revision No.</label>
-              <input
-                id="formula-revision"
-                value={header.revision}
-                onChange={(e) => updateHeader('revision', e.target.value)}
               />
             </div>
             <div className="form-group">
@@ -324,6 +318,18 @@ const FormulaCreatePage: React.FC = () => {
                 step="0.000001"
                 value={header.yieldPercentage}
                 onChange={(e) => updateHeader('yieldPercentage', e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="formula-labor-minutes">Labor Minutes / Batch</label>
+              <input
+                id="formula-labor-minutes"
+                type="number"
+                min="0"
+                step="0.01"
+                value={header.laborMinutesPerBatch}
+                onChange={(e) => updateHeader('laborMinutesPerBatch', e.target.value)}
+                placeholder="Optional"
               />
             </div>
           </div>

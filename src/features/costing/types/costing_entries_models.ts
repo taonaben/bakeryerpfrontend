@@ -1,6 +1,8 @@
 import type { PaginatedResponse } from './shared';
 export type { PaginatedResponse };
 
+export type OverheadAllocationMethod = 'labor_minutes' | 'unit_rate';
+
 // ──────────────────────────────────────────────
 // Costing Entries
 // ──────────────────────────────────────────────
@@ -26,6 +28,7 @@ export interface CostingEntry {
   total_cost: string;
   cost_per_unit: string;
   actual_output_quantity: string;
+  overhead_allocation_method?: OverheadAllocationMethod;
   currency: string;
   computed_at: string;
 }

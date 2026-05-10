@@ -58,12 +58,10 @@ const FormulaDetailHeader: React.FC<FormulaDetailHeaderProps> = ({
       </div>
 
       <div className="formula-detail-summary__actions">
-        {formula.status === 'draft' && (
-          <button type="button" className="btn btn-primary" onClick={onEdit} disabled={isBusy}>
-            <Pencil size={16} />
-            Edit
-          </button>
-        )}
+        <button type="button" className="btn btn-primary" onClick={onEdit} disabled={isBusy}>
+          <Pencil size={16} />
+          Edit
+        </button>
         {formula.status !== 'active' && (
           <button type="button" className="btn btn-outline" onClick={onActivate} disabled={isBusy}>
             <PlayCircle size={16} />

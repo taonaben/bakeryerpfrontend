@@ -32,6 +32,7 @@ const OverheadRateModal: React.FC<Props> = ({
     period_end: rate?.period_end ?? '',
     total_overhead_budgeted: rate?.total_overhead_budgeted ?? '',
     planned_production_units: rate?.planned_production_units ?? '',
+    planned_labor_minutes: rate?.planned_labor_minutes ?? '',
     currency: rate?.currency ?? 'USD',
     notes: rate?.notes ?? '',
   });
@@ -50,12 +51,21 @@ const OverheadRateModal: React.FC<Props> = ({
       .finally(() => setWarehousesLoading(false));
   }, [user?.company]);
 
-  // Derived: rate per unit preview
-  const ratePreview = (() => {
+  // Derived previews
+  const unitRatePreview = (() => {
     const oh = parseFloat(form.total_overhead_budgeted);
     const units = parseFloat(form.planned_production_units);
     if (!isNaN(oh) && !isNaN(units) && units > 0) {
       return (oh / units).toFixed(4);
+    }
+    return null;
+  })();
+
+  const laborRatePreview = (() => {
+    const oh = parseFloat(form.total_overhead_budgeted);
+    const minutes = parseFloat(form.planned_labor_minutes || '');
+    if (!isNaN(oh) && !isNaN(minutes) && minutes > 0) {
+      return (oh / minutes).toFixed(4);
     }
     return null;
   })();
@@ -76,6 +86,8 @@ const OverheadRateModal: React.FC<Props> = ({
       e.total_overhead_budgeted = 'Must be greater than 0';
     if (!form.planned_production_units || parseFloat(form.planned_production_units) <= 0)
       e.planned_production_units = 'Must be greater than 0';
+    if (form.planned_labor_minutes && parseFloat(form.planned_labor_minutes) <= 0)
+      e.planned_labor_minutes = 'Must be greater than 0';
     if (!form.currency) e.currency = 'Currency is required';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -83,7 +95,12 @@ const OverheadRateModal: React.FC<Props> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) onSubmit(form);
+    if (validate()) {
+      onSubmit({
+        ...form,
+        planned_labor_minutes: form.planned_labor_minutes || undefined,
+      });
+    }
   };
 
   // Trap focus — close on Escape
@@ -189,13 +206,41 @@ const OverheadRateModal: React.FC<Props> = ({
               </div>
             </div>
 
+            <div className="form-group">
+              <label>Planned Labor Minutes</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Optional"
+                value={form.planned_labor_minutes ?? ''}
+                onChange={(e) => set('planned_labor_minutes', e.target.value)}
+                className={errors.planned_labor_minutes ? 'input-error' : ''}
+              />
+              {errors.planned_labor_minutes && (
+                <span className="field-error">{errors.planned_labor_minutes}</span>
+              )}
+            </div>
+
             {/* Rate preview */}
-            {ratePreview && (
+            {(unitRatePreview || laborRatePreview) && (
               <div className="or-rate-preview">
-                <span className="or-rate-preview__label">Computed Rate / Unit</span>
-                <span className="or-rate-preview__value">
-                  {form.currency} {ratePreview}
-                </span>
+                {unitRatePreview && (
+                  <>
+                    <span className="or-rate-preview__label">Computed Rate / Unit</span>
+                    <span className="or-rate-preview__value">
+                      {form.currency} {unitRatePreview}
+                    </span>
+                  </>
+                )}
+                {laborRatePreview && (
+                  <>
+                    <span className="or-rate-preview__label">Computed Rate / Labor Minute</span>
+                    <span className="or-rate-preview__value">
+                      {form.currency} {laborRatePreview}
+                    </span>
+                  </>
+                )}
               </div>
             )}
 

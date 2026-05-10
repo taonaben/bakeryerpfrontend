@@ -61,7 +61,9 @@ function normalize(raw: any): OverheadRate {
     ...raw,
     total_overhead_budgeted: raw.total_overhead_budgeted ?? '0',
     planned_production_units: raw.planned_production_units ?? '0',
+    planned_labor_minutes: raw.planned_labor_minutes ?? '',
     rate_per_unit: raw.rate_per_unit ?? '0',
+    rate_per_labor_minute: raw.rate_per_labor_minute ?? '',
     notes: raw.notes ?? '',
   };
 }

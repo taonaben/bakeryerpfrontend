@@ -30,6 +30,12 @@ const fmtQty = (v: string | number) => {
   return isNaN(n) ? '—' : n.toLocaleString('en-US', { maximumFractionDigits: 4 });
 };
 
+const allocationLabel = (method?: string) => {
+  if (method === 'labor_minutes') return 'Labor minutes';
+  if (method === 'unit_rate') return 'Unit rate fallback';
+  return 'â€”';
+};
+
 const CostingEntryDetailPage: React.FC = () => {
   const { entryId } = useParams<{ entryId: string }>();
   const navigate = useNavigate();
@@ -178,6 +184,12 @@ const CostingEntryDetailPage: React.FC = () => {
             <div className="costing-meta-item">
               <label>Status</label>
               <span className="badge costed">Costed</span>
+            </div>
+            <div className="costing-meta-item">
+              <label>Overhead Method</label>
+              <span className="costing-meta-value">
+                {allocationLabel(entry.overhead_allocation_method)}
+              </span>
             </div>
           </div>
 
