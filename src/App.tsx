@@ -17,6 +17,8 @@ import { Company } from './core/companies/types/models';
 import { authService } from './features/auth/services/authService';
 import { User } from './features/auth/types/models';
 import { Warehouse } from './core/warehouses/types/models';
+import SnackbarHost from './shared/notifications/SnackbarHost';
+import './shared/styles/scrollbar.css';
 
 // Procurement views
 import ProcurementDashboard from './features/procurement/views/dashboard/ProcurementDashboard';
@@ -259,8 +261,9 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
+    <>
+      <Router>
+        <Routes>
         {/* Public Route - Login */}
         <Route
           path="/login"
@@ -458,8 +461,10 @@ function App() {
           /* Redirect unauthenticated users to login */
           <Route path="*" element={<Navigate to="/login" />} />
         )}
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+      <SnackbarHost />
+    </>
   );
 }
 

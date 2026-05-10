@@ -1,10 +1,19 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
+import { notifyError } from '../notifications/notificationStore';
 
 
 declare module 'axios' {
+  interface AxiosRequestConfig {
+    metadata?: {
+      retryCount?: number;
+      suppressMutationErrorSnackbar?: boolean;
+    };
+  }
+
   interface InternalAxiosRequestConfig {
     metadata?: {
-      retryCount: number;
+      retryCount?: number;
+      suppressMutationErrorSnackbar?: boolean;
     };
   }
 }
@@ -87,6 +96,51 @@ const isRetryableError = (error: any): boolean => {
   return false;
 };
 
+const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
+const isMutationRequest = (method?: string): boolean => (
+  !!method && MUTATION_METHODS.includes(method.toUpperCase())
+);
+
+const stringifyErrorValue = (value: unknown): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return '';
+};
+
+const flattenApiError = (value: unknown, prefix?: string): string[] => {
+  const primitive = stringifyErrorValue(value);
+  if (primitive) return [prefix ? `${prefix}: ${primitive}` : primitive];
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => flattenApiError(item, prefix));
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    const data = value as Record<string, unknown>;
+
+    if (data.detail) return flattenApiError(data.detail, prefix);
+    if (data.errors) return flattenApiError(data.errors, prefix);
+    if (data.non_field_errors) return flattenApiError(data.non_field_errors, prefix);
+
+    return Object.entries(data).flatMap(([field, fieldValue]) => {
+      const nextPrefix = prefix ? `${prefix}.${field}` : field;
+      return flattenApiError(fieldValue, nextPrefix);
+    });
+  }
+
+  return [];
+};
+
+const formatApiErrorMessage = (data: unknown): string => {
+  const messages = flattenApiError(data)
+    .map((message) => message.trim())
+    .filter(Boolean);
+
+  return messages.length > 0 ? messages.join('\n') : 'Request failed. Please check the submitted details.';
+};
+
 /**
  * REQUEST INTERCEPTOR
  * Automatically inject access token into every request
@@ -105,6 +159,8 @@ apiClient.interceptors.request.use(
     // Initialize retry counter if not already set
     if (!config.metadata) {
       config.metadata = { retryCount: 0 };
+    } else if (config.metadata.retryCount === undefined) {
+      config.metadata.retryCount = 0;
     }
 
     return config;
@@ -125,6 +181,8 @@ apiClient.interceptors.response.use(
     // Get retry count from metadata
     if (!originalRequest.metadata) {
       originalRequest.metadata = { retryCount: 0 };
+    } else if (originalRequest.metadata.retryCount === undefined) {
+      originalRequest.metadata.retryCount = 0;
     }
 
     // ==================== RETRY LOGIC ====================
@@ -195,6 +253,17 @@ apiClient.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // ==================== MUTATION VALIDATION FEEDBACK ====================
+    if (
+      error.response?.status === 400 &&
+      isMutationRequest(originalRequest.method) &&
+      !originalRequest.metadata?.suppressMutationErrorSnackbar
+    ) {
+      const message = formatApiErrorMessage(error.response.data);
+      error.message = message;
+      notifyError(message, { title: 'Validation error' });
     }
 
     return Promise.reject(error);

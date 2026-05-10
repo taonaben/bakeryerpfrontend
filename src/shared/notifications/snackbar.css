@@ -1,0 +1,76 @@
+.snackbar-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(420px, calc(100vw - 48px));
+  pointer-events: none;
+}
+
+.snackbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 14px 14px 16px;
+  border-radius: 8px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  pointer-events: auto;
+}
+
+.snackbar-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+
+.snackbar-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.snackbar-title {
+  margin-bottom: 4px;
+  color: #991b1b;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.snackbar-message {
+  color: #7f1d1d;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.snackbar-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #991b1b;
+  cursor: pointer;
+}
+
+.snackbar-close:hover {
+  background: #fee2e2;
+}
+
+@media (max-width: 768px) {
+  .snackbar-stack {
+    right: 14px;
+    bottom: 14px;
+    width: calc(100vw - 28px);
+  }
+}
