@@ -1,12 +1,17 @@
-import apiClient from '@/shared/services/api';
-import type { LoginRequest, LoginResponse, TokenRefreshResponse, User } from '../types/models';
+import apiClient from "@/shared/services/api";
+import type {
+  LoginRequest,
+  LoginResponse,
+  TokenRefreshResponse,
+  User,
+} from "../types/models";
 
 /**
  * AUTH SERVICE
- * 
+ *
  * Handles all authentication-related API calls and token management.
  * This is the single source of truth for auth operations.
- * 
+ *
  * Security Features:
  * - Tokens stored in memory (not localStorage)
  * - Automatic token refresh
@@ -24,8 +29,8 @@ export const authService = {
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>(
-      '/account/login',
-      credentials
+      "/account/login",
+      credentials,
     );
 
     // Store tokens in memory
@@ -33,8 +38,8 @@ export const authService = {
     inMemoryRefreshToken = response.data.refresh;
 
     // Also store tokens in sessionStorage for api client interceptor
-    sessionStorage.setItem('accessToken', response.data.access);
-    sessionStorage.setItem('refreshToken', response.data.refresh);
+    sessionStorage.setItem("accessToken", response.data.access);
+    sessionStorage.setItem("refreshToken", response.data.refresh);
 
     return response.data;
   },
@@ -42,13 +47,29 @@ export const authService = {
   /**
    * Logout user - Clear all tokens
    */
-  logout(): void {
-    inMemoryAccessToken = null;
-    inMemoryRefreshToken = null;
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
-    localStorage.removeItem('accessToken'); // Clean up old implementation
-    localStorage.removeItem('refreshToken'); // Clean up old implementation
+  async logout(): Promise<void> {
+    const refreshToken = this.getRefreshToken();
+    if (refreshToken) {
+      try {
+        await apiClient.post("/account/logout", { refresh: refreshToken });
+
+        inMemoryAccessToken = null;
+        inMemoryRefreshToken = null;
+
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        localStorage.removeItem("accessToken"); // Clean up old implementation
+        localStorage.removeItem("refreshToken"); // Clean up old implementation
+      } catch (error) {
+        // Even if logout API call fails, we should clear tokens locally
+        inMemoryAccessToken = null;
+        inMemoryRefreshToken = null;
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+    }
   },
 
   /**
@@ -57,26 +78,26 @@ export const authService = {
   async refreshToken(): Promise<string> {
     const refreshToken =
       inMemoryRefreshToken ||
-      sessionStorage.getItem('refreshToken') ||
-      localStorage.getItem('refreshToken');
+      sessionStorage.getItem("refreshToken") ||
+      localStorage.getItem("refreshToken");
 
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error("No refresh token available");
     }
 
     try {
       const response = await apiClient.post<TokenRefreshResponse>(
-        '/api/token/refresh/',
-        { refresh: refreshToken }
+        "/api/token/refresh/",
+        { refresh: refreshToken },
       );
 
       inMemoryAccessToken = response.data.access;
-      sessionStorage.setItem('accessToken', response.data.access);
+      sessionStorage.setItem("accessToken", response.data.access);
       return response.data.access;
     } catch (error) {
       // If refresh fails, user needs to login again
       this.logout();
-      throw new Error('Session expired. Please login again.');
+      throw new Error("Session expired. Please login again.");
     }
   },
 
@@ -86,8 +107,8 @@ export const authService = {
   getAccessToken(): string | null {
     const storedToken =
       inMemoryAccessToken ||
-      sessionStorage.getItem('accessToken') ||
-      localStorage.getItem('accessToken');
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken");
 
     if (storedToken && storedToken !== inMemoryAccessToken) {
       inMemoryAccessToken = storedToken;
@@ -102,8 +123,8 @@ export const authService = {
   getRefreshToken(): string | null {
     const storedToken =
       inMemoryRefreshToken ||
-      sessionStorage.getItem('refreshToken') ||
-      localStorage.getItem('refreshToken');
+      sessionStorage.getItem("refreshToken") ||
+      localStorage.getItem("refreshToken");
 
     if (storedToken && storedToken !== inMemoryRefreshToken) {
       inMemoryRefreshToken = storedToken;
@@ -123,7 +144,7 @@ export const authService = {
    * Get current user profile
    */
   async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<User>('/account/users/me');
+    const response = await apiClient.get<User>("/account/users/me");
     return response.data;
   },
 

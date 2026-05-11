@@ -8,6 +8,7 @@ interface LayoutProps {
   user: User | null;
   activeWarehouse: Warehouse | null;
   warehouses: Warehouse[];
+  companyName: string;
   onWarehouseChange: (warehouse: Warehouse) => void;
   onLogout: () => void;
   children: React.ReactNode;
@@ -26,6 +27,7 @@ const Layout: React.FC<LayoutProps> = ({
   user,
   activeWarehouse,
   warehouses,
+  companyName,
   onWarehouseChange,
   onLogout,
   children,
@@ -54,6 +56,7 @@ const Layout: React.FC<LayoutProps> = ({
         user={user}
         activeWarehouse={activeWarehouse}
         warehouses={warehouses}
+        companyName={companyName}
         onWarehouseChange={onWarehouseChange}
         onLogout={onLogout}
       />

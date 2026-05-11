@@ -1,8 +1,9 @@
-import axios, { InternalAxiosRequestConfig } from 'axios';
-import { notifyError } from '../notifications/notificationStore';
+import axios, { InternalAxiosRequestConfig } from "axios";
+import { notifyError } from "../notifications/notificationStore";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-declare module 'axios' {
+declare module "axios" {
   interface AxiosRequestConfig {
     metadata?: {
       retryCount?: number;
@@ -20,7 +21,7 @@ declare module 'axios' {
 
 /**
  * API CLIENT
- * 
+ *
  * Centralized Axios instance with:
  * - Automatic token injection
  * - Automatic token refresh on 401
@@ -39,11 +40,11 @@ const RETRY_CONFIG = {
 };
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    timeout: 30000,
-    headers: {
-        'Content-Type': 'application/json',
-    }
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Track if we're currently refreshing to avoid multiple refresh calls
@@ -51,14 +52,14 @@ let isRefreshing = false;
 let failedQueue: any[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
       prom.resolve(token);
     }
   });
-  
+
   failedQueue = [];
 };
 
@@ -68,45 +69,52 @@ const processQueue = (error: any, token: string | null = null) => {
  */
 const getRetryDelay = (retryCount: number): number => {
   const exponentialDelay = Math.min(
-    RETRY_CONFIG.initialDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryCount),
-    RETRY_CONFIG.maxDelay
+    RETRY_CONFIG.initialDelay *
+      Math.pow(RETRY_CONFIG.backoffMultiplier, retryCount),
+    RETRY_CONFIG.maxDelay,
   );
   // Add random jitter (±20%)
   const jitter = exponentialDelay * 0.2 * Math.random();
   return exponentialDelay + jitter;
 };
 
-
 const isRetryableError = (error: any): boolean => {
   // Timeout or network errors
-  if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+  if (
+    error.code === "ECONNABORTED" ||
+    error.code === "ENOTFOUND" ||
+    error.code === "ECONNREFUSED"
+  ) {
     return true;
   }
-  
+
   // Retryable status codes
-  if (error.response?.status && RETRY_CONFIG.retryableStatusCodes.includes(error.response.status)) {
+  if (
+    error.response?.status &&
+    RETRY_CONFIG.retryableStatusCodes.includes(error.response.status)
+  ) {
     return true;
   }
-  
+
   // Network timeout
-  if (error.message?.includes('timeout')) {
+  if (error.message?.includes("timeout")) {
     return true;
   }
-  
+
   return false;
 };
 
-const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+const MUTATION_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 
-const isMutationRequest = (method?: string): boolean => (
-  !!method && MUTATION_METHODS.includes(method.toUpperCase())
-);
+const isMutationRequest = (method?: string): boolean =>
+  !!method && MUTATION_METHODS.includes(method.toUpperCase());
 
 const stringifyErrorValue = (value: unknown): string => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  return '';
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
+  return "";
 };
 
 const flattenApiError = (value: unknown, prefix?: string): string[] => {
@@ -117,12 +125,13 @@ const flattenApiError = (value: unknown, prefix?: string): string[] => {
     return value.flatMap((item) => flattenApiError(item, prefix));
   }
 
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === "object" && value !== null) {
     const data = value as Record<string, unknown>;
 
     if (data.detail) return flattenApiError(data.detail, prefix);
     if (data.errors) return flattenApiError(data.errors, prefix);
-    if (data.non_field_errors) return flattenApiError(data.non_field_errors, prefix);
+    if (data.non_field_errors)
+      return flattenApiError(data.non_field_errors, prefix);
 
     return Object.entries(data).flatMap(([field, fieldValue]) => {
       const nextPrefix = prefix ? `${prefix}.${field}` : field;
@@ -138,7 +147,9 @@ const formatApiErrorMessage = (data: unknown): string => {
     .map((message) => message.trim())
     .filter(Boolean);
 
-  return messages.length > 0 ? messages.join('\n') : 'Request failed. Please check the submitted details.';
+  return messages.length > 0
+    ? messages.join("\n")
+    : "Request failed. Please check the submitted details.";
 };
 
 /**
@@ -149,8 +160,9 @@ const formatApiErrorMessage = (data: unknown): string => {
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from sessionStorage (set by authService during login)
-    const token = sessionStorage.getItem('accessToken') || 
-                  localStorage.getItem('accessToken');
+    const token =
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -165,7 +177,7 @@ apiClient.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 /**
@@ -187,17 +199,20 @@ apiClient.interceptors.response.use(
 
     // ==================== RETRY LOGIC ====================
     // Retry if error is retryable AND we haven't exceeded max retries
-    if (isRetryableError(error) && originalRequest.metadata.retryCount < RETRY_CONFIG.maxRetries) {
+    if (
+      isRetryableError(error) &&
+      originalRequest.metadata.retryCount < RETRY_CONFIG.maxRetries
+    ) {
       originalRequest.metadata.retryCount += 1;
       const delayMs = getRetryDelay(originalRequest.metadata.retryCount - 1);
-      
+
       console.warn(
         `[API] Request failed (${error.response?.status || error.code}). ` +
-        `Retrying in ${Math.round(delayMs)}ms... (Attempt ${originalRequest.metadata.retryCount}/${RETRY_CONFIG.maxRetries})`
+          `Retrying in ${Math.round(delayMs)}ms... (Attempt ${originalRequest.metadata.retryCount}/${RETRY_CONFIG.maxRetries})`,
       );
 
       // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
       return apiClient(originalRequest);
     }
 
@@ -209,11 +224,11 @@ apiClient.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then(token => {
+          .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return apiClient(originalRequest);
           })
-          .catch(err => Promise.reject(err));
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -221,34 +236,44 @@ apiClient.interceptors.response.use(
 
       try {
         // Get refresh token from storage
-        const refreshToken = sessionStorage.getItem('refreshToken') || 
-                             localStorage.getItem('refreshToken');
-        
+        const refreshToken =
+          sessionStorage.getItem("refreshToken") ||
+          localStorage.getItem("refreshToken");
+
         if (!refreshToken) {
-          // No refresh token available, redirect to login
-          window.location.href = '/login';
+          // No refresh token available – clear storage and signal the app
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("refreshToken");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          window.dispatchEvent(new CustomEvent("erp:auth-failure"));
+          window.location.href = "/login";
           return Promise.reject(error);
         }
 
-        const response = await axios.post(
-          'https://bakeryerpbackend.onrender.com/api/token/refresh/',
-          { refresh: refreshToken }
-        );
-        
+        const response = await axios.post(`${API_BASE_URL}/token/refresh/`, {
+          refresh: refreshToken,
+        });
+
         const newToken = response.data.access;
-        sessionStorage.setItem('accessToken', newToken);
-        
+        sessionStorage.setItem("accessToken", newToken);
+        localStorage.setItem("accessToken", newToken);
         processQueue(null, newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        
+
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        
-        // If refresh fails, clear storage and redirect to login
-        sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = '/login';
+
+        // Refresh failed – clear auth tokens and signal the app
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("erp_user");
+        localStorage.removeItem("active_warehouse");
+        window.dispatchEvent(new CustomEvent("erp:auth-failure"));
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -263,11 +288,11 @@ apiClient.interceptors.response.use(
     ) {
       const message = formatApiErrorMessage(error.response.data);
       error.message = message;
-      notifyError(message, { title: 'Validation error' });
+      notifyError(message, { title: "Validation error" });
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

@@ -12,18 +12,18 @@ import {
 import './Sidebar.css';
 import { User } from '@/features/auth/types/models';
 import { Warehouse } from '@/core/warehouses/types/models';
-import { companyService } from '@/core/companies/services/companyService';
 
 interface SidebarProps {
   user: User | null;
   activeWarehouse: Warehouse | null;
   warehouses: Warehouse[];
+  companyName: string;
   onWarehouseChange: (warehouse: Warehouse) => void;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
   badges?: Record<string, number>;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, onWarehouseChange, onLogout, badges = {} }) => {
+const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, companyName, onWarehouseChange, onLogout, badges = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,11 +32,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
     return saved === 'true';
   });
 
-  const [companyName, setCompanyName] = useState<string>('');
   const [showWhDropdown, setShowWhDropdown] = useState(false);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [flyoutModuleId, setFlyoutModuleId] = useState<string | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const sidebarRef = useRef<HTMLElement>(null);
   const whDropdownRef = useRef<HTMLDivElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +66,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
   // Close flyout on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (flyoutRef.current && !flyoutRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      if (flyoutRef.current?.contains(target) || sidebarRef.current?.contains(target)) {
+        return;
+      }
+
+      if (flyoutRef.current) {
         setFlyoutModuleId(null);
       }
     };
@@ -79,22 +87,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
     localStorage.setItem('sidebar_collapsed', String(isCollapsed));
     window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { isCollapsed } }));
   }, [isCollapsed]);
-
-  // Fetch company name
-  useEffect(() => {
-    const fetchCompanyName = async () => {
-      try {
-        if (user?.company) {
-          const company = await companyService.getCompany(user.company);
-          setCompanyName(company.name);
-        }
-      } catch (error) {
-        console.error('Failed to load company name:', error);
-        setCompanyName('');
-      }
-    };
-    fetchCompanyName();
-  }, [user?.company]);
 
   const initials = user
     ? `${user.first_name?.[0] || '?'}${user.last_name?.[0] || '?'}`.toUpperCase()
@@ -149,6 +141,31 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
   const toggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
     setFlyoutModuleId(null);
+    setShowWhDropdown(false);
+  };
+
+  const handleLogoutClick = () => {
+    setFlyoutModuleId(null);
+    setShowWhDropdown(false);
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+
+    try {
+      await Promise.resolve(onLogout());
+      setShowLogoutConfirm(false);
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const flyoutConfig = flyoutModuleId ? getModuleSidebarConfig(flyoutModuleId) : null;
@@ -161,7 +178,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
   const flyoutActiveChildId = getMostSpecificChildMatchId(flyoutVisibleChildren);
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`} ref={sidebarRef}>
 
       {/* ─── HEADER ─── */}
       <div className="sidebar-logo">
@@ -169,11 +186,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
           <>
             <Factory size={20} className="sidebar-logo-icon" />
             <span className="sidebar-app-name" onClick={() => navigate('/')}>
-              {companyName} ERP
+              {companyName ? `${companyName} ERP` : 'ERP'}
             </span>
           </>
         )}
         <button
+          type="button"
           className="sidebar-toggle"
           onClick={toggleSidebar}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -317,8 +335,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
             )}
           </div>
           <button
+            type="button"
             className="sidebar-logout-btn"
-            onClick={onLogout}
+            onClick={handleLogoutClick}
             data-tooltip={isCollapsed ? 'Logout' : undefined}
           >
             <LogOut size={18} />
@@ -360,6 +379,41 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, on
               })}
             </div>
           ))}
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div className="sidebar-confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="sidebar-logout-title">
+          <div
+            className="sidebar-confirmation-dialog__overlay"
+            onClick={() => {
+              if (!isLoggingOut) {
+                setShowLogoutConfirm(false);
+              }
+            }}
+          />
+          <div className="sidebar-confirmation-dialog__content">
+            <h3 id="sidebar-logout-title">Log out?</h3>
+            <p>You will be signed out of the current session and returned to the login page.</p>
+            <div className="sidebar-confirmation-dialog__actions">
+              <button
+                type="button"
+                className="sidebar-confirmation-dialog__button sidebar-confirmation-dialog__button--secondary"
+                onClick={() => setShowLogoutConfirm(false)}
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="sidebar-confirmation-dialog__button sidebar-confirmation-dialog__button--danger"
+                onClick={handleConfirmLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? 'Logging out...' : 'Log out'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </aside>
