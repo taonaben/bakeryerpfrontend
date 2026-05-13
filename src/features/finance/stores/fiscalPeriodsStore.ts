@@ -4,6 +4,15 @@ import { immer } from 'zustand/middleware/immer';
 import { fiscalPeriodsService } from '../services/fiscalPeriodsService';
 import type { FiscalPeriod, CreateFiscalPeriodDTO } from '../types/fiscal_periods_models';
 
+const getErrorMessage = (error: any): string => {
+  const data = error?.response?.data;
+  if (typeof data === 'string') return data;
+  if (data?.detail) return data.detail;
+  if (data?.message) return data.message;
+  if (data?.errors) return typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors);
+  return error?.message || 'Fiscal period request failed';
+};
+
 interface FiscalPeriodsState {
   items: FiscalPeriod[];
   isLoading: boolean;
@@ -32,7 +41,7 @@ export const useFiscalPeriodsStore = create<FiscalPeriodsState>()(
           const items = await fiscalPeriodsService.fetchAll(params);
           set((state) => { state.items = items; state.isLoading = false; });
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isLoading = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isLoading = false; });
         }
       },
 
@@ -43,7 +52,7 @@ export const useFiscalPeriodsStore = create<FiscalPeriodsState>()(
           set((state) => { state.isLoading = false; });
           return item;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isLoading = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isLoading = false; });
           throw e;
         }
       },
@@ -58,7 +67,7 @@ export const useFiscalPeriodsStore = create<FiscalPeriodsState>()(
           });
           return newItem;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },
@@ -76,7 +85,7 @@ export const useFiscalPeriodsStore = create<FiscalPeriodsState>()(
           });
           return updatedItem;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },

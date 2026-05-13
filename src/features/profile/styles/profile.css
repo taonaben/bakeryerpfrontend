@@ -94,6 +94,15 @@
   text-align: center;
 }
 
+.profile-empty-state--error {
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.profile-empty-state--error h1 {
+  color: #7f1d1d;
+}
+
 .profile-empty-state h1 {
   margin: 0;
   color: #1e293b;

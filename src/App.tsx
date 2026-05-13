@@ -393,6 +393,7 @@ function App() {
                       }
                     />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile/:userId" element={<ProfilePage />} />
 
                     {/* Inventory Module */}
                     <Route
