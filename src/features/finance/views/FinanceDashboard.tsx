@@ -1,12 +1,8 @@
-import React from 'react';
-
-const FinanceDashboard: React.FC = () => {
-  return (
-    <div style={{ padding: '30px' }}>
-      <h1 style={{ marginBottom: '8px' }}>Finance Dashboard</h1>
-      <p style={{ color: '#6b7280' }}>Finance overview — coming soon.</p>
-    </div>
-  );
-};
+const FinanceDashboard = () => (
+  <div style={{ padding: '32px' }}>
+    <h1>Finance</h1>
+    <p>Finance module overview coming soon.</p>
+  </div>
+);
 
 export default FinanceDashboard;

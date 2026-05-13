@@ -80,20 +80,7 @@ export const navigationItems: NavigationItem[] = [
     ],
     isActive: (pathname) => pathname.startsWith('/procurement'),
   },
-  {
-    id: 'finance',
-    label: 'Finance',
-    path: '/finance',
-    icon: DollarSign,
-    roles: [
-      'purchasing_officer',
-      'accountant',
-      'planner',
-      'manager',
-      'owner_director',
-    ],
-    isActive: (pathname) => pathname.startsWith('/finance'),
-  },
+
   {
     id: 'inventory',
     label: 'Inventory',
@@ -144,6 +131,32 @@ export const navigationItems: NavigationItem[] = [
     isActive: (pathname) => pathname.startsWith('/production'),
   },
   {
+    id: 'sales',
+    label: 'Sales & Dist.',
+    path: '/sales',
+    icon: ShoppingCart,
+    roles: [
+      'sales_rep',
+      'manager',
+      'owner_director',
+    ],
+    isActive: (pathname) => pathname.startsWith('/sales'),
+  },
+  {
+    id: 'finance',
+    label: 'Finance',
+    path: '/finance',
+    icon: DollarSign,
+    roles: [
+      'purchasing_officer',
+      'accountant',
+      'planner',
+      'manager',
+      'owner_director',
+    ],
+    isActive: (pathname) => pathname.startsWith('/finance'),
+  },
+  {
     id: 'costing',
     label: 'Costing',
     path: '/costing',
@@ -156,18 +169,6 @@ export const navigationItems: NavigationItem[] = [
       'system_admin',
     ],
     isActive: (pathname) => pathname.startsWith('/costing'),
-  },
-  {
-    id: 'sales',
-    label: 'Sales & Dist.',
-    path: '/sales',
-    icon: ShoppingCart,
-    roles: [
-      'sales_rep',
-      'manager',
-      'owner_director',
-    ],
-    isActive: (pathname) => pathname.startsWith('/sales'),
   },
   {
     id: 'reports',
@@ -206,7 +207,7 @@ export const settingsItem: NavigationItem = {
  * UTILITY: Filter navigation items by user role
  */
 export const getNavigationForRole = (role: string): NavigationItem[] => {
-  return navigationItems.filter((item) => 
+  return navigationItems.filter((item) =>
     item.roles.includes(role as any)
   );
 };
@@ -382,7 +383,7 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
       },
     ],
   },
-  
+
   finance: {
     moduleId: 'finance',
     sections: [
@@ -391,22 +392,24 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
         label: 'Overview',
         items: [
           { id: 'finance-dashboard', label: 'Overview', path: '/finance', icon: LayoutDashboard },
+          { id: 'finance-reports', label: 'Reports', path: '/finance/reports', icon: BarChart3 },
         ],
       },
       {
-        id: 'finance',
-        label: 'Finance',
+        id: 'accounting',
+        label: 'Accounting',
         items: [
-          { id: 'invoices', label: 'Invoices', path: '/finance/invoices', icon: Receipt },
-          { id: 'price-lists', label: 'Price Lists', path: '/finance/price-lists', icon: Tag },
-          { id: 'costing', label: 'Costing', path: '/finance/costing', icon: Calculator },
+          { id: 'journal-entries', label: 'Journal Entries', path: '/finance/journal-entries', icon: FileText },
+          { id: 'chart-of-accounts', label: 'Chart of Accounts', path: '/finance/chart-of-accounts', icon: ListOrdered },
+          { id: 'fiscal-periods', label: 'Fiscal Periods', path: '/finance/fiscal-periods', icon: CalendarDays },
         ],
       },
       {
-        id: 'master-data',
-        label: 'Master Data',
+        id: 'receivables-payables',
+        label: 'Receivables & Payables',
         items: [
-          { id: 'finance-suppliers', label: 'Suppliers', path: '/finance/suppliers', icon: Users },
+          { id: 'accounts-receivable', label: 'Accounts Receivable', path: '/finance/accounts-receivable', icon: ShoppingCart },
+          { id: 'accounts-payable', label: 'Accounts Payable', path: '/finance/accounts-payable', icon: ShoppingBag },
         ],
       },
     ],

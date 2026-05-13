@@ -54,10 +54,12 @@ import EditFormulaPage from "./features/formulation/views/EditFormulaPage";
 
 // Finance views
 import FinanceDashboard from "./features/finance/views/FinanceDashboard";
-import InvoicesPage from "./features/sales/views/invoices/InvoicesPage";
-import PriceListsPage from "./features/finance/views/PriceListsPage";
-import CostingPage from "./features/finance/views/CostingPage";
-import FinanceSuppliersPage from "./features/finance/views/SuppliersPage";
+import FiscalPeriodPage from "./features/finance/views/fiscal_periods/fiscal_period_page";
+import ChartOfAccountsPage from "./features/finance/views/chart_of_accounts/coa_page";
+import JournalEntriesPage from "./features/finance/views/journal_entries/journal_entries_page";
+import AccountsReceivablePage from "./features/finance/views/accounts_receivable/ar_page";
+import AccountsPayablePage from "./features/finance/views/accounts_payable/ap_page";
+import FinanceReportsPage from "./features/finance/views/finance_reports/finance_reports";
 
 // Production views
 import ProductionDashboard from "./features/production/views/ProductionDashboard";
@@ -595,17 +597,28 @@ function App() {
                     {/* Finance Module */}
                     <Route path="/finance" element={<FinanceDashboard />} />
                     <Route
-                      path="/finance/invoices"
-                      element={<InvoicesPage />}
+                      path="/finance/reports"
+                      element={<FinanceReportsPage />}
                     />
                     <Route
-                      path="/finance/price-lists"
-                      element={<PriceListsPage />}
+                      path="/finance/journal-entries"
+                      element={<JournalEntriesPage />}
                     />
-                    <Route path="/finance/costing" element={<CostingPage />} />
                     <Route
-                      path="/finance/suppliers"
-                      element={<FinanceSuppliersPage />}
+                      path="/finance/chart-of-accounts"
+                      element={<ChartOfAccountsPage />}
+                    />
+                    <Route
+                      path="/finance/fiscal-periods"
+                      element={<FiscalPeriodPage />}
+                    />
+                    <Route
+                      path="/finance/accounts-receivable"
+                      element={<AccountsReceivablePage />}
+                    />
+                    <Route
+                      path="/finance/accounts-payable"
+                      element={<AccountsPayablePage />}
                     />
 
                     {/* Production Module */}
