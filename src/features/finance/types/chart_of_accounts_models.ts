@@ -26,6 +26,8 @@ export interface CreateChartOfAccountDTO {
 
 export interface UpdateChartOfAccountDTO {
   name?: string;
+  account_type?: AccountType;
+  normal_balance?: NormalBalance;
   account_subtype?: string;
   description?: string;
   is_active?: boolean;

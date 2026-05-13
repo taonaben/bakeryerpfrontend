@@ -4,6 +4,15 @@ import { immer } from 'zustand/middleware/immer';
 import { chartOfAccountsService } from '../services/chartOfAccountsService';
 import type { ChartOfAccount, CreateChartOfAccountDTO, UpdateChartOfAccountDTO } from '../types/chart_of_accounts_models';
 
+const getErrorMessage = (error: any): string => {
+  const data = error?.response?.data;
+  if (typeof data === 'string') return data;
+  if (data?.detail) return data.detail;
+  if (data?.message) return data.message;
+  if (data?.errors) return typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors);
+  return error?.message || 'Chart of accounts request failed';
+};
+
 interface ChartOfAccountsState {
   items: ChartOfAccount[];
   isLoading: boolean;
@@ -34,7 +43,7 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
           const items = await chartOfAccountsService.fetchAll(params);
           set((state) => { state.items = items; state.isLoading = false; });
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isLoading = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isLoading = false; });
         }
       },
 
@@ -45,7 +54,7 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
           set((state) => { state.isLoading = false; });
           return item;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isLoading = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isLoading = false; });
           throw e;
         }
       },
@@ -60,7 +69,7 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
           });
           return newItem;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },
@@ -78,7 +87,7 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
           });
           return updatedItem;
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },
@@ -88,11 +97,14 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
         try {
           await chartOfAccountsService.delete(id);
           set((state) => {
-            state.items = state.items.filter(i => i.id !== id);
+            const index = state.items.findIndex(i => i.id === id);
+            if (index !== -1) {
+              state.items[index].is_active = false;
+            }
             state.isSubmitting = false;
           });
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },
@@ -105,7 +117,7 @@ export const useChartOfAccountsStore = create<ChartOfAccountsState>()(
           const items = await chartOfAccountsService.fetchAll();
           set((state) => { state.items = items; state.isSubmitting = false; });
         } catch (e: any) {
-          set((state) => { state.error = e.message; state.isSubmitting = false; });
+          set((state) => { state.error = getErrorMessage(e); state.isSubmitting = false; });
           throw e;
         }
       },
