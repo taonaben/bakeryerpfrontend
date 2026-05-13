@@ -23,6 +23,7 @@ import { authService } from "./features/auth/services/authService";
 import { User } from "./features/auth/types/models";
 import { Warehouse } from "./core/warehouses/types/models";
 import SnackbarHost from "./shared/notifications/SnackbarHost";
+import ProfilePage from "./features/profile/views/profile_page";
 import "./shared/styles/scrollbar.css";
 
 // Procurement views
@@ -57,6 +58,8 @@ import FinanceDashboard from "./features/finance/views/FinanceDashboard";
 import FiscalPeriodPage from "./features/finance/views/fiscal_periods/fiscal_period_page";
 import ChartOfAccountsPage from "./features/finance/views/chart_of_accounts/coa_page";
 import JournalEntriesPage from "./features/finance/views/journal_entries/journal_entries_page";
+import CreateJournalEntryPage from "./features/finance/views/journal_entries/CreateJournalEntryPage";
+import JournalEntryDetailPage from "./features/finance/views/journal_entries/JournalEntryDetailPage";
 import AccountsReceivablePage from "./features/finance/views/accounts_receivable/ar_page";
 import AccountsPayablePage from "./features/finance/views/accounts_payable/ap_page";
 import FinanceReportsPage from "./features/finance/views/finance_reports/finance_reports";
@@ -389,6 +392,7 @@ function App() {
                         />
                       }
                     />
+                    <Route path="/profile" element={<ProfilePage />} />
 
                     {/* Inventory Module */}
                     <Route
@@ -603,6 +607,14 @@ function App() {
                     <Route
                       path="/finance/journal-entries"
                       element={<JournalEntriesPage />}
+                    />
+                    <Route
+                      path="/finance/journal-entries/new"
+                      element={<CreateJournalEntryPage />}
+                    />
+                    <Route
+                      path="/finance/journal-entries/:entryId"
+                      element={<JournalEntryDetailPage />}
                     />
                     <Route
                       path="/finance/chart-of-accounts"
