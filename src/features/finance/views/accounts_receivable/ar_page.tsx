@@ -1,23 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  AlertCircle,
-  CalendarDays,
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
-  Receipt,
-  Search,
-  User,
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useCustomersStore } from '../../../sales/stores/customersStore';
+import { AlertCircle, CalendarDays, Receipt, Search, User } from 'lucide-react';
+import AccountsReceivableTable from '../../components/accounts_receivable/AccountsReceivableTable';
 import { useAccountsReceivableStore } from '../../stores/accountsReceivableStore';
-import type { AccountsReceivable, ARStatus } from '../../types/accounts_receivable_models';
+import type { AccountsReceivable } from '../../types/accounts_receivable_models';
+import {
+  dateToMs,
+  FinanceBalanceFilter,
+  formatMoney,
+  getEffectiveStatus,
+  isOverdue,
+  toNumber,
+} from '../../utils/receivablesPayablesDisplay';
+import { useCustomersStore } from '../../../sales/stores/customersStore';
 import '../../styles/finance.css';
 
-type ARFilter = 'all' | 'open' | 'partially_paid' | 'overdue' | 'paid';
-
-const STATUS_FILTERS: Array<{ label: string; value: ARFilter }> = [
+const STATUS_FILTERS: Array<{ label: string; value: FinanceBalanceFilter }> = [
   { label: 'All', value: 'all' },
   { label: 'Open', value: 'open' },
   { label: 'Partially Paid', value: 'partially_paid' },
@@ -39,7 +36,7 @@ const AccountsReceivablePage: React.FC = () => {
     fetchAll: fetchCustomers,
   } = useCustomersStore();
 
-  const [statusFilter, setStatusFilter] = useState<ARFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<FinanceBalanceFilter>('all');
   const [customerId, setCustomerId] = useState('');
   const [dueFrom, setDueFrom] = useState('');
   const [dueTo, setDueTo] = useState('');
@@ -85,7 +82,7 @@ const AccountsReceivablePage: React.FC = () => {
     });
   }, [customerId, dueFrom, dueTo, overdueOnly, searchTerm, sortedItems, statusFilter]);
 
-  const setSummaryFilter = (filter: ARFilter) => {
+  const setSummaryFilter = (filter: FinanceBalanceFilter) => {
     setStatusFilter(filter);
     setOverdueOnly(filter === 'overdue');
   };
@@ -238,132 +235,17 @@ const AccountsReceivablePage: React.FC = () => {
             <div className="finance-spinner" />
             <span>Loading accounts receivable...</span>
           </div>
-        ) : filteredItems.length === 0 ? (
-          <div className="finance-table-container">
-            <div className="finance-empty-state">
-              <div className="finance-empty-state__icon">
-                <Receipt size={44} />
-              </div>
-              <h3>No receivables found</h3>
-              <p>Adjust the filters to review customer invoice balances.</p>
-            </div>
-          </div>
         ) : (
-          <div className="finance-table-container ar-table-wrap">
-            <table className="finance-table ar-table">
-              <thead>
-                <tr>
-                  <th aria-label="Expand row" />
-                  <th>Invoice Number</th>
-                  <th>Customer</th>
-                  <th className="finance-table__amount">Original Amount</th>
-                  <th className="finance-table__amount">Amount Paid</th>
-                  <th className="finance-table__amount">Outstanding</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
-                  <th>Days Overdue</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredItems.map((record) => {
-                  const expanded = expandedIds.has(record.id);
-                  const daysOverdue = getDaysOverdue(record);
-                  const overdue = daysOverdue > 0;
-
-                  return (
-                    <React.Fragment key={record.id}>
-                      <tr
-                        className={`finance-table__clickable-row ${overdue ? 'ar-row--overdue' : ''}`}
-                        onClick={() => toggleRow(record.id)}
-                        aria-expanded={expanded}
-                      >
-                        <td className="finance-table__icon-cell">
-                          {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                        </td>
-                        <td>
-                          <span className="finance-mono-link">{record.invoice_number}</span>
-                        </td>
-                        <td>{record.customer_name}</td>
-                        <td className="finance-table__amount">{formatMoney(toNumber(record.original_amount))}</td>
-                        <td className="finance-table__amount">{formatMoney(toNumber(record.amount_paid))}</td>
-                        <td className="finance-table__amount">{formatMoney(toNumber(record.amount_outstanding))}</td>
-                        <td>{formatDate(record.due_date)}</td>
-                        <td>
-                          <span className={`finance-badge ${getStatusClass(record)}`}>
-                            {formatStatus(getEffectiveStatus(record))}
-                          </span>
-                        </td>
-                        <td>
-                          {overdue ? (
-                            <span className="ar-days-overdue">{daysOverdue}d overdue</span>
-                          ) : (
-                            <span className="finance-muted">-</span>
-                          )}
-                        </td>
-                        <td>
-                          <Link
-                            className="btn btn-outline ar-table-action"
-                            to={`/sales/invoices/${record.invoice}`}
-                            onClick={(event) => event.stopPropagation()}
-                          >
-                            <ExternalLink size={14} />
-                            Invoice
-                          </Link>
-                        </td>
-                      </tr>
-
-                      {expanded && (
-                        <tr className="journal-entry-expanded-row">
-                          <td colSpan={10}>
-                            <ARInlinePreview record={record} />
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <AccountsReceivableTable
+            records={filteredItems}
+            expandedIds={expandedIds}
+            onToggleRow={toggleRow}
+          />
         )}
       </div>
     </div>
   );
 };
-
-const ARInlinePreview: React.FC<{ record: AccountsReceivable }> = ({ record }) => (
-  <div className="ar-inline-preview">
-    <div className="journal-entry-preview__meta">
-      <div>
-        <span>AR Record</span>
-        <strong>{record.id}</strong>
-      </div>
-      <div>
-        <span>Linked Journal Entry</span>
-        {record.journal_entry ? (
-          <Link className="finance-text-link" to={`/finance/journal-entries/${record.journal_entry}`}>
-            {record.entry_number || record.journal_entry}
-          </Link>
-        ) : (
-          <strong>-</strong>
-        )}
-      </div>
-      <div>
-        <span>Created</span>
-        <strong>{formatDateTime(record.created_at)}</strong>
-      </div>
-      <div>
-        <span>Last Updated</span>
-        <strong>{formatDateTime(record.updated_at)}</strong>
-      </div>
-    </div>
-
-    <div className="ar-inline-preview__note">
-      AR is read-only here. Payments are recorded in the Sales module and reflected automatically.
-    </div>
-  </div>
-);
 
 function getSummary(records: AccountsReceivable[]) {
   const now = new Date();
@@ -389,79 +271,6 @@ function getSummary(records: AccountsReceivable[]) {
     },
     { open: 0, overdue: 0, partiallyPaid: 0, paidThisPeriod: 0 },
   );
-}
-
-function getEffectiveStatus(record: AccountsReceivable): ARFilter {
-  if (record.status === 'paid') return 'paid';
-  if (record.status === 'partially_paid') return isOverdue(record) ? 'overdue' : 'partially_paid';
-  if (record.status === 'overdue') return 'overdue';
-  if (isOverdue(record)) return 'overdue';
-  return 'open';
-}
-
-function getStatusClass(record: AccountsReceivable): string {
-  const status = getEffectiveStatus(record);
-  if (status === 'open') return 'finance-badge--open-ar';
-  if (status === 'partially_paid') return 'finance-badge--partial-ar';
-  if (status === 'overdue') return 'finance-badge--overdue-ar';
-  if (status === 'paid') return 'finance-badge--paid-ar';
-  return 'finance-badge--inactive';
-}
-
-function isOverdue(record: AccountsReceivable): boolean {
-  return getDaysOverdue(record) > 0;
-}
-
-function getDaysOverdue(record: AccountsReceivable): number {
-  if (record.status === 'paid' || toNumber(record.amount_outstanding) <= 0) return 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(`${record.due_date}T00:00:00`);
-  const diff = Math.floor((today.getTime() - due.getTime()) / 86400000);
-  return Math.max(0, diff);
-}
-
-function toNumber(value: number | string | null | undefined): number {
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric : 0;
-}
-
-function dateToMs(value?: string | null): number {
-  if (!value) return Number.MAX_SAFE_INTEGER;
-  const [year, month, day] = value.split('-').map(Number);
-  return Date.UTC(year, month - 1, day);
-}
-
-function formatMoney(value: number): string {
-  return `$${value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
-function formatStatus(status: ARFilter): string {
-  if (status === 'partially_paid') return 'Partially Paid';
-  return status.replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function formatDate(value?: string | null): string {
-  if (!value) return '-';
-  return new Date(`${value}T00:00:00`).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function formatDateTime(value?: string | null): string {
-  if (!value) return '-';
-  return new Date(value).toLocaleString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 export default AccountsReceivablePage;
