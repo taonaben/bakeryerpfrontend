@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertCircle, CalendarDays, Receipt, Search, User } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import AccountsReceivableTable from '../../components/accounts_receivable/AccountsReceivableTable';
 import { useAccountsReceivableStore } from '../../stores/accountsReceivableStore';
 import type { AccountsReceivable } from '../../types/accounts_receivable_models';
@@ -23,6 +24,7 @@ const STATUS_FILTERS: Array<{ label: string; value: FinanceBalanceFilter }> = [
 ];
 
 const AccountsReceivablePage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const {
     items,
     isLoading,
@@ -43,6 +45,7 @@ const AccountsReceivablePage: React.FC = () => {
   const [overdueOnly, setOverdueOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const overdueQuery = searchParams.get('overdue');
 
   const loadData = useCallback(async () => {
     await fetchAll(undefined, true);
@@ -52,6 +55,13 @@ const AccountsReceivablePage: React.FC = () => {
     loadData();
     fetchCustomers(undefined, true);
   }, [fetchCustomers, loadData]);
+
+  useEffect(() => {
+    if (overdueQuery === 'true') {
+      setOverdueOnly(true);
+      setStatusFilter('all');
+    }
+  }, [overdueQuery]);
 
   const sortedItems = useMemo(
     () => [...items].sort((a, b) => dateToMs(a.due_date) - dateToMs(b.due_date)),

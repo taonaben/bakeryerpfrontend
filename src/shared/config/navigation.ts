@@ -497,19 +497,19 @@ export const moduleSidebarConfigs: Record<string, ModuleSidebarConfig> = {
           },
         ],
       },
-      {
-        id: 'postings',
-        label: 'Postings',
-        items: [
-          {
-            id: 'cogs-posting',
-            label: 'COGS Posting',
-            path: '/costing/cogs-posting',
-            icon: ShoppingBag,
-            isActive: (pathname) => pathname.startsWith('/costing/cogs-posting'),
-          },
-        ],
-      },
+      // {
+      //   id: 'postings',
+      //   label: 'Postings',
+      //   items: [
+      //     {
+      //       id: 'cogs-posting',
+      //       label: 'COGS Posting',
+      //       path: '/costing/cogs-posting',
+      //       icon: ShoppingBag,
+      //       isActive: (pathname) => pathname.startsWith('/costing/cogs-posting'),
+      //     },
+      //   ],
+      // },
     ],
   },
 

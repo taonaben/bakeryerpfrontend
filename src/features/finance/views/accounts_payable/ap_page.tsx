@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertCircle, CalendarDays, Landmark, Search, User } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import AccountsPayableTable from '../../components/accounts_payable/AccountsPayableTable';
 import PayAccountsPayableModal from '../../components/accounts_payable/PayAccountsPayableModal';
 import { supplierService } from '../../../procurement/services/suppliers_services';
@@ -25,6 +26,7 @@ const STATUS_FILTERS: Array<{ label: string; value: FinanceBalanceFilter }> = [
 ];
 
 const AccountsPayablePage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const {
     items,
     isLoading,
@@ -47,6 +49,7 @@ const AccountsPayablePage: React.FC = () => {
   const [detailById, setDetailById] = useState<Record<string, AccountsPayable>>({});
   const [detailLoadingIds, setDetailLoadingIds] = useState<Set<string>>(new Set());
   const [payingRecord, setPayingRecord] = useState<AccountsPayable | null>(null);
+  const overdueQuery = searchParams.get('overdue');
 
   const loadData = useCallback(async () => {
     await fetchAll(undefined, true);
@@ -59,6 +62,13 @@ const AccountsPayablePage: React.FC = () => {
       .then((result) => setSuppliers(result.data))
       .catch(() => setSuppliers([]));
   }, [loadData]);
+
+  useEffect(() => {
+    if (overdueQuery === 'true') {
+      setOverdueOnly(true);
+      setStatusFilter('all');
+    }
+  }, [overdueQuery]);
 
   const sortedItems = useMemo(
     () => [...items].sort((a, b) => dateToMs(a.due_date) - dateToMs(b.due_date)),

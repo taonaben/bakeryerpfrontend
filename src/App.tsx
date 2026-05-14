@@ -54,7 +54,7 @@ import FormulaCreatePage from "./features/formulation/views/FormulaCreatePage";
 import EditFormulaPage from "./features/formulation/views/EditFormulaPage";
 
 // Finance views
-import FinanceDashboard from "./features/finance/views/FinanceDashboard";
+import FinanceDashboard from "./features/finance/views/finance_overview/FinanceOverview";
 import FiscalPeriodPage from "./features/finance/views/fiscal_periods/fiscal_period_page";
 import ChartOfAccountsPage from "./features/finance/views/chart_of_accounts/coa_page";
 import JournalEntriesPage from "./features/finance/views/journal_entries/journal_entries_page";
@@ -91,6 +91,7 @@ import PricingRulesPage from "./features/costing/views/pricing_rules/PricingRule
 import VarianceAnalysisPage from "./features/costing/views/variance_analysis/VarianceAnalysisPage";
 import CostingReportsPage from "./features/costing/views/costing_reports/CostingReportsPage";
 import CogsPostingPage from "./features/costing/views/cogs/CogsPostingPage";
+import CostingOverview from "./features/costing/views/overview/CostingOverview";
 
 // Sales views
 import SalesOrdersPage from "./features/sales/views/sales_orders/SalesOrdersPage";
@@ -108,6 +109,7 @@ import EditCustomerPage from "./features/sales/views/customers/EditCustomerPage"
 import SalesReportsPage from "./features/sales/views/reports/SalesReports";
 import PriceAgreementsPage from "./features/sales/views/price_agreements/PriceAgreementsPage";
 import DebtorManagementPage from "./features/sales/views/debtor_management/DebtorManagementPage";
+import SalesOverview from "./features/sales/views/overview/SalesOverview";
 
 /**
  * Main Application Component
@@ -719,7 +721,7 @@ function App() {
                     />
 
                     {/* Costing Module */}
-                    <Route path="/costing" element={<CostingDashboard />} />
+                    <Route path="/costing" element={<CostingOverview />} />
                     <Route
                       path="/costing/entries"
                       element={<CostingEntriesPage />}
@@ -765,7 +767,7 @@ function App() {
                     <Route
                       path="/sales"
                       element={
-                        <SalesOrdersPage
+                        <SalesOverview
                           activeWarehouse={activeWarehouse ?? undefined}
                         />
                       }
