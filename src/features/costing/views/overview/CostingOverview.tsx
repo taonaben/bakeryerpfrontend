@@ -152,7 +152,9 @@ const CostingOverview: React.FC = () => {
           </div>
           <div>
             <span>Average Variance %</span>
-            <strong>{isLoading ? "Loading..." : pct(kpis.avgVariancePct)}</strong>
+            <strong>
+              {isLoading ? "Loading..." : pct(kpis.avgVariancePct)}
+            </strong>
             <small>Across summary groups</small>
           </div>
         </article>

@@ -151,7 +151,9 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
           </div>
           <div>
             <span>Today Revenue</span>
-            <strong>{isLoading ? "Loading..." : money(kpis.todayRevenue)}</strong>
+            <strong>
+              {isLoading ? "Loading..." : money(kpis.todayRevenue)}
+            </strong>
             <small>From daily summary</small>
           </div>
         </article>
