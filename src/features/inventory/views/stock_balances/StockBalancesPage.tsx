@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { inventoryService } from '../services/inventoryService';
-import { useStockFilters } from '../hooks/useStockFilters';
-import type { StockBalance } from '../types/models';
-import '../styles/inventory.css';
-import InventoryToolbar from '../components/InventoryToolbar';
-import StockBalancesTable from './stock_balances/StockBalancesTable';
-import NoWarehouseSelected from '../components/NoWarehouseSelected';
+import { inventoryService } from '../../services/inventoryService';
+import { useStockFilters } from '../../hooks/useStockFilters';
+import type { StockBalance } from '../../types/models';
+import '../../styles/inventory.css';
+import InventoryToolbar from '../../components/InventoryToolbar';
+import StockBalancesTable from './StockBalancesTable';
+import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
 interface StockBalancesPageProps {
   activeWarehouse?: { id: string; name: string };

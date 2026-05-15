@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import '../styles/inventory.css';
-import NoWarehouseSelected from '../components/NoWarehouseSelected';
+import '../../styles/inventory.css';
+import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
 interface InventoryDashboardProps {
   activeWarehouse?: { id: string; name: string };

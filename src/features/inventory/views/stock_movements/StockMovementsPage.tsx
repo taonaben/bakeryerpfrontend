@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { inventoryService } from '../services/inventoryService';
-import { useMovementFilters } from '../hooks/useMovementFilters';
-import type { StockMovement } from '../types/models';
-import '../styles/inventory.css';
-import InventoryToolbar from '../components/InventoryToolbar';
-import MovementLedgerTable from './stock_movements/MovementLedgerTable';
-import NoWarehouseSelected from '../components/NoWarehouseSelected';
+import { inventoryService } from '../../services/inventoryService';
+import { useMovementFilters } from '../../hooks/useMovementFilters';
+import type { StockMovement } from '../../types/models';
+import '../../styles/inventory.css';
+import InventoryToolbar from '../../components/InventoryToolbar';
+import MovementLedgerTable from './MovementLedgerTable';
+import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
 interface StockMovementsPageProps {
   activeWarehouse?: { id: string; name: string };

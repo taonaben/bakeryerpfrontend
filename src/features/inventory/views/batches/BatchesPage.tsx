@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { inventoryService } from '../services/inventoryService';
-import { useBatchFilters } from '../hooks/useBatchFilters';
-import type { BatchRegistry } from '../types/models';
-import '../styles/inventory.css';
-import InventoryToolbar from '../components/InventoryToolbar';
-import BatchesRegistryTable from './batches/BatchesRegistryTable';
-import BatchModal from './batches/add_batch_modal';
-import NoWarehouseSelected from '../components/NoWarehouseSelected';
+import { inventoryService } from '../../services/inventoryService';
+import { useBatchFilters } from '../../hooks/useBatchFilters';
+import type { BatchRegistry } from '../../types/models';
+import '../../styles/inventory.css';
+import InventoryToolbar from '../../components/InventoryToolbar';
+import BatchesRegistryTable from './BatchesRegistryTable';
+import BatchModal from './add_batch_modal';
+import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
 interface BatchesPageProps {
   activeWarehouse?: { id: string; name: string };

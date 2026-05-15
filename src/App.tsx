@@ -6,10 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import Dashboard from "./features/dashboard/views/Dashboard";
-import InventoryDashboard from "./features/inventory/views/InventoryDashboard";
-import StockMovementsPage from "./features/inventory/views/StockMovementsPage";
-import StockBalancesPage from "./features/inventory/views/StockBalancesPage";
-import BatchesPage from "./features/inventory/views/BatchesPage";
+import InventoryDashboard from "./features/inventory/views/inventory_overview/InventoryOverview";
+import StockMovementsPage from "./features/inventory/views/stock_movements/StockMovementsPage";
+import StockBalancesPage from "./features/inventory/views/stock_balances/StockBalancesPage";
+import BatchesPage from "./features/inventory/views/batches/BatchesPage";
 import BatchDetailPage from "./features/inventory/views/batches/BatchDetailPage";
 import StockMovementDetailPage from "./features/inventory/views/stock_movements/StockMovementDetailPage";
 import ProductsPage from "./features/inventory/views/products/ProductsPage";
