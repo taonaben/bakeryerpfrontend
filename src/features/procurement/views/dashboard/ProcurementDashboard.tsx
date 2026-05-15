@@ -16,6 +16,27 @@ import {
 } from '../../components/procurement_overview/procurementOverviewUtils';
 import '../../styles/procurement.css';
 
+const resolveCompanyId = (company: unknown): string | null => {
+  if (typeof company === 'string' && company.trim()) return company;
+  if (company && typeof company === 'object') {
+    const value = (company as { id?: unknown; uuid?: unknown }).id
+      ?? (company as { id?: unknown; uuid?: unknown }).uuid;
+    return typeof value === 'string' && value.trim() ? value : null;
+  }
+  return null;
+};
+
+const getStoredCompanyId = (): string | null => {
+  try {
+    const savedUser = localStorage.getItem('erp_user');
+    if (!savedUser) return null;
+    const parsedUser = JSON.parse(savedUser) as { company?: unknown };
+    return resolveCompanyId(parsedUser.company);
+  } catch {
+    return null;
+  }
+};
+
 const ProcurementDashboard: React.FC = () => {
   const user = useUserStore((state) => state.user);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -54,8 +75,11 @@ const ProcurementDashboard: React.FC = () => {
   }, [fetchOverview, filters.date_from, filters.date_to, setFilters]);
 
   useEffect(() => {
-    const companyId = typeof user?.company === 'string' ? user.company : null;
-    if (!companyId) return;
+    const companyId = resolveCompanyId(user?.company) || getStoredCompanyId();
+    if (!companyId) {
+      setWarehouses([]);
+      return;
+    }
 
     let cancelled = false;
     setWarehousesLoading(true);
@@ -78,7 +102,7 @@ const ProcurementDashboard: React.FC = () => {
   }, [user?.company]);
 
   const isLoading = isLoadingSummary || isLoadingTrends || isLoadingSupplierPerformance;
-
+ 
   return (
     <div className="procurement-page">
       <div className="procurement-sticky-stack">
@@ -125,10 +149,13 @@ const ProcurementDashboard: React.FC = () => {
         )}
 
         <ProcurementKpiStrip summary={summary} isLoading={isLoadingSummary} />
-        <ProcurementAttentionPanels summary={summary} />
-        <ProcurementStatusBreakdowns summary={summary} />
-        <ProcurementTrendsSection trends={trends} />
-        <SupplierPerformanceSection supplierPerformance={supplierPerformance} />
+        <ProcurementAttentionPanels summary={summary} isLoading={isLoadingSummary} />
+        <ProcurementStatusBreakdowns summary={summary} isLoading={isLoadingSummary} />
+        <ProcurementTrendsSection trends={trends} isLoading={isLoadingTrends} />
+        <SupplierPerformanceSection
+          supplierPerformance={supplierPerformance}
+          isLoading={isLoadingSupplierPerformance}
+        />
       </div>
     </div>
   );

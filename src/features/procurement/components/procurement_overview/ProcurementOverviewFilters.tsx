@@ -35,9 +35,10 @@ const ProcurementOverviewFiltersBar: React.FC<ProcurementOverviewFiltersProps> =
       <select
         id="procurement-overview-warehouse"
         value={filters.warehouse_id}
+        disabled={warehousesLoading}
         onChange={(event) => onChange({ warehouse_id: event.target.value })}
       >
-        <option value="">{warehousesLoading ? 'Loading warehouses...' : 'All warehouses'}</option>
+        <option value="">All warehouses</option>
         {warehouses.map((warehouse) => (
           <option key={warehouse.id} value={warehouse.id}>
             {warehouse.name}
@@ -103,7 +104,7 @@ const ProcurementOverviewFiltersBar: React.FC<ProcurementOverviewFiltersProps> =
       onClick={onRefresh}
       disabled={isRefreshing}
     >
-      <RefreshCw size={15} className={isRefreshing ? 'spin' : ''} />
+      <RefreshCw size={15} />
       Refresh
     </button>
   </section>

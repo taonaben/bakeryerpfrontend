@@ -293,6 +293,46 @@
   font-size: 0.78rem;
 }
 
+.costing-overview-skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e8eef4;
+}
+
+.costing-overview-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.68), transparent);
+  animation: costing-overview-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes costing-overview-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.costing-overview-skeleton--value {
+  width: min(150px, 72%);
+  height: 28px;
+  margin-top: 7px;
+}
+
+.costing-overview-skeleton--text {
+  width: min(180px, 86%);
+  height: 12px;
+  margin-top: 8px;
+}
+
+.costing-overview-skeleton--row {
+  width: 100%;
+  height: 18px;
+}
+
 /* Responsive Design */
 @media (max-width: 860px) {
   .costing-overview-kpis {

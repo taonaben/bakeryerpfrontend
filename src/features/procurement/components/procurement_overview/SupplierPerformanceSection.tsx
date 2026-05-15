@@ -16,10 +16,12 @@ import { pct, PROCUREMENT_CHART_COLORS } from './procurementOverviewUtils';
 
 interface SupplierPerformanceSectionProps {
   supplierPerformance: ProcurementSupplierPerformance | null;
+  isLoading: boolean;
 }
 
 const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
   supplierPerformance,
+  isLoading,
 }) => {
   const suppliers = supplierPerformance?.suppliers || [];
   const exceptionChartData = useMemo(
@@ -77,7 +79,9 @@ const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {suppliers.length === 0 ? (
+                {isLoading ? (
+                  <SupplierRowsSkeleton />
+                ) : suppliers.length === 0 ? (
                   <tr>
                     <td colSpan={11} className="procurement-overview-empty-cell">
                       No supplier performance data returned.
@@ -89,21 +93,21 @@ const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
                       key={supplier.supplier_id}
                       className={supplier.total_exception_lines > 0 ? 'is-attention' : ''}
                     >
-                      <td>{supplier.supplier_name}</td>
-                      <td>{supplier.rating ?? '-'}</td>
-                      <td>
+                      <td data-label="Supplier">{supplier.supplier_name}</td>
+                      <td data-label="Rating">{supplier.rating ?? '-'}</td>
+                      <td data-label="Status">
                         <span className={`badge ${supplier.on_hold ? 'on-hold' : supplier.is_active ? 'active' : 'inactive'}`}>
                           {supplier.on_hold ? 'On hold' : supplier.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td>{supplier.total_grns}</td>
-                      <td>{supplier.rejected_grns}</td>
-                      <td>{pct(supplier.on_time_delivery_rate)}</td>
-                      <td>{supplier.average_lead_time_days ?? '-'}</td>
-                      <td>{supplier.price_variance_lines}</td>
-                      <td>{supplier.quantity_variance_lines}</td>
-                      <td>{supplier.unmatched_lines}</td>
-                      <td>{supplier.total_exception_lines}</td>
+                      <td data-label="GRNs">{supplier.total_grns}</td>
+                      <td data-label="Rejected">{supplier.rejected_grns}</td>
+                      <td data-label="On-time %">{pct(supplier.on_time_delivery_rate)}</td>
+                      <td data-label="Avg Lead">{supplier.average_lead_time_days ?? '-'}</td>
+                      <td data-label="Price Var.">{supplier.price_variance_lines}</td>
+                      <td data-label="Qty Var.">{supplier.quantity_variance_lines}</td>
+                      <td data-label="Unmatched">{supplier.unmatched_lines}</td>
+                      <td data-label="Exceptions">{supplier.total_exception_lines}</td>
                     </tr>
                   ))
                 )}
@@ -112,23 +116,23 @@ const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
           </div>
         </article>
 
-        <div className="procurement-overview-supplier-side">
-          <MiniSupplierList
-            title="Best Suppliers"
+        <MiniSupplierList
+          title="Best Suppliers"
             suppliers={supplierPerformance?.best_suppliers || []}
             emptyText="No best-supplier data."
+            isLoading={isLoading}
           />
           <MiniSupplierList
             title="Worst / Risk Suppliers"
             suppliers={supplierPerformance?.worst_suppliers || []}
             emptyText="No risk supplier data."
             attention
+            isLoading={isLoading}
           />
-        </div>
 
         <article className="procurement-overview-panel procurement-overview-chart">
           <h3>Top Exception Counts</h3>
-          <ResponsiveContainer width="100%" height={220}>
+          {isLoading ? <ChartSkeleton /> : <ResponsiveContainer width="100%" height={220}>
             <BarChart data={exceptionChartData} margin={{ top: 12, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
@@ -136,12 +140,12 @@ const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
               <Tooltip />
               <Bar dataKey="exceptions" fill={PROCUREMENT_CHART_COLORS.red} radius={[4, 4, 0, 0]} />
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer>}
         </article>
 
         <article className="procurement-overview-panel procurement-overview-chart">
           <h3>On-time Delivery Rate</h3>
-          <ResponsiveContainer width="100%" height={220}>
+          {isLoading ? <ChartSkeleton /> : <ResponsiveContainer width="100%" height={220}>
             <BarChart data={onTimeChartData} layout="vertical" margin={{ top: 12, right: 16, left: 20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" horizontal={false} />
               <XAxis type="number" domain={[0, 100]} tickFormatter={(value) => `${value}%`} tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
@@ -149,7 +153,7 @@ const SupplierPerformanceSection: React.FC<SupplierPerformanceSectionProps> = ({
               <Tooltip formatter={(value) => `${Number(value).toFixed(1)}%`} />
               <Bar dataKey="rate" fill={PROCUREMENT_CHART_COLORS.green} radius={[0, 4, 4, 0]} />
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer>}
         </article>
       </div>
     </section>
@@ -161,10 +165,18 @@ const MiniSupplierList: React.FC<{
   suppliers: ProcurementSupplierPerformanceRow[];
   emptyText: string;
   attention?: boolean;
-}> = ({ title, suppliers, emptyText, attention = false }) => (
+  isLoading: boolean;
+}> = ({ title, suppliers, emptyText, attention = false, isLoading }) => (
   <article className={`procurement-overview-panel procurement-overview-mini-list ${attention ? 'procurement-overview-mini-list--attention' : ''}`}>
     <h3>{title}</h3>
-    {suppliers.length === 0 ? (
+    {isLoading ? (
+      <div className="procurement-overview-mini-list-skeleton" aria-label="Loading">
+        <span className="procurement-skeleton procurement-skeleton--line" />
+        <span className="procurement-skeleton procurement-skeleton--line procurement-skeleton--short" />
+        <span className="procurement-skeleton procurement-skeleton--line" />
+        <span className="procurement-skeleton procurement-skeleton--line procurement-skeleton--short" />
+      </div>
+    ) : suppliers.length === 0 ? (
       <p className="procurement-overview-muted">{emptyText}</p>
     ) : (
       <ol>
@@ -177,6 +189,30 @@ const MiniSupplierList: React.FC<{
       </ol>
     )}
   </article>
+);
+
+const SupplierRowsSkeleton: React.FC = () => (
+  <>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <tr key={index}>
+        <td colSpan={11}>
+          <span className="procurement-skeleton procurement-skeleton--row" />
+        </td>
+      </tr>
+    ))}
+  </>
+);
+
+const ChartSkeleton: React.FC = () => (
+  <div className="procurement-overview-chart-skeleton" aria-label="Loading chart">
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-1" />
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-2" />
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-3" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-1" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-2" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-3" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-4" />
+  </div>
 );
 
 const trimName = (name: string): string => (name.length > 14 ? `${name.slice(0, 13)}...` : name);

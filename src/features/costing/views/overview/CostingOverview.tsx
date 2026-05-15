@@ -28,14 +28,10 @@ const money = (value: number): string => {
 
 const pct = (value: number): string => `${value.toFixed(1)}%`;
 
-const monthStartIso = (): string => {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1)
-    .toISOString()
-    .slice(0, 10);
-};
-
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
+
+const recentWindowStartIso = (): string =>
+  new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
 
 const CostingOverview: React.FC = () => {
   const {
@@ -50,7 +46,7 @@ const CostingOverview: React.FC = () => {
   } = useCostingOverviewStore();
 
   useEffect(() => {
-    fetchOverview({ date_from: monthStartIso(), date_to: todayIso() }, true);
+    fetchOverview({ date_from: recentWindowStartIso(), date_to: todayIso() }, true);
   }, [fetchOverview]);
 
   const topVarianceDrivers = useMemo(() => {
@@ -140,10 +136,11 @@ const CostingOverview: React.FC = () => {
           </div>
           <div>
             <span>Total Variance</span>
-            <strong>
-              {isLoading ? "Loading..." : money(kpis.totalVariance)}
-            </strong>
-            <small>Summary groups combined</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={money(kpis.totalVariance)}
+              helper="Summary groups combined"
+            />
           </div>
         </article>
         <article className="costing-overview-kpi">
@@ -152,10 +149,11 @@ const CostingOverview: React.FC = () => {
           </div>
           <div>
             <span>Average Variance %</span>
-            <strong>
-              {isLoading ? "Loading..." : pct(kpis.avgVariancePct)}
-            </strong>
-            <small>Across summary groups</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={pct(kpis.avgVariancePct)}
+              helper="Across summary groups"
+            />
           </div>
         </article>
         <article className="costing-overview-kpi">
@@ -164,8 +162,11 @@ const CostingOverview: React.FC = () => {
           </div>
           <div>
             <span>Adverse Batches</span>
-            <strong>{isLoading ? "Loading..." : kpis.adverseBatches}</strong>
-            <small>Requires corrective action</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={kpis.adverseBatches}
+              helper="Requires corrective action"
+            />
           </div>
         </article>
         <article className="costing-overview-kpi">
@@ -174,10 +175,11 @@ const CostingOverview: React.FC = () => {
           </div>
           <div>
             <span>Products With Margin Targets</span>
-            <strong>
-              {isLoading ? "Loading..." : kpis.productsWithMarginData}
-            </strong>
-            <small>{kpis.ingredientRows} ingredient rows loaded</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={kpis.productsWithMarginData}
+              helper={`${kpis.ingredientRows} ingredient rows loaded`}
+            />
           </div>
         </article>
       </section>
@@ -199,7 +201,9 @@ const CostingOverview: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {topVarianceDrivers.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : topVarianceDrivers.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="costing-overview-empty">
                     No variance summary data
@@ -234,7 +238,9 @@ const CostingOverview: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {topMarginTargets.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : topMarginTargets.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="costing-overview-empty">
                     No margin report data
@@ -271,7 +277,9 @@ const CostingOverview: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {recentVarianceItems.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : recentVarianceItems.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="costing-overview-empty">
                     No variance analysis data
@@ -309,5 +317,37 @@ const CostingOverview: React.FC = () => {
     </div>
   );
 };
+
+const OverviewKpiValue: React.FC<{
+  isLoading: boolean;
+  value: React.ReactNode;
+  helper: string;
+}> = ({ isLoading, value, helper }) => (
+  <>
+    {isLoading ? (
+      <>
+        <strong className="costing-overview-skeleton costing-overview-skeleton--value" aria-label="Loading" />
+        <small className="costing-overview-skeleton costing-overview-skeleton--text" />
+      </>
+    ) : (
+      <>
+        <strong>{value}</strong>
+        <small>{helper}</small>
+      </>
+    )}
+  </>
+);
+
+const OverviewTableSkeleton: React.FC<{ colSpan: number }> = ({ colSpan }) => (
+  <>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <tr key={index}>
+        <td colSpan={colSpan}>
+          <span className="costing-overview-skeleton costing-overview-skeleton--row" />
+        </td>
+      </tr>
+    ))}
+  </>
+);
 
 export default CostingOverview;

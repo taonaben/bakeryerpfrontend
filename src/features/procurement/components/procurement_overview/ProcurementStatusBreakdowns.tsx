@@ -4,10 +4,12 @@ import { countTotal, statusClassName } from './procurementOverviewUtils';
 
 interface ProcurementStatusBreakdownsProps {
   summary: ProcurementOverviewSummary | null;
+  isLoading: boolean;
 }
 
 const ProcurementStatusBreakdowns: React.FC<ProcurementStatusBreakdownsProps> = ({
   summary,
+  isLoading,
 }) => (
   <section className="procurement-overview-section">
     <div className="procurement-overview-section__head">
@@ -18,12 +20,13 @@ const ProcurementStatusBreakdowns: React.FC<ProcurementStatusBreakdownsProps> = 
     </div>
 
     <div className="procurement-overview-status-grid">
-      <StatusBreakdownCard title="Purchase Requisitions" counts={summary?.pr_counts_by_status || {}} />
-      <StatusBreakdownCard title="Purchase Orders" counts={summary?.po_counts_by_status || {}} />
-      <StatusBreakdownCard title="Goods Receipts" counts={summary?.grn_counts_by_status || {}} />
+      <StatusBreakdownCard title="Purchase Requisitions" counts={summary?.pr_counts_by_status || {}} isLoading={isLoading} />
+      <StatusBreakdownCard title="Purchase Orders" counts={summary?.po_counts_by_status || {}} isLoading={isLoading} />
+      <StatusBreakdownCard title="Goods Receipts" counts={summary?.grn_counts_by_status || {}} isLoading={isLoading} />
       <StatusBreakdownCard
         title="Supplier Invoices"
         counts={summary?.supplier_invoice_counts_by_status || {}}
+        isLoading={isLoading}
       />
     </div>
   </section>
@@ -32,7 +35,8 @@ const ProcurementStatusBreakdowns: React.FC<ProcurementStatusBreakdownsProps> = 
 const StatusBreakdownCard: React.FC<{
   title: string;
   counts: ProcurementStatusCounts;
-}> = ({ title, counts }) => {
+  isLoading: boolean;
+}> = ({ title, counts, isLoading }) => {
   const total = countTotal(counts);
   const entries = Object.entries(counts).filter(([, value]) => value > 0);
 
@@ -43,6 +47,15 @@ const StatusBreakdownCard: React.FC<{
         <span>{total}</span>
       </div>
 
+      {isLoading ? (
+        <div className="procurement-overview-status-skeleton" aria-label="Loading status breakdown">
+          <span className="procurement-skeleton procurement-skeleton--bar" />
+          <span className="procurement-skeleton procurement-skeleton--line" />
+          <span className="procurement-skeleton procurement-skeleton--line procurement-skeleton--short" />
+          <span className="procurement-skeleton procurement-skeleton--line" />
+        </div>
+      ) : (
+        <>
       <div className="procurement-overview-segmented" aria-label={`${title} status split`}>
         {entries.length === 0 ? (
           <span className="procurement-overview-segment procurement-overview-segment--empty" />
@@ -71,6 +84,8 @@ const StatusBreakdownCard: React.FC<{
           ))
         )}
       </div>
+        </>
+      )}
     </article>
   );
 };

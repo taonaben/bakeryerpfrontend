@@ -55,10 +55,10 @@ const AGING_BUCKETS: Array<{ key: AgingBucketKey; label: string; color: string }
 ];
 
 const FinanceOverview: React.FC = () => {
-  const { items: arItems, fetchAll: fetchAR } = useAccountsReceivableStore();
-  const { items: apItems, fetchAll: fetchAP } = useAccountsPayableStore();
-  const { items: journalEntries, fetchAll: fetchJournalEntries } = useJournalEntriesStore();
-  const { items: fiscalPeriods, fetchAll: fetchFiscalPeriods } = useFiscalPeriodsStore();
+  const { items: arItems, isLoading: isLoadingAR, fetchAll: fetchAR } = useAccountsReceivableStore();
+  const { items: apItems, isLoading: isLoadingAP, fetchAll: fetchAP } = useAccountsPayableStore();
+  const { items: journalEntries, isLoading: isLoadingJournalEntries, fetchAll: fetchJournalEntries } = useJournalEntriesStore();
+  const { items: fiscalPeriods, isLoading: isLoadingFiscalPeriods, fetchAll: fetchFiscalPeriods } = useFiscalPeriodsStore();
 
   const [trialBalance, setTrialBalance] = useState<TrialBalanceReport | null>(null);
   const [isLoadingReport, setIsLoadingReport] = useState(false);
@@ -196,25 +196,29 @@ const FinanceOverview: React.FC = () => {
             icon={<TrendingUp size={20} />}
             label="Total Revenue"
             helper="This Period"
-            value={isLoadingReport ? 'Loading...' : formatReportMoney(revenueThisPeriod)}
+            value={formatReportMoney(revenueThisPeriod)}
+            isLoading={isLoadingReport}
           />
           <KpiCard
             icon={<Receipt size={20} />}
             label="Outstanding AR"
             helper={`${openAR.length} open records`}
             value={formatReportMoney(outstandingAR)}
+            isLoading={isLoadingAR}
           />
           <KpiCard
             icon={<WalletCards size={20} />}
             label="Outstanding AP"
             helper={`${openAP.length} open records`}
             value={formatReportMoney(outstandingAP)}
+            isLoading={isLoadingAP}
           />
           <KpiCard
             icon={<CircleDollarSign size={20} />}
             label="Net Cash Position"
             helper="Accounts 1001 + 1100"
-            value={isLoadingReport ? 'Loading...' : formatReportMoney(netCashPosition)}
+            value={formatReportMoney(netCashPosition)}
+            isLoading={isLoadingReport}
           />
         </section>
 
@@ -239,6 +243,7 @@ const FinanceOverview: React.FC = () => {
             description="Customer balances by overdue age bucket."
             buckets={arAging}
             linkTo="/finance/reports?report=ar_aging"
+            isLoading={isLoadingAR}
           />
           <AgingPanel
             title="AP Aging Summary"
@@ -246,12 +251,17 @@ const FinanceOverview: React.FC = () => {
             buckets={apAging}
             linkTo="/finance/reports?report=ap_aging"
             alarming={apAging.find((bucket) => bucket.key === 'over_90')?.value ? true : false}
+            isLoading={isLoadingAP}
           />
         </section>
 
         <section className="finance-overview-grid finance-overview-grid--bottom">
-          <RecentJournalEntries entries={recentEntries} />
-          <FiscalPeriodStatus period={openPeriod} progress={periodProgress} />
+          <RecentJournalEntries entries={recentEntries} isLoading={isLoadingJournalEntries} />
+          <FiscalPeriodStatus
+            period={openPeriod}
+            progress={periodProgress}
+            isLoading={isLoadingFiscalPeriods}
+          />
         </section>
       </div>
     </div>
@@ -263,13 +273,23 @@ const KpiCard: React.FC<{
   label: string;
   helper: string;
   value: string;
-}> = ({ icon, label, helper, value }) => (
+  isLoading?: boolean;
+}> = ({ icon, label, helper, value, isLoading = false }) => (
   <article className="finance-overview-kpi">
     <div className="finance-overview-kpi__icon">{icon}</div>
     <div>
       <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{helper}</small>
+      {isLoading ? (
+        <>
+          <strong className="finance-overview-skeleton finance-overview-skeleton--value" aria-label="Loading" />
+          <small className="finance-overview-skeleton finance-overview-skeleton--text" />
+        </>
+      ) : (
+        <>
+          <strong>{value}</strong>
+          <small>{helper}</small>
+        </>
+      )}
     </div>
   </article>
 );
@@ -280,7 +300,8 @@ const AgingPanel: React.FC<{
   buckets: AgingBucket[];
   linkTo: string;
   alarming?: boolean;
-}> = ({ title, description, buckets, linkTo, alarming = false }) => (
+  isLoading?: boolean;
+}> = ({ title, description, buckets, linkTo, alarming = false, isLoading = false }) => (
   <Link className={`finance-overview-panel finance-overview-aging ${alarming ? 'finance-overview-panel--danger' : ''}`} to={linkTo}>
     <div className="finance-section-header">
       <div>
@@ -289,7 +310,7 @@ const AgingPanel: React.FC<{
       </div>
       <ArrowRight size={18} />
     </div>
-    <ResponsiveContainer width="100%" height={210}>
+    {isLoading ? <FinanceChartSkeleton /> : <ResponsiveContainer width="100%" height={210}>
       <BarChart data={buckets} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
         <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
@@ -301,7 +322,7 @@ const AgingPanel: React.FC<{
           ))}
         </Bar>
       </BarChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer>}
   </Link>
 );
 
@@ -319,7 +340,7 @@ const AgingTooltip: React.FC<any> = ({ active, payload, label }) => {
   );
 };
 
-const RecentJournalEntries: React.FC<{ entries: JournalEntry[] }> = ({ entries }) => (
+const RecentJournalEntries: React.FC<{ entries: JournalEntry[]; isLoading: boolean }> = ({ entries, isLoading }) => (
   <section className="finance-overview-panel">
     <div className="finance-section-header">
       <div>
@@ -329,7 +350,21 @@ const RecentJournalEntries: React.FC<{ entries: JournalEntry[] }> = ({ entries }
       <BookOpenCheck size={18} />
     </div>
 
-    {entries.length === 0 ? (
+    {isLoading ? (
+      <div className="finance-table-container finance-overview-table-wrap">
+        <table className="finance-table finance-overview-journal-table">
+          <tbody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <tr key={index}>
+                <td colSpan={5}>
+                  <span className="finance-overview-skeleton finance-overview-skeleton--row" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : entries.length === 0 ? (
       <div className="finance-empty-state finance-overview-empty">
         <h3>No journal entries yet</h3>
         <p>Recent ledger postings will appear here.</p>
@@ -377,7 +412,19 @@ const RecentJournalEntries: React.FC<{ entries: JournalEntry[] }> = ({ entries }
 const FiscalPeriodStatus: React.FC<{
   period: FiscalPeriod | null;
   progress: number;
-}> = ({ period, progress }) => {
+  isLoading: boolean;
+}> = ({ period, progress, isLoading }) => {
+  if (isLoading) {
+    return (
+      <section className="finance-overview-panel finance-period-status">
+        <span className="finance-overview-skeleton finance-overview-skeleton--line" />
+        <span className="finance-overview-skeleton finance-overview-skeleton--value" />
+        <span className="finance-overview-skeleton finance-overview-skeleton--text" />
+        <span className="finance-overview-skeleton finance-overview-skeleton--bar" />
+      </section>
+    );
+  }
+
   if (!period) {
     return (
       <section className="finance-overview-panel finance-period-status finance-period-status--blocked">
@@ -408,6 +455,16 @@ const FiscalPeriodStatus: React.FC<{
     </section>
   );
 };
+
+const FinanceChartSkeleton: React.FC = () => (
+  <div className="finance-overview-chart-skeleton" aria-label="Loading chart">
+    <span className="finance-overview-skeleton finance-overview-skeleton--chart-bar finance-overview-skeleton--chart-bar-1" />
+    <span className="finance-overview-skeleton finance-overview-skeleton--chart-bar finance-overview-skeleton--chart-bar-2" />
+    <span className="finance-overview-skeleton finance-overview-skeleton--chart-bar finance-overview-skeleton--chart-bar-3" />
+    <span className="finance-overview-skeleton finance-overview-skeleton--chart-bar finance-overview-skeleton--chart-bar-4" />
+    <span className="finance-overview-skeleton finance-overview-skeleton--chart-bar finance-overview-skeleton--chart-bar-5" />
+  </div>
+);
 
 function buildAgingBuckets<T extends { due_date: string; amount_outstanding: number | string }>(items: T[]): AgingBucket[] {
   const totals: Record<AgingBucketKey, number> = {

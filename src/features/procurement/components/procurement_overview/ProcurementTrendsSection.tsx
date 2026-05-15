@@ -22,10 +22,12 @@ import {
 
 interface ProcurementTrendsSectionProps {
   trends: ProcurementOverviewTrends | null;
+  isLoading: boolean;
 }
 
 const ProcurementTrendsSection: React.FC<ProcurementTrendsSectionProps> = ({
   trends,
+  isLoading,
 }) => {
   const invoiceData = useMemo(() => {
     const byPeriod = new Map<string, { period: string; approved: number; paid: number }>();
@@ -59,7 +61,7 @@ const ProcurementTrendsSection: React.FC<ProcurementTrendsSectionProps> = ({
       </div>
 
       <div className="procurement-overview-trends-grid">
-        <ChartPanel title="PO Value Trend" size="large">
+        <ChartPanel title="PO Value Trend" size="large" isLoading={isLoading}>
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={trends?.po_value || []} margin={{ top: 12, right: 18, left: 0, bottom: 0 }}>
               <defs>
@@ -84,7 +86,7 @@ const ProcurementTrendsSection: React.FC<ProcurementTrendsSectionProps> = ({
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Approved GRNs">
+        <ChartPanel title="Approved GRNs" isLoading={isLoading}>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={trends?.grns_approved || []} margin={{ top: 12, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
@@ -96,7 +98,7 @@ const ProcurementTrendsSection: React.FC<ProcurementTrendsSectionProps> = ({
           </ResponsiveContainer>
         </ChartPanel>
 
-        <ChartPanel title="Supplier Invoices">
+        <ChartPanel title="Supplier Invoices" isLoading={isLoading}>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={invoiceData} margin={{ top: 12, right: 16, left: 0, bottom: 0 }} barGap={5}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
@@ -107,13 +109,13 @@ const ProcurementTrendsSection: React.FC<ProcurementTrendsSectionProps> = ({
               <Bar dataKey="paid" fill={PROCUREMENT_CHART_COLORS.green} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-          <div className="procurement-overview-legend">
+          {!isLoading && <div className="procurement-overview-legend">
             <span><i style={{ background: PROCUREMENT_CHART_COLORS.blueLight }} />Approved</span>
             <span><i style={{ background: PROCUREMENT_CHART_COLORS.green }} />Paid</span>
-          </div>
+          </div>}
         </ChartPanel>
 
-        <ChartPanel title="Overdue PO Trend">
+        <ChartPanel title="Overdue PO Trend" isLoading={isLoading}>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={trends?.overdue_pos || []} margin={{ top: 12, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" vertical={false} />
@@ -139,11 +141,24 @@ const ChartPanel: React.FC<{
   title: string;
   children: React.ReactNode;
   size?: 'normal' | 'large';
-}> = ({ title, children, size = 'normal' }) => (
+  isLoading: boolean;
+}> = ({ title, children, size = 'normal', isLoading }) => (
   <article className={`procurement-overview-panel procurement-overview-chart procurement-overview-chart--${size}`}>
     <h3>{title}</h3>
-    {children}
+    {isLoading ? <ChartSkeleton /> : children}
   </article>
+);
+
+const ChartSkeleton: React.FC = () => (
+  <div className="procurement-overview-chart-skeleton" aria-label="Loading chart">
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-1" />
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-2" />
+    <span className="procurement-skeleton procurement-skeleton--chart-line procurement-skeleton--chart-line-3" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-1" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-2" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-3" />
+    <span className="procurement-skeleton procurement-skeleton--chart-bar procurement-skeleton--chart-bar-4" />
+  </div>
 );
 
 const MoneyTooltip: React.FC<any> = ({ active, payload, label, valueKey, valueLabel }) => {

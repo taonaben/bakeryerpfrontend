@@ -151,10 +151,11 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
           </div>
           <div>
             <span>Today Revenue</span>
-            <strong>
-              {isLoading ? "Loading..." : money(kpis.todayRevenue)}
-            </strong>
-            <small>From daily summary</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={money(kpis.todayRevenue)}
+              helper="From daily summary"
+            />
           </div>
         </article>
         <article className="sales-overview-kpi">
@@ -163,8 +164,11 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
           </div>
           <div>
             <span>Today Gross Margin</span>
-            <strong>{isLoading ? "Loading..." : pct(kpis.todayMargin)}</strong>
-            <small>Profit / Revenue</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={pct(kpis.todayMargin)}
+              helper="Profit / Revenue"
+            />
           </div>
         </article>
         <article className="sales-overview-kpi">
@@ -173,10 +177,11 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
           </div>
           <div>
             <span>Outstanding Debtors</span>
-            <strong>
-              {isLoading ? "Loading..." : money(kpis.outstandingTotal)}
-            </strong>
-            <small>{topDebtors.length} key accounts shown</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={money(kpis.outstandingTotal)}
+              helper={`${topDebtors.length} key accounts shown`}
+            />
           </div>
         </article>
         <article className="sales-overview-kpi">
@@ -185,8 +190,11 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
           </div>
           <div>
             <span>Warehouses With Sales</span>
-            <strong>{isLoading ? "Loading..." : kpis.activeWarehouses}</strong>
-            <small>Current filter context</small>
+            <OverviewKpiValue
+              isLoading={isLoading}
+              value={kpis.activeWarehouses}
+              helper="Current filter context"
+            />
           </div>
         </article>
       </section>
@@ -208,7 +216,9 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
               </tr>
             </thead>
             <tbody>
-              {topProducts.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : topProducts.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="sales-overview-empty">
                     No product revenue data
@@ -243,7 +253,9 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
               </tr>
             </thead>
             <tbody>
-              {topDebtors.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : topDebtors.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="sales-overview-empty">
                     No debtor balances
@@ -282,7 +294,9 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
               </tr>
             </thead>
             <tbody>
-              {topWarehouses.length === 0 ? (
+              {isLoading ? (
+                <OverviewTableSkeleton colSpan={3} />
+              ) : topWarehouses.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="sales-overview-empty">
                     No warehouse sales data
@@ -326,5 +340,37 @@ const SalesOverview: React.FC<SalesOverviewProps> = ({ activeWarehouse }) => {
     </div>
   );
 };
+
+const OverviewKpiValue: React.FC<{
+  isLoading: boolean;
+  value: React.ReactNode;
+  helper: string;
+}> = ({ isLoading, value, helper }) => (
+  <>
+    {isLoading ? (
+      <>
+        <strong className="sales-overview-skeleton sales-overview-skeleton--value" aria-label="Loading" />
+        <small className="sales-overview-skeleton sales-overview-skeleton--text" />
+      </>
+    ) : (
+      <>
+        <strong>{value}</strong>
+        <small>{helper}</small>
+      </>
+    )}
+  </>
+);
+
+const OverviewTableSkeleton: React.FC<{ colSpan: number }> = ({ colSpan }) => (
+  <>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <tr key={index}>
+        <td colSpan={colSpan}>
+          <span className="sales-overview-skeleton sales-overview-skeleton--row" />
+        </td>
+      </tr>
+    ))}
+  </>
+);
 
 export default SalesOverview;
