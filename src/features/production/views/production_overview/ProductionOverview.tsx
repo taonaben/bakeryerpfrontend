@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductionPageShell from '../components/ProductionPageShell';
+import ProductionPageShell from '../../components/ProductionPageShell';
 
 const ProductionDashboard: React.FC = () => {
   return (

@@ -12,3 +12,4 @@ export type {
 } from './plannedOrderModel';
 
 export type { PlannedOrderListState, PlannedOrderDetailState, PlanningFiltersState } from './store';
+export type * from './productionOverviewModels';

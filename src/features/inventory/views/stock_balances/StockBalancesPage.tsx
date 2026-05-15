@@ -4,8 +4,8 @@ import { inventoryService } from '../../services/inventoryService';
 import { useStockFilters } from '../../hooks/useStockFilters';
 import type { StockBalance } from '../../types/models';
 import '../../styles/inventory.css';
-import InventoryToolbar from '../../components/InventoryToolbar';
-import StockBalancesTable from './StockBalancesTable';
+import InventoryListToolbar from '../../components/InventoryListToolbar';
+import StockBalancesTable from './StockBalancesTable.tsx';
 import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
 interface StockBalancesPageProps {
@@ -23,6 +23,17 @@ const StockBalancesPage = ({ activeWarehouse }: StockBalancesPageProps) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const warehouseId = activeWarehouse?.id;
+  const activeStatus = stockFilters.filters.status[0] || '';
+
+  const handleStatusChange = (status: string) => {
+    stockFilters.updateFilter('status', status ? [status] : []);
+    stockFilters.updateFilter('page', 1);
+  };
+
+  const handleSortChange = (ordering: string) => {
+    stockFilters.updateFilter('ordering', ordering);
+    stockFilters.updateFilter('page', 1);
+  };
 
   useEffect(() => {
     if (!warehouseId) return;
@@ -67,13 +78,27 @@ const StockBalancesPage = ({ activeWarehouse }: StockBalancesPageProps) => {
         <div className="inventory-header">
           <h1>Stock Balances</h1>
         </div>
-        <InventoryToolbar
-          activeTab="balances"
+        <InventoryListToolbar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onOpenMovementModal={() => {}}
-          onQualityAudit={() => {}}
-          warehouseId={warehouseId}
+          activeTab={activeStatus}
+          onTabChange={handleStatusChange}
+          tabs={[
+            { label: 'All', value: '' },
+            { label: 'Empty', value: 'EMPTY' },
+            { label: 'Almost Out', value: 'ALMOST_OUT' },
+            { label: 'Good', value: 'GOOD' },
+            { label: 'Full', value: 'FULL' },
+          ]}
+          sortValue={stockFilters.filters.ordering}
+          onSortChange={handleSortChange}
+          sortOptions={[
+            { label: 'Quantity on hand', value: 'quantity_on_hand' },
+            { label: 'Status', value: 'status' },
+            { label: 'Last updated', value: 'last_updated' },
+            { label: 'Created', value: 'created_at' },
+          ]}
+          placeholder="Search by SKU or product..."
         />
       </div>
       <div className="inventory-content">

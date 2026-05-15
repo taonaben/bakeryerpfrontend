@@ -4,8 +4,8 @@ import { inventoryService } from '../../services/inventoryService';
 import { useBatchFilters } from '../../hooks/useBatchFilters';
 import type { BatchRegistry } from '../../types/models';
 import '../../styles/inventory.css';
-import InventoryToolbar from '../../components/InventoryToolbar';
-import BatchesRegistryTable from './BatchesRegistryTable';
+import InventoryListToolbar from '../../components/InventoryListToolbar';
+import BatchesRegistryTable from './BatchesRegistryTable.tsx';
 import BatchModal from './add_batch_modal';
 import NoWarehouseSelected from '../../components/NoWarehouseSelected';
 
@@ -26,6 +26,17 @@ const BatchesPage = ({ activeWarehouse }: BatchesPageProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   const warehouseId = activeWarehouse?.id;
+  const activeStatus = batchFilters.filters.status[0] || '';
+
+  const handleStatusChange = (status: string) => {
+    batchFilters.updateFilter('status', status ? [status] : []);
+    batchFilters.updateFilter('page', 1);
+  };
+
+  const handleSortChange = (ordering: string) => {
+    batchFilters.updateFilter('ordering', ordering);
+    batchFilters.updateFilter('page', 1);
+  };
 
   useEffect(() => {
     if (!warehouseId) return;
@@ -97,13 +108,28 @@ const BatchesPage = ({ activeWarehouse }: BatchesPageProps) => {
         <div className="inventory-header">
           <h1>Batches Registry</h1>
         </div>
-        <InventoryToolbar
-          activeTab="batches"
+        <InventoryListToolbar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onOpenMovementModal={() => setShowBatchModal(true)}
-          onQualityAudit={() => {}}
-          warehouseId={warehouseId}
+          activeTab={activeStatus}
+          onTabChange={handleStatusChange}
+          tabs={[
+            { label: 'All', value: '' },
+            { label: 'Active', value: 'ACTIVE' },
+            { label: 'Expired', value: 'EXPIRED' },
+            { label: 'Depleted', value: 'DEPLETED' },
+          ]}
+          sortValue={batchFilters.filters.ordering}
+          onSortChange={handleSortChange}
+          sortOptions={[
+            { label: 'Batch number', value: 'batch_number' },
+            { label: 'Manufacture date', value: 'manufacture_date' },
+            { label: 'Expiry date', value: 'expiry_date' },
+            { label: 'Quantity', value: 'quantity' },
+            { label: 'Created', value: 'created_at' },
+          ]}
+          placeholder="Search batch number..."
+          action={{ label: 'New Batch', onClick: () => setShowBatchModal(true) }}
         />
       </div>
       <div className="inventory-content">

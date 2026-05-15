@@ -65,7 +65,7 @@ import AccountsPayablePage from "./features/finance/views/accounts_payable/ap_pa
 import FinanceReportsPage from "./features/finance/views/finance_reports/finance_reports";
 
 // Production views
-import ProductionDashboard from "./features/production/views/ProductionDashboard";
+import ProductionDashboard from "./features/production/views/production_overview/ProductionOverview";
 import PlannedOrdersPage from "./features/production/views/planning/planned-orders/plannedOrdersPage";
 import PlannedOrdersCalendarPage from "./features/production/views/planning/calender/plannedOrdersCalender";
 import ProductionOrdersPage from "./features/production/views/production/orders/productionOrdersPage";
