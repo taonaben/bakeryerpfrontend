@@ -4,6 +4,7 @@ export { useReworkOrderListStore } from './reworkOrderListStore';
 export { useReworkOrderDetailStore } from './reworkOrderDetailStore';
 export { useProductionBatchListStore } from './productionBatchListStore';
 export { useProductionBatchDetailStore } from './productionBatchDetailStore';
+export { useProductionOverviewStore } from './productionOverviewStore';
 // Production Feature – Barrel Export
 
 // Stores

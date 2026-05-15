@@ -190,6 +190,247 @@
 
 .inventory-table tr:hover { background-color: #fcfcfc; }
 
+.inventory-registry-table {
+    table-layout: auto;
+}
+
+.inventory-list-toolbar {
+    border-radius: 8px 8px 0 0;
+}
+
+.products-toolbar {
+    background: var(--white);
+    padding: 0.75rem 1rem;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.products-toolbar__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.products-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.status-tab {
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.status-tab:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.status-tab.active {
+    background: var(--marble-blue);
+    color: var(--white);
+    border-color: var(--marble-blue);
+}
+
+.toolbar-select {
+    min-width: 148px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: var(--white);
+    color: var(--text-dark);
+    font-size: 0.88rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toolbar-select:focus {
+    outline: none;
+    border-color: var(--marble-blue);
+    box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.1);
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f1f5f9;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    max-width: 300px;
+    width: 100%;
+}
+
+.search-bar:focus-within {
+    border-color: var(--marble-blue);
+    box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.1);
+    background: var(--white);
+}
+
+.search-bar input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+}
+
+.inventory-list-toolbar .products-toolbar__right {
+    flex-wrap: wrap;
+}
+
+.inventory-list-toolbar__action {
+    white-space: nowrap;
+}
+
+.inventory-list-toolbar .search-bar {
+    min-width: 260px;
+}
+
+@media (max-width: 768px) {
+    .products-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .products-toolbar__left,
+    .products-toolbar__right {
+        width: 100%;
+    }
+
+    .products-toolbar__right {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .toolbar-select,
+    .search-bar,
+    .inventory-list-toolbar .search-bar,
+    .inventory-list-toolbar__action {
+        max-width: none;
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+.inventory-table__clickable-row {
+    cursor: pointer;
+}
+
+.inventory-table tbody tr.inventory-table__clickable-row:hover {
+    background-color: #f8fafc;
+}
+
+.inventory-table input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--marble-blue);
+}
+
+.sku-cell,
+.unit-cell {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    color: var(--marble-blue);
+    font-weight: 600;
+}
+
+.name-cell {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.quantity-cell {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.quantity-cell--positive {
+    color: #059669;
+}
+
+.quantity-cell--negative {
+    color: #dc2626;
+}
+
+.notes-cell {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inventory-status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.inventory-status-badge--active,
+.inventory-status-badge--good,
+.inventory-status-badge--in {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.inventory-status-badge--expired,
+.inventory-status-badge--empty,
+.inventory-status-badge--out {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.inventory-status-badge--near,
+.inventory-status-badge--almost-out,
+.inventory-status-badge--adjustment {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.inventory-status-badge--full,
+.inventory-status-badge--return {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.inventory-status-badge--depleted {
+    background: #f1f5f9;
+    color: #475569;
+}
+
 /* Status Badges */
 .badge {
     padding: 4px 10px;

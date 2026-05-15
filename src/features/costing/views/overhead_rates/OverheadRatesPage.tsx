@@ -144,6 +144,7 @@ const OverheadRatesPage: React.FC = () => {
                   <th style={{ textAlign: 'right' }}>Overhead Budgeted</th>
                   <th style={{ textAlign: 'right' }}>Planned Units</th>
                   <th style={{ textAlign: 'right' }}>Rate / Unit</th>
+                  <th style={{ textAlign: 'right' }}>Rate / Labor Min.</th>
                   <th>Status</th>
                   <th>Created By</th>
                   <th style={{ textAlign: 'center' }}>Actions</th>
@@ -176,6 +177,13 @@ const OverheadRatesPage: React.FC = () => {
                             {fmtCurrency(rate.rate_per_unit, rate.currency)}
                           </span>
                         </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <span className="costing-cpu-cell">
+                            {rate.rate_per_labor_minute
+                              ? fmtCurrency(rate.rate_per_labor_minute, rate.currency)
+                              : 'â€”'}
+                          </span>
+                        </td>
                         <td>
                           <span className={`badge or-badge--${status}`}>
                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -198,7 +206,7 @@ const OverheadRatesPage: React.FC = () => {
                       {/* Inline locked warning */}
                       {isLocked && (
                         <tr className="or-locked-row">
-                          <td colSpan={8}>
+                          <td colSpan={9}>
                             <div className="or-locked-warning">
                               <AlertTriangle size={15} />
                               This rate has already been applied to costing entries and cannot be edited.

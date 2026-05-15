@@ -61,6 +61,7 @@ function normalizeList(raw: any): CostingEntry {
     total_cost: raw.total_cost ?? '0',
     cost_per_unit: raw.cost_per_unit ?? '0',
     actual_output_quantity: raw.actual_output_quantity ?? '0',
+    overhead_allocation_method: raw.overhead_allocation_method || undefined,
   };
 }
 

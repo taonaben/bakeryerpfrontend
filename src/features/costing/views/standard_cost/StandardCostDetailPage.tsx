@@ -27,6 +27,12 @@ const fmtQty = (v: string | number) => {
   return isNaN(n) ? '—' : n.toLocaleString('en-US', { maximumFractionDigits: 4 });
 };
 
+const allocationLabel = (method?: string) => {
+  if (method === 'labor_minutes') return 'Labor minutes';
+  if (method === 'unit_rate') return 'Unit rate fallback';
+  return 'â€”';
+};
+
 const StandardCostDetailPage: React.FC = () => {
   const { costId } = useParams<{ costId: string }>();
   const navigate = useNavigate();
@@ -166,6 +172,12 @@ const StandardCostDetailPage: React.FC = () => {
                 <span className="costing-meta-value">{yieldPct.toFixed(2)}%</span>
               </div>
             )}
+            <div className="costing-meta-item">
+              <label>Overhead Method</label>
+              <span className="costing-meta-value">
+                {allocationLabel(record.overhead_allocation_method)}
+              </span>
+            </div>
           </div>
         </aside>
 

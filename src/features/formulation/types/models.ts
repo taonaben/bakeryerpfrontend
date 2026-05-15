@@ -43,6 +43,7 @@ export interface Formula extends Timestamp {
   revision: number;
   batch_size: number;
   yield_percentage: number;
+  labor_minutes_per_batch?: number | null;
   status: FormulaStatus;
   lines: FormulaLine[];
 }
@@ -50,9 +51,9 @@ export interface Formula extends Timestamp {
 export interface CreateFormulaDTO {
   name: string;
   product: string;
-  revision: number;
   batch_size: number;
   yield_percentage: number;
+  labor_minutes_per_batch?: number;
   status: FormulaStatus;
 }
 

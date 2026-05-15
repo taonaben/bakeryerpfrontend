@@ -120,6 +120,12 @@ export const formulationService = {
       revision: Number(raw.revision ?? 0),
       batch_size: Number(raw.batch_size ?? 0),
       yield_percentage: Number(raw.yield_percentage ?? 0),
+      labor_minutes_per_batch:
+        raw.labor_minutes_per_batch === undefined ||
+        raw.labor_minutes_per_batch === null ||
+        raw.labor_minutes_per_batch === ''
+          ? null
+          : Number(raw.labor_minutes_per_batch),
       status: this.normalizeStatus(raw.status),
       lines: Array.isArray(raw.lines) ? raw.lines.map((line: any) => this.normalizeLine(line)) : [],
       created_at: raw.created_at || new Date().toISOString(),
@@ -156,10 +162,15 @@ export const formulationService = {
   validateCreateFormula(dto: CreateFormulaWithLinesDTO): void {
     if (!dto.name?.trim()) throw new Error('Formula name is required');
     if (!dto.product?.trim()) throw new Error('Product is required');
-    if (!Number.isFinite(Number(dto.revision))) throw new Error('Revision is required');
     if (!Number.isFinite(Number(dto.batch_size))) throw new Error('Batch size must be a valid number');
     if (!Number.isFinite(Number(dto.yield_percentage))) {
       throw new Error('Yield percentage must be a valid number');
+    }
+    if (
+      dto.labor_minutes_per_batch !== undefined &&
+      !Number.isFinite(Number(dto.labor_minutes_per_batch))
+    ) {
+      throw new Error('Labor minutes per batch must be a valid number');
     }
     if (!Array.isArray(dto.lines) || dto.lines.length === 0) {
       throw new Error('At least one formula line is required');
@@ -191,9 +202,14 @@ export const formulationService = {
   serializeCreateFormula(dto: CreateFormulaWithLinesDTO): CreateFormulaWithLinesDTO {
     return {
       ...dto,
-      revision: Number(dto.revision),
       batch_size: Number(dto.batch_size),
       yield_percentage: Number(dto.yield_percentage),
+      labor_minutes_per_batch:
+        dto.labor_minutes_per_batch === undefined ||
+        dto.labor_minutes_per_batch === null ||
+        dto.labor_minutes_per_batch === ('' as any)
+          ? undefined
+          : Number(dto.labor_minutes_per_batch),
       lines: dto.lines.map((line) => ({
         ...line,
         sequence: Number(line.sequence),

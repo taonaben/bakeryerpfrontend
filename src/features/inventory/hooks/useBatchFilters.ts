@@ -6,6 +6,7 @@ export interface BatchFilters {
   // Text filters
   batch_number__icontains: string;
   product__sku__icontains: string;
+  status: string[];
   // Manufacture date range
   manufacture_date_start: string;
   manufacture_date_end: string;
@@ -38,6 +39,7 @@ interface BatchFiltersState {
 const DEFAULT_FILTERS: BatchFilters = {
   batch_number__icontains: '',
   product__sku__icontains: '',
+  status: [],
   manufacture_date_start: '',
   manufacture_date_end: '',
   expiry_date_start: '',
@@ -83,6 +85,9 @@ const useBatchFiltersStore = create<BatchFiltersState>()(
         if (filters.product__sku__icontains) {
           params.product__sku__icontains = filters.product__sku__icontains;
         }
+        if (filters.status.length > 0) {
+          params.status = filters.status.join(',');
+        }
 
         // Date ranges — serialise as field__range=start,end
         if (filters.manufacture_date_start && filters.manufacture_date_end) {
@@ -126,6 +131,7 @@ const useBatchFiltersStore = create<BatchFiltersState>()(
         let count = 0;
         if (filters.batch_number__icontains) count++;
         if (filters.product__sku__icontains) count++;
+        if (filters.status.length > 0) count++;
         if (filters.manufacture_date_start || filters.manufacture_date_end) count++;
         if (filters.expiry_date_start || filters.expiry_date_end) count++;
         if (filters.created_at_start || filters.created_at_end) count++;

@@ -29,6 +29,12 @@ const formatCurrency = (value: string | number, currency = 'USD') => {
   }).format(n);
 };
 
+const allocationLabel = (method?: string) => {
+  if (method === 'labor_minutes') return 'Labor minutes';
+  if (method === 'unit_rate') return 'Unit rate fallback';
+  return 'â€”';
+};
+
 // Costing entries are always "Costed" once they exist.
 // The API doesn't return a status field, so we derive it.
 const deriveStatus = (_entry: CostingEntry) => 'Costed';
@@ -69,6 +75,7 @@ const CostingEntriesTable: React.FC<Props> = ({
               <th>Warehouse</th>
               <th>Date Completed</th>
               <th>Cost / Unit</th>
+              <th>Overhead Method</th>
               <th style={{ textAlign: 'right' }}>Total Cost</th>
               <th>Status</th>
             </tr>
@@ -95,6 +102,9 @@ const CostingEntriesTable: React.FC<Props> = ({
                     <span className="costing-cpu-cell">
                       {formatCurrency(entry.cost_per_unit, entry.currency)}
                     </span>
+                  </td>
+                  <td className="costing-date-cell">
+                    {allocationLabel(entry.overhead_allocation_method)}
                   </td>
                   <td className="costing-total-cell">
                     {formatCurrency(entry.total_cost, entry.currency)}

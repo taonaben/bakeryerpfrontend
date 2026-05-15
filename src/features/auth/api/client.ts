@@ -1,1 +1,1 @@
-import apiClient from '.'
+import apiClient from './'

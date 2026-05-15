@@ -1,6 +1,8 @@
 import type { PaginatedResponse } from './shared';
 export type { PaginatedResponse };
 
+export type OverheadAllocationMethod = 'labor_minutes' | 'unit_rate';
+
 // ──────────────────────────────────────────────
 // Standard Costs
 // ──────────────────────────────────────────────
@@ -28,6 +30,7 @@ export interface StandardCost {
   total_standard_cost_per_unit: string;
   material_cost_per_unit: string;
   overhead_cost_per_unit: string;
+  overhead_allocation_method?: OverheadAllocationMethod;
   currency: string;
   computed_at: string;
 }

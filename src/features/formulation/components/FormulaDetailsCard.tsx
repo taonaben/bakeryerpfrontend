@@ -36,6 +36,14 @@ const FormulaDetailsCard: React.FC<FormulaDetailsCardProps> = ({ formula, produc
           <strong>{formula.yield_percentage}%</strong>
         </div>
         <div className="formula-detail-grid__item">
+          <span className="formula-detail-grid__label">Labor minutes / batch</span>
+          <strong>
+            {formula.labor_minutes_per_batch !== undefined && formula.labor_minutes_per_batch !== null
+              ? formula.labor_minutes_per_batch.toLocaleString()
+              : '—'}
+          </strong>
+        </div>
+        <div className="formula-detail-grid__item">
           <span className="formula-detail-grid__label">Status</span>
           <strong>
             <span className={`badge formula-status ${formula.status.replace(/_/g, '-')}`}>

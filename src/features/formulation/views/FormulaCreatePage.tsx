@@ -23,7 +23,7 @@ const createLine = (sequence: number): FormulaEntryLine => ({
 const PRODUCT_LINE_TYPES: FormulaLineType[] = ['MATERIAL', 'BYPRODUCT'];
 
 const FormulaCreatePage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const [products, setProducts] = useState<product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -34,13 +34,13 @@ const FormulaCreatePage: React.FC = () => {
   const [header, setHeader] = useState({
     formulaKey: '',
     formulaDescription: '',
-    revision: '0000000001',
     dateTimeRevised: new Date().toLocaleString(),
     costMethod: 'STANDARD',
     viewMode: 'By Quantity',
     product: '',
     batchSize: '',
     yieldPercentage: '100',
+    laborMinutesPerBatch: '',
     status: 'draft' as FormulaStatus,
   });
 
@@ -85,6 +85,16 @@ const FormulaCreatePage: React.FC = () => {
   );
 
   const totalVolume = useMemo(() => totalWeight, [totalWeight]);
+
+  const headerProducts = useMemo(
+    () => products.filter((p) => p.category === 'finished_good'),
+    [products],
+  );
+
+  const lineProducts = useMemo(
+    () => products.filter((p) => p.category !== 'finished_good'),
+    [products],
+  );
 
   const updateHeader = (key: keyof typeof header, value: string) => {
     setHeader((prev) => ({ ...prev, [key]: value }));
@@ -169,9 +179,11 @@ const FormulaCreatePage: React.FC = () => {
     const payload: CreateFormulaWithLinesDTO = {
       name: header.formulaKey,
       product: header.product,
-      revision: Number(header.revision),
       batch_size: Number(header.batchSize),
       yield_percentage: Number(header.yieldPercentage),
+      labor_minutes_per_batch: header.laborMinutesPerBatch
+        ? Number(header.laborMinutesPerBatch)
+        : undefined,
       status: header.status,
       is_active: header.status === 'active',
       lines: syncSequences(lines).map((line) => ({
@@ -231,14 +243,6 @@ const FormulaCreatePage: React.FC = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="formula-revision">Revision No.</label>
-              <input
-                id="formula-revision"
-                value={header.revision}
-                onChange={(e) => updateHeader('revision', e.target.value)}
-              />
-            </div>
-            <div className="form-group">
               <label htmlFor="formula-date-time">Date and Time Revised</label>
               <input
                 id="formula-date-time"
@@ -279,7 +283,7 @@ const FormulaCreatePage: React.FC = () => {
                 disabled={loadingProducts}
               >
                 <option value="">Select product</option>
-                {products.map((item) => (
+                {headerProducts.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.sku} - {item.name}
                   </option>
@@ -326,6 +330,18 @@ const FormulaCreatePage: React.FC = () => {
                 onChange={(e) => updateHeader('yieldPercentage', e.target.value)}
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="formula-labor-minutes">Labor Minutes / Batch</label>
+              <input
+                id="formula-labor-minutes"
+                type="number"
+                min="0"
+                step="0.01"
+                value={header.laborMinutesPerBatch}
+                onChange={(e) => updateHeader('laborMinutesPerBatch', e.target.value)}
+                placeholder="Optional"
+              />
+            </div>
           </div>
         </section>
 
@@ -351,7 +367,7 @@ const FormulaCreatePage: React.FC = () => {
 
         <FormulaLineEditorTable
           lines={lines}
-          products={products}
+          products={lineProducts}
           draggingLineId={draggingLineId}
           onAddLine={addLine}
           onRemoveLine={removeLine}

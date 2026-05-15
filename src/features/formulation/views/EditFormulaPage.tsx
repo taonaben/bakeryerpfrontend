@@ -57,17 +57,18 @@ const EditFormulaPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draggingLineId, setDraggingLineId] = useState<string | null>(null);
+  const [sourceStatus, setSourceStatus] = useState<FormulaStatus>('draft');
 
   const [header, setHeader] = useState({
     formulaKey: '',
     formulaDescription: '',
-    revision: '',
     dateTimeRevised: '',
     costMethod: 'STANDARD',
     viewMode: 'By Quantity',
     product: '',
     batchSize: '',
     yieldPercentage: '',
+    laborMinutesPerBatch: '',
     status: 'draft' as FormulaStatus,
   });
 
@@ -90,11 +91,11 @@ const EditFormulaPage: React.FC = () => {
 
         setProducts(productList);
         setIsDraft(formula.status === 'draft');
+        setSourceStatus(formula.status);
 
         setHeader({
           formulaKey: formula.name,
           formulaDescription: '',           // not returned by API
-          revision: String(formula.revision),
           dateTimeRevised: formula.updated_at
             ? new Date(formula.updated_at).toLocaleString()
             : new Date(formula.created_at).toLocaleString(),
@@ -103,7 +104,11 @@ const EditFormulaPage: React.FC = () => {
           product: formula.product,
           batchSize: String(formula.batch_size),
           yieldPercentage: String(formula.yield_percentage),
-          status: formula.status,
+          laborMinutesPerBatch:
+            formula.labor_minutes_per_batch !== undefined && formula.labor_minutes_per_batch !== null
+              ? String(formula.labor_minutes_per_batch)
+              : '',
+          status: formula.status === 'draft' ? formula.status : 'draft',
         });
 
         setLines(
@@ -227,20 +232,23 @@ const EditFormulaPage: React.FC = () => {
     setError(null);
 
     const finalLines = syncSequences(lines);
+    const nextStatus = isDraft ? header.status : 'draft';
 
     try {
-      await formulationService.patchFormula(id, {
+      const saved = await formulationService.patchFormula(id, {
         name: header.formulaKey,
         product: header.product,
-        revision: Number(header.revision),
         batch_size: Number(header.batchSize),
         yield_percentage: Number(header.yieldPercentage),
-        status: header.status,
-        is_active: header.status === 'active',
+        labor_minutes_per_batch: header.laborMinutesPerBatch
+          ? Number(header.laborMinutesPerBatch)
+          : undefined,
+        status: nextStatus,
+        is_active: isDraft && nextStatus === 'active',
         lines: finalLines.map((line) => ({
           // Only include id when it looks like a real UUID (persisted lines),
           // not the generated localId strings used for new lines.
-          ...(isUUID(line.localId) ? { id: line.localId } : {}),
+          ...(isDraft && isUUID(line.localId) ? { id: line.localId } : {}),
           sequence: line.sequence,
           line_type: line.line_type as FormulaLineType,
           product: line.product || undefined,
@@ -249,7 +257,7 @@ const EditFormulaPage: React.FC = () => {
         })),
       });
 
-      navigate(`/formulation/${id}`);
+      navigate(`/formulation/${saved.id}`);
     } catch (err: any) {
       setError(err.message || 'Failed to save formula');
     } finally {
@@ -293,8 +301,8 @@ const EditFormulaPage: React.FC = () => {
           className="error-banner"
           style={{ margin: '0 0 1rem 0', padding: '12px 16px', borderRadius: 8 }}
         >
-          This formula is <strong>{header.status}</strong> and cannot be edited. Only
-          draft formulas can be modified.
+          This formula is <strong>{sourceStatus.replace(/_/g, ' ')}</strong>. Saving will create a
+          new draft revision and preserve this formula for history.
         </div>
       )}
 
@@ -313,7 +321,6 @@ const EditFormulaPage: React.FC = () => {
                 value={header.formulaKey}
                 onChange={(e) => updateHeader('formulaKey', e.target.value)}
                 placeholder="BREAD LOAVES PREP"
-                disabled={!isDraft}
               />
             </div>
             <div className="form-group">
@@ -323,16 +330,6 @@ const EditFormulaPage: React.FC = () => {
                 value={header.formulaDescription}
                 onChange={(e) => updateHeader('formulaDescription', e.target.value)}
                 placeholder="Bread loaves preparation"
-                disabled={!isDraft}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="formula-revision">Revision No.</label>
-              <input
-                id="formula-revision"
-                value={header.revision}
-                onChange={(e) => updateHeader('revision', e.target.value)}
-                disabled={!isDraft}
               />
             </div>
             <div className="form-group">
@@ -350,7 +347,6 @@ const EditFormulaPage: React.FC = () => {
                 id="formula-cost-method"
                 value={header.costMethod}
                 onChange={(e) => updateHeader('costMethod', e.target.value)}
-                disabled={!isDraft}
               >
                 <option value="STANDARD">STANDARD</option>
                 <option value="AVERAGE">AVERAGE</option>
@@ -362,7 +358,6 @@ const EditFormulaPage: React.FC = () => {
                 id="formula-view-mode"
                 value={header.viewMode}
                 onChange={(e) => updateHeader('viewMode', e.target.value)}
-                disabled={!isDraft}
               >
                 <option value="By Quantity">By Quantity</option>
                 <option value="By Percentage">By Percentage</option>
@@ -376,7 +371,6 @@ const EditFormulaPage: React.FC = () => {
                 id="formula-product"
                 value={header.product}
                 onChange={(e) => updateHeader('product', e.target.value)}
-                disabled={!isDraft}
               >
                 <option value="">Select product</option>
                 {products.map((item) => (
@@ -412,7 +406,6 @@ const EditFormulaPage: React.FC = () => {
                 step="0.000001"
                 value={header.batchSize}
                 onChange={(e) => updateHeader('batchSize', e.target.value)}
-                disabled={!isDraft}
               />
             </div>
             <div className="form-group">
@@ -426,7 +419,18 @@ const EditFormulaPage: React.FC = () => {
                 step="0.000001"
                 value={header.yieldPercentage}
                 onChange={(e) => updateHeader('yieldPercentage', e.target.value)}
-                disabled={!isDraft}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="formula-labor-minutes">Labor Minutes / Batch</label>
+              <input
+                id="formula-labor-minutes"
+                type="number"
+                min="0"
+                step="0.01"
+                value={header.laborMinutesPerBatch}
+                onChange={(e) => updateHeader('laborMinutesPerBatch', e.target.value)}
+                placeholder="Optional"
               />
             </div>
           </div>
@@ -465,7 +469,6 @@ const EditFormulaPage: React.FC = () => {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onDragEnd={handleDragEnd}
-          readOnly={!isDraft}
         />
 
         {/* ── Footer actions ───────────────────────── */}
@@ -477,11 +480,9 @@ const EditFormulaPage: React.FC = () => {
           >
             Close
           </button>
-          {isDraft && (
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving…' : 'Save Changes'}
-            </button>
-          )}
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? 'Saving…' : isDraft ? 'Save Changes' : 'Create Draft Revision'}
+          </button>
         </div>
       </form>
     </div>

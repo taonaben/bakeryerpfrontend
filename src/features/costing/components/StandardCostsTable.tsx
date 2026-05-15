@@ -29,6 +29,12 @@ const fmtCurrency = (v: string | number, currency = 'USD') => {
   }).format(n);
 };
 
+const allocationLabel = (method?: string) => {
+  if (method === 'labor_minutes') return 'Labor minutes';
+  if (method === 'unit_rate') return 'Unit rate fallback';
+  return 'â€”';
+};
+
 // The most recent record per product is "Active"; older ones are "Superseded".
 // We mark the first occurrence of each product as active (list is ordered -computed_at).
 const tagActive = (items: StandardCost[]): Set<string> => {
@@ -80,6 +86,7 @@ const StandardCostsTable: React.FC<Props> = ({
               <th>Effective Date</th>
               <th>Material / Unit</th>
               <th>Overhead / Unit</th>
+              <th>Overhead Method</th>
               <th style={{ textAlign: 'right' }}>Std Cost / Unit</th>
               <th>Status</th>
             </tr>
@@ -105,6 +112,9 @@ const StandardCostsTable: React.FC<Props> = ({
                   </td>
                   <td className="costing-date-cell">
                     {fmtCurrency(item.overhead_cost_per_unit, item.currency)}
+                  </td>
+                  <td className="costing-date-cell">
+                    {allocationLabel(item.overhead_allocation_method)}
                   </td>
                   <td>
                     <span className="costing-cpu-cell" style={{ display: 'block', textAlign: 'right' }}>
