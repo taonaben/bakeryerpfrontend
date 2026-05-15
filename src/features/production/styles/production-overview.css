@@ -1,0 +1,589 @@
+.production-overview-title {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.production-overview-title__icon {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #566d7e;
+  color: #ffffff;
+}
+
+.production-overview-content {
+  gap: 1rem;
+}
+
+.production-overview-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+}
+
+.production-overview-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 170px;
+}
+
+.production-overview-filter label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #526987;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.production-overview-filter input,
+.production-overview-filter select {
+  height: 40px;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 0 0.75rem;
+  background: #ffffff;
+  color: #152033;
+  font-size: 0.95rem;
+}
+
+.production-overview-filter input:focus,
+.production-overview-filter select:focus {
+  outline: none;
+  border-color: #566d7e;
+  box-shadow: 0 0 0 3px rgba(86, 109, 126, 0.14);
+}
+
+.production-overview-refresh {
+  height: 40px;
+}
+
+.production-overview-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.production-overview-alert button {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: #991b1b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.production-overview-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.production-overview-kpi,
+.production-overview-panel {
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+}
+
+.production-overview-kpi {
+  min-height: 145px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.production-overview-kpi__icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.production-overview-kpi--warning .production-overview-kpi__icon,
+.production-overview-attention-card--warning .production-overview-attention-card__head {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.production-overview-kpi--danger .production-overview-kpi__icon,
+.production-overview-table-card--danger .production-overview-card-title h3 {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.production-overview-kpi--success .production-overview-kpi__icon {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.production-overview-kpi span {
+  color: #526987;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.production-overview-kpi strong {
+  color: #111827;
+  font-size: clamp(1.45rem, 2vw, 2.1rem);
+  line-height: 1.05;
+}
+
+.production-overview-kpi small {
+  color: #64748b;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.production-overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.production-overview-section__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.production-overview-section__head h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.15rem;
+}
+
+.production-overview-section__head p {
+  margin: 0.25rem 0 0;
+  color: #526987;
+}
+
+.production-overview-panel {
+  padding: 1rem;
+}
+
+.production-overview-status-grid,
+.production-overview-wip-grid,
+.production-overview-efficiency-grid,
+.production-overview-schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+.production-overview-status-card,
+.production-overview-chart--output,
+.production-overview-chart--large,
+.production-overview-table-card--wide {
+  grid-column: span 2;
+}
+
+.production-overview-chart--top-products {
+  grid-column: span 2;
+}
+
+.production-overview-wip-grid .production-overview-table-card {
+  grid-column: span 2;
+}
+
+.production-overview-wip-grid .production-overview-table-card--danger,
+.production-overview-wip-grid .production-overview-table-card--warning {
+  grid-column: span 2;
+}
+
+.production-overview-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.production-overview-card-title h3 {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.production-overview-card-title span {
+  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.production-overview-segmented {
+  width: 100%;
+  height: 12px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf2f7;
+}
+
+.production-overview-segment {
+  min-width: 0;
+  transition: width 0.2s ease;
+}
+
+.production-overview-segment--empty {
+  display: none;
+}
+
+.production-overview-segment--scheduled,
+.production-overview-status-dot--scheduled {
+  background: #f59e0b;
+}
+
+.production-overview-segment--in-progress,
+.production-overview-status-dot--in-progress {
+  background: #2563eb;
+}
+
+.production-overview-segment--completed,
+.production-overview-status-dot--completed {
+  background: #059669;
+}
+
+.production-overview-segment--cancelled,
+.production-overview-status-dot--cancelled {
+  background: #64748b;
+}
+
+.production-overview-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.production-overview-status-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  color: #334155;
+}
+
+.production-overview-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.production-overview-chart {
+  min-height: 300px;
+}
+
+.production-overview-chart--large {
+  min-height: 365px;
+}
+
+.production-overview-chart--delay {
+  grid-column: span 2;
+}
+
+.production-overview-metric-pair {
+  display: grid;
+  grid-column: span 2;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.production-overview-attention-card,
+.production-overview-rate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.production-overview-attention-card__head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #526987;
+}
+
+.production-overview-attention-card__head h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.production-overview-attention-card strong,
+.production-overview-rate-card strong {
+  color: #111827;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.production-overview-attention-card span,
+.production-overview-rate-card span {
+  color: #526987;
+  font-weight: 600;
+}
+
+.production-overview-table-wrap {
+  overflow-x: auto;
+}
+
+.production-overview-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.production-overview-table th {
+  padding: 0.75rem 0.85rem;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.78rem;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.production-overview-table td {
+  padding: 0.8rem 0.85rem;
+  border-bottom: 1px solid #e6edf5;
+  color: #1f2937;
+  vertical-align: middle;
+}
+
+.production-overview-table tr:not(:has(.production-overview-empty-cell)) {
+  cursor: pointer;
+}
+
+.production-overview-table tbody tr:hover td {
+  background: #f8fafc;
+}
+
+.production-overview-table td strong,
+.production-overview-table td span,
+.production-overview-table td small {
+  display: block;
+}
+
+.production-overview-table td strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.production-overview-table td small {
+  color: #64748b;
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.production-overview-table tr.is-attention td {
+  background: #fff7ed;
+}
+
+.production-overview-table-card--danger {
+  border-color: #fecaca;
+  background: #fffafa;
+}
+
+.production-overview-table-card--warning {
+  border-color: #fed7aa;
+  background: #fffdf7;
+}
+
+.production-overview-table-card--warning .production-overview-card-title h3 {
+  color: #b45309;
+}
+
+.production-overview-empty,
+.production-overview-empty-cell {
+  color: #8aa0b8;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.production-overview-link {
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.production-overview-link:hover {
+  text-decoration: underline;
+}
+
+.production-overview-muted {
+  color: #94a3b8;
+}
+
+.production-overview-status-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  padding: 0.32rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.production-overview-status-badge--scheduled {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.production-overview-status-badge--in-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.production-overview-status-badge--completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.production-overview-status-badge--cancelled,
+.production-overview-status-badge--default {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.production-overview-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 150px;
+  padding: 0.7rem 0.8rem;
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.production-overview-tooltip strong {
+  color: #111827;
+}
+
+.production-overview-tooltip span {
+  font-weight: 700;
+}
+
+.production-overview-skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e8eef5;
+}
+
+.production-overview-skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: production-overview-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes production-overview-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.production-overview-skeleton--value {
+  width: 70%;
+  height: 32px;
+}
+
+.production-overview-skeleton--text {
+  width: 88%;
+  height: 14px;
+}
+
+.production-overview-skeleton--row {
+  width: 100%;
+  height: 36px;
+}
+
+.production-overview-status-skeleton,
+.production-overview-attention-skeleton {
+  width: 100%;
+  min-height: 135px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #edf2f7 0%, #f8fafc 100%);
+}
+
+.production-overview-chart-skeleton {
+  width: 100%;
+  min-height: 220px;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, transparent 0 12%, #f1f5f9 12% 13%, transparent 13% 100%),
+    repeating-linear-gradient(0deg, #ffffff 0 48px, #e6edf5 49px 50px);
+}
+
+@media (max-width: 1300px) {
+  .production-overview-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .production-overview-status-grid,
+  .production-overview-wip-grid,
+  .production-overview-efficiency-grid,
+  .production-overview-schedule-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .production-overview-kpis,
+  .production-overview-status-grid,
+  .production-overview-wip-grid,
+  .production-overview-efficiency-grid,
+  .production-overview-schedule-grid,
+  .production-overview-metric-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .production-overview-status-card,
+  .production-overview-chart--output,
+  .production-overview-chart--top-products,
+  .production-overview-chart--large,
+  .production-overview-chart--delay,
+  .production-overview-table-card--wide,
+  .production-overview-wip-grid .production-overview-table-card,
+  .production-overview-wip-grid .production-overview-table-card--danger,
+  .production-overview-wip-grid .production-overview-table-card--warning,
+  .production-overview-metric-pair {
+    grid-column: span 1;
+  }
+
+  .production-overview-filter,
+  .production-overview-refresh {
+    width: 100%;
+  }
+}
