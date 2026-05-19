@@ -1,22 +1,22 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertCircle, LayoutDashboard, Plus, RefreshCw } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AlertCircle, LayoutDashboard, Plus, RefreshCw } from "lucide-react";
 import {
   ResponsiveGridLayout,
   useContainerWidth,
   verticalCompactor,
   type Layout,
   type ResponsiveLayouts,
-} from 'react-grid-layout';
-import type { Warehouse } from '../../../core/warehouses/types/models';
-import type { User } from '../../auth/types/models';
-import { BaseInfoletCard } from '../components/BaseInfoletCard';
-import { WidgetPickerModal } from '../components/WidgetPickerModal';
-import { dashboardService } from '../services/dashboardService';
-import { useDashboardStore } from '../stores/dashboardStore';
-import type { DashboardResolvedWidget } from '../types/dashboardTypes';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
-import '../styles/dashboard.css';
+} from "react-grid-layout";
+import type { Warehouse } from "../../../core/warehouses/types/models";
+import type { User } from "../../auth/types/models";
+import { BaseInfoletCard } from "../components/BaseInfoletCard";
+import { WidgetPickerModal } from "../components/WidgetPickerModal";
+import { dashboardService } from "../services/dashboardService";
+import { useDashboardStore } from "../stores/dashboardStore";
+import type { DashboardResolvedWidget } from "../types/dashboardTypes";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import "../styles/dashboard.css";
 
 const GRID_COLUMNS = {
   lg: 4,
@@ -27,41 +27,55 @@ const GRID_COLUMNS = {
 };
 
 const CHART_WIDGET_KEYS = new Set([
-  'production_output',
-  'production_yield_trends',
-  'production_schedule',
-  'inventory_alerts',
-  'inventory_movement',
+  "production_output",
+  "production_yield_trends",
+  "production_schedule",
+  "inventory_alerts",
+  "inventory_movement",
+  "pending_approvals",
+  "purchasing_trends",
+  "cost_variance_summary",
+  "costing_margin",
+  "finance_pnl",
 ]);
 
 const TABLE_WIDGET_KEYS = new Set([
-  'production_top_products',
-  'inventory_low_stock',
+  "production_top_products",
+  "inventory_low_stock",
+  "overdue_pos",
+  "supplier_risk",
+  "adverse_variances",
 ]);
 
 const STATUS_WIDGET_KEYS = new Set([
-  'production_orders_status',
-  'production_waste',
-  'inventory_stock_status',
-  'inventory_expiring',
-  'inventory_expired',
+  "production_orders_status",
+  "production_waste",
+  "inventory_stock_status",
+  "inventory_expiring",
+  "inventory_expired",
+  "po_status",
 ]);
 
 const getWidgetHeight = (widget: DashboardResolvedWidget): number => {
   if (widget.isLoading || widget.error) return 3;
-  if (CHART_WIDGET_KEYS.has(widget.key)) return widget.layout.width === 'full' ? 5 : 4;
-  if (TABLE_WIDGET_KEYS.has(widget.key)) return widget.layout.width === 'full' ? 5 : 4;
+  if (widget.key === "finance_pnl") {
+    return widget.layout.width === "full" ? 6 : 7;
+  }
+  if (CHART_WIDGET_KEYS.has(widget.key))
+    return widget.layout.width === "full" ? 5 : 4;
+  if (TABLE_WIDGET_KEYS.has(widget.key))
+    return widget.layout.width === "full" ? 5 : 4;
   if (STATUS_WIDGET_KEYS.has(widget.key)) return 3;
   if (
-    typeof widget.data === 'number' ||
-    typeof widget.data === 'string' ||
-    typeof widget.data === 'boolean'
+    typeof widget.data === "number" ||
+    typeof widget.data === "string" ||
+    typeof widget.data === "boolean"
   ) {
-    return 2;
+    return 3;
   }
-  if (Array.isArray(widget.data)) return widget.layout.width === 'full' ? 4 : 3;
-  if (widget.data && typeof widget.data === 'object') {
-    return widget.layout.width === 'full' ? 4 : 3;
+  if (Array.isArray(widget.data)) return widget.layout.width === "full" ? 4 : 3;
+  if (widget.data && typeof widget.data === "object") {
+    return widget.layout.width === "full" ? 4 : 3;
   }
   return 2;
 };
@@ -74,7 +88,12 @@ const buildGridLayout = (
   let cursorY = 0;
 
   return widgets.map((widget) => {
-    const width = columns === 1 ? 1 : widget.layout.width === 'full' ? columns : columns / 2;
+    const width =
+      columns === 1
+        ? 1
+        : widget.layout.width === "full"
+          ? columns
+          : columns / 2;
     const height = getWidgetHeight(widget);
 
     if (cursorX + width > columns) {
@@ -104,9 +123,7 @@ const buildGridLayout = (
 };
 
 const orderWidgetKeysFromGrid = (gridLayout: Layout[]): string[] =>
-  [...gridLayout]
-    .sort((a, b) => a.y - b.y || a.x - b.x)
-    .map((item) => item.i);
+  [...gridLayout].sort((a, b) => a.y - b.y || a.x - b.x).map((item) => item.i);
 
 interface DashboardProps {
   user: User | null;
@@ -115,10 +132,15 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
   const [isPickerOpen, setPickerOpen] = useState(false);
-  const [highlightedWidgetKey, setHighlightedWidgetKey] = useState<string | null>(null);
+  const [highlightedWidgetKey, setHighlightedWidgetKey] = useState<
+    string | null
+  >(null);
   const widgetRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const { width: gridWidth, containerRef: gridContainerRef, mounted: gridMounted } =
-    useContainerWidth();
+  const {
+    width: gridWidth,
+    containerRef: gridContainerRef,
+    mounted: gridMounted,
+  } = useContainerWidth();
   const registry = useDashboardStore((state) => state.registry);
   const layout = useDashboardStore((state) => state.layout);
   const endpointData = useDashboardStore((state) => state.endpointData);
@@ -176,9 +198,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
     }),
     [widgets],
   );
-  const userDisplayName = [user?.first_name, user?.last_name]
-    .filter(Boolean)
-    .join(' ') || user?.username || 'Current user';
+  const userDisplayName =
+    [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
+    user?.username ||
+    "Current user";
 
   useEffect(() => {
     void loadDashboard();
@@ -193,7 +216,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
   useEffect(() => {
     if (!highlightedWidgetKey) return undefined;
 
-    const widgetExists = widgets.some((widget) => widget.key === highlightedWidgetKey);
+    const widgetExists = widgets.some(
+      (widget) => widget.key === highlightedWidgetKey,
+    );
     if (!widgetExists) {
       setHighlightedWidgetKey(null);
       return undefined;
@@ -201,8 +226,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
 
     const scrollTimer = window.setTimeout(() => {
       widgetRefs.current[highlightedWidgetKey]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
+        behavior: "smooth",
+        block: "center",
       });
     }, 180);
 
@@ -219,7 +244,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
   const handleDragStop = (currentLayout: Layout[]) => {
     const nextOrder = orderWidgetKeysFromGrid(currentLayout);
     const currentOrder = widgets.map((widget) => widget.key);
-    const hasChanged = nextOrder.some((widgetKey, index) => widgetKey !== currentOrder[index]);
+    const hasChanged = nextOrder.some(
+      (widgetKey, index) => widgetKey !== currentOrder[index],
+    );
     if (hasChanged) void reorderWidgets(nextOrder);
   };
 
@@ -234,13 +261,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
             <span className="dashboard-eyebrow">Operational overview</span>
             <h1>Dashboard</h1>
             <p>
-              {userDisplayName} viewing {activeWarehouse?.name || 'all warehouse data'}
+              {userDisplayName} viewing{" "}
+              {activeWarehouse?.name || "all warehouse data"}
             </p>
           </div>
         </div>
         <div className="dashboard-page-header__actions">
           <span className="dashboard-save-state">
-            {isSavingLayout ? 'Saving layout' : `${visibleWidgetCount} active infolets`}
+            {isSavingLayout
+              ? "Saving layout"
+              : `${visibleWidgetCount} active infolets`}
           </span>
           <button
             type="button"
@@ -274,7 +304,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
       )}
 
       {isLoading ? (
-        <section className="dashboard-infolet-skeleton-grid" aria-label="Loading dashboard">
+        <section
+          className="dashboard-infolet-skeleton-grid"
+          aria-label="Loading dashboard"
+        >
           {Array.from({ length: 6 }).map((_, index) => (
             <article
               key={index}
@@ -292,7 +325,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
             <LayoutDashboard size={30} />
           </div>
           <h2>Your dashboard is empty</h2>
-          <p>Add infolets from production, inventory, purchasing, sales, costing, or finance.</p>
+          <p>
+            Add infolets from production, inventory, purchasing, sales, costing,
+            or finance.
+          </p>
           <button
             type="button"
             className="btn btn-primary dashboard-action-button"
@@ -304,7 +340,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
           </button>
         </section>
       ) : (
-        <section className="dashboard-infolet-grid-wrap" aria-label="Dashboard infolets">
+        <section
+          className="dashboard-infolet-grid-wrap"
+          aria-label="Dashboard infolets"
+        >
           <div ref={gridContainerRef}>
             {gridMounted && (
               <ResponsiveGridLayout
@@ -321,8 +360,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, activeWarehouse }) => {
                 dragConfig={{
                   enabled: true,
                   bounded: false,
-                  handle: '.dashboard-infolet__drag-handle',
-                  cancel: 'button,input,select,textarea,a',
+                  handle: ".dashboard-infolet__drag-handle",
+                  cancel: "button,input,select,textarea,a",
                   threshold: 3,
                 }}
                 onDragStop={handleDragStop}
