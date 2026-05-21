@@ -17,6 +17,17 @@ interface InventoryMovementInfoletProps {
   width: DashboardWidgetWidth;
 }
 
+const formatPeriodLabel = (value: unknown): string => {
+  const raw = String(value ?? '');
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(parsed);
+};
+
 export const InventoryMovementInfolet: React.FC<InventoryMovementInfoletProps> = ({
   data,
   width,
@@ -49,9 +60,17 @@ export const InventoryMovementInfolet: React.FC<InventoryMovementInfoletProps> =
       <ChartFrame>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="period" tickLine={false} axisLine={false} />
+          <XAxis
+            dataKey="period"
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={formatPeriodLabel}
+          />
           <YAxis hide />
-          <Tooltip formatter={(value) => formatNumber(value)} />
+          <Tooltip
+            labelFormatter={formatPeriodLabel}
+            formatter={(value) => formatNumber(value)}
+          />
           {movementTypes.map((type) => (
             <Line
               key={type.key}

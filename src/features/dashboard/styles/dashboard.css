@@ -120,7 +120,8 @@
 }
 
 .dashboard-infolet-grid-wrap {
-  margin: -10px;
+  width: 100%;
+  min-width: 0;
 }
 
 .dashboard-infolet-grid {
