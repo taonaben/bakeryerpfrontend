@@ -1,13 +1,20 @@
 import { profileApi } from "../api/profile_api";
 import type {
+  ChangePasswordPayload,
+  CreatedProfileUser,
   CreateProfileUserPayload,
+  PasswordMutationResponse,
   PatchProfileUserPayload,
   ProfileUser,
+  ProfileUsersQueryParams,
+  RegisterProfileUserPayload,
+  RegisterProfileUserResponse,
+  ResetPasswordPayload,
   UpdateProfileUserPayload,
 } from "../types/profile_model";
 
 export const profileService = {
-  async fetchUsers(params: Record<string, unknown> = {}) {
+  async fetchUsers(params: ProfileUsersQueryParams = {}) {
     const response = await profileApi.getUsers(params);
     const pageSize = Number(params.page_size || 25);
     const currentPage = Number(params.page || 1);
@@ -23,6 +30,10 @@ export const profileService = {
     };
   },
 
+  async listUsers(params: ProfileUsersQueryParams = {}) {
+    return profileApi.getUsers(params);
+  },
+
   async getUserById(id: string): Promise<ProfileUser> {
     return profileApi.getUserById(id);
   },
@@ -31,8 +42,16 @@ export const profileService = {
     return profileApi.getCurrentUser();
   },
 
-  async createUser(payload: CreateProfileUserPayload): Promise<ProfileUser> {
+  async createUser(
+    payload: CreateProfileUserPayload,
+  ): Promise<CreatedProfileUser> {
     return profileApi.createUser(payload);
+  },
+
+  async registerUser(
+    payload: RegisterProfileUserPayload,
+  ): Promise<RegisterProfileUserResponse> {
+    return profileApi.registerUser(payload);
   },
 
   async updateUser(
@@ -51,5 +70,18 @@ export const profileService = {
 
   async deleteUser(id: string): Promise<void> {
     return profileApi.deleteUser(id);
+  },
+
+  async changePassword(
+    payload: ChangePasswordPayload,
+  ): Promise<PasswordMutationResponse> {
+    return profileApi.changePassword(payload);
+  },
+
+  async resetPassword(
+    id: string,
+    payload: ResetPasswordPayload,
+  ): Promise<PasswordMutationResponse> {
+    return profileApi.resetPassword(id, payload);
   },
 };

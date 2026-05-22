@@ -378,8 +378,8 @@
   overflow: hidden;
 }
 
-/* â”€â”€â”€ SETTINGS ITEM â”€â”€â”€ */
-.nav-item.settings-item {
+/* â”€â”€â”€ USER MANAGEMENT ITEM â”€â”€â”€ */
+.nav-item.user-management-item {
   margin-top: auto;
   border-top: 1px solid #f1f5f9;
   border-radius: 0;
@@ -428,9 +428,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 6px 8px;
   border-radius: 8px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
   position: relative;
+}
+
+.sidebar-user-profile:hover {
+  background: #f8fafc;
 }
 
 .sidebar.collapsed .sidebar-user-profile {
