@@ -1,6 +1,13 @@
-import React from 'react';
-import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
-import type { DashboardWidgetWidth } from '../../../types/dashboardTypes';
+import React from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import type { DashboardWidgetWidth } from "../../../types/dashboardTypes";
 import {
   ChartFrame,
   type DashboardChartPoint,
@@ -10,30 +17,42 @@ import {
   isRecord,
   readString,
   toNumber,
-} from '../infoletRenderUtils';
+} from "../infoletRenderUtils";
 
 interface InventoryMovementInfoletProps {
   data: unknown;
   width: DashboardWidgetWidth;
 }
 
-export const InventoryMovementInfolet: React.FC<InventoryMovementInfoletProps> = ({
-  data,
-  width,
-}) => {
+const formatPeriodLabel = (value: unknown): string => {
+  const raw = String(value ?? "");
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(parsed);
+};
+
+export const InventoryMovementInfolet: React.FC<
+  InventoryMovementInfoletProps
+> = ({ data, width }) => {
   const record = isRecord(data) ? data : {};
   const movementTypes = [
-    { key: 'inbound', label: 'Inbound', stroke: '#16a34a' },
-    { key: 'outbound', label: 'Outbound', stroke: '#dc2626' },
-    { key: 'adjustments', label: 'Adjustments', stroke: '#2563eb' },
-    { key: 'returns', label: 'Returns', stroke: '#7c3aed' },
+    { key: "inbound", label: "Inbound", stroke: "#16a34a" },
+    { key: "outbound", label: "Outbound", stroke: "#dc2626" },
+    { key: "adjustments", label: "Adjustments", stroke: "#2563eb" },
+    { key: "returns", label: "Returns", stroke: "#7c3aed" },
   ];
   const periods = new Map<string, DashboardChartPoint>();
 
   movementTypes.forEach((type) => {
-    const rows = Array.isArray(record[type.key]) ? record[type.key].filter(isRecord) : [];
+    const rows = Array.isArray(record[type.key])
+      ? record[type.key].filter(isRecord)
+      : [];
     rows.forEach((row) => {
-      const period = readString(row, ['period'], '');
+      const period = readString(row, ["period"], "");
       if (!period) return;
       const existing = periods.get(period) || { period };
       existing[type.key] = Math.abs(toNumber(row.total_quantity ?? row.count));
@@ -42,16 +61,25 @@ export const InventoryMovementInfolet: React.FC<InventoryMovementInfoletProps> =
   });
 
   const chartData = Array.from(periods.values()).slice(-getRowLimit(width, 5));
-  if (chartData.length === 0) return <EmptyInfolet message="No movement trend data found." />;
+  if (chartData.length === 0)
+    return <EmptyInfolet message="No movement trend data found." />;
 
   return (
     <div className="dashboard-module-renderer">
       <ChartFrame>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="period" tickLine={false} axisLine={false} />
+          <XAxis
+            dataKey="period"
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={formatPeriodLabel}
+          />
           <YAxis hide />
-          <Tooltip formatter={(value) => formatNumber(value)} />
+          <Tooltip
+            labelFormatter={formatPeriodLabel}
+            formatter={(value) => formatNumber(value)}
+          />
           {movementTypes.map((type) => (
             <Line
               key={type.key}

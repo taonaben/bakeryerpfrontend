@@ -61,6 +61,9 @@ const getWidgetHeight = (widget: DashboardResolvedWidget): number => {
   if (widget.key === "finance_pnl") {
     return widget.layout.width === "full" ? 6 : 7;
   }
+  if (["finance_net_profit", "finance_gross_profit"].includes(widget.key)) {
+    return widget.layout.width === "full" ? 4 : 5;
+  }
   if (CHART_WIDGET_KEYS.has(widget.key))
     return widget.layout.width === "full" ? 5 : 4;
   if (TABLE_WIDGET_KEYS.has(widget.key))
