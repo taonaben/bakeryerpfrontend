@@ -1,9 +1,16 @@
 import apiClient from "@/shared/services/api";
 import type {
+  ChangePasswordPayload,
+  CreatedProfileUser,
   CreateProfileUserPayload,
   PaginatedProfileUsersResponse,
+  PasswordMutationResponse,
   PatchProfileUserPayload,
   ProfileUser,
+  ProfileUsersQueryParams,
+  RegisterProfileUserPayload,
+  RegisterProfileUserResponse,
+  ResetPasswordPayload,
   UpdateProfileUserPayload,
 } from "../types/profile_model";
 
@@ -24,14 +31,26 @@ const toPaginatedUsers = (data: unknown): PaginatedProfileUsersResponse => {
 
 export const profileApi = {
   async getUsers(
-    params: Record<string, unknown> = {},
+    params: ProfileUsersQueryParams = {},
   ): Promise<PaginatedProfileUsersResponse> {
     const { data } = await apiClient.get(PROFILE_USERS_ENDPOINT, { params });
     return toPaginatedUsers(data);
   },
 
-  async createUser(payload: CreateProfileUserPayload): Promise<ProfileUser> {
+  async createUser(
+    payload: CreateProfileUserPayload,
+  ): Promise<CreatedProfileUser> {
     const { data } = await apiClient.post(PROFILE_USERS_ENDPOINT, payload);
+    return data;
+  },
+
+  async registerUser(
+    payload: RegisterProfileUserPayload,
+  ): Promise<RegisterProfileUserResponse> {
+    const { data } = await apiClient.post(
+      `${PROFILE_USERS_ENDPOINT}/register`,
+      payload,
+    );
     return data;
   },
 
@@ -68,6 +87,27 @@ export const profileApi = {
 
   async getCurrentUser(): Promise<ProfileUser> {
     const { data } = await apiClient.get(`${PROFILE_USERS_ENDPOINT}/me`);
+    return data;
+  },
+
+  async changePassword(
+    payload: ChangePasswordPayload,
+  ): Promise<PasswordMutationResponse> {
+    const { data } = await apiClient.post(
+      `${PROFILE_USERS_ENDPOINT}/change-password`,
+      payload,
+    );
+    return data;
+  },
+
+  async resetPassword(
+    id: string,
+    payload: ResetPasswordPayload,
+  ): Promise<PasswordMutationResponse> {
+    const { data } = await apiClient.post(
+      `${PROFILE_USERS_ENDPOINT}/${id}/reset-password`,
+      payload,
+    );
     return data;
   },
 };

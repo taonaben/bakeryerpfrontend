@@ -24,6 +24,9 @@ import { User } from "./features/auth/types/models";
 import { Warehouse } from "./core/warehouses/types/models";
 import SnackbarHost from "./shared/notifications/SnackbarHost";
 import ProfilePage from "./features/profile/views/profile_page";
+import UserManagementPage from "./features/profile/views/user_management_page";
+import CreateUserPage from "./features/profile/views/create_user_page";
+import UserDetailPage from "./features/profile/views/user_detail_page";
 import "./shared/styles/scrollbar.css";
 
 // Procurement views
@@ -110,6 +113,9 @@ import SalesReportsPage from "./features/sales/views/reports/SalesReports";
 import PriceAgreementsPage from "./features/sales/views/price_agreements/PriceAgreementsPage";
 import DebtorManagementPage from "./features/sales/views/debtor_management/DebtorManagementPage";
 import SalesOverview from "./features/sales/views/overview/SalesOverview";
+
+const canManageUsers = (user: User | null): boolean =>
+  user?.role === "manager" || user?.role === "owner_director";
 
 /**
  * Main Application Component
@@ -309,6 +315,11 @@ function App() {
     localStorage.setItem("erp_user", JSON.stringify(userData));
   };
 
+  const handleUserUpdated = (userData: User) => {
+    setCurrentUser(userData);
+    localStorage.setItem("erp_user", JSON.stringify(userData));
+  };
+
   /**
    * Handle warehouse change
    */
@@ -394,8 +405,54 @@ function App() {
                         />
                       }
                     />
-                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProfilePage
+                          onLogout={handleLogout}
+                          onUserUpdated={handleUserUpdated}
+                        />
+                      }
+                    />
                     <Route path="/profile/:userId" element={<ProfilePage />} />
+                    <Route
+                      path="/users"
+                      element={
+                        canManageUsers(currentUser) ? (
+                          <UserManagementPage />
+                        ) : (
+                          <Navigate to="/profile" replace />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/users/new"
+                      element={
+                        canManageUsers(currentUser) ? (
+                          <CreateUserPage />
+                        ) : (
+                          <Navigate to="/profile" replace />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/users/:userId"
+                      element={
+                        canManageUsers(currentUser) ? (
+                          <UserDetailPage />
+                        ) : (
+                          <Navigate to="/profile" replace />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/employees"
+                      element={<Navigate to="/users" replace />}
+                    />
+                    <Route
+                      path="/employees/new"
+                      element={<Navigate to="/users/new" replace />}
+                    />
 
                     {/* Inventory Module */}
                     <Route
@@ -848,11 +905,7 @@ function App() {
                     />
                     <Route
                       path="/settings"
-                      element={
-                        <div style={{ padding: "30px" }}>
-                          Settings (Coming Soon)
-                        </div>
-                      }
+                      element={<Navigate to="/profile" replace />}
                     />
 
                     {/* 404 - Redirect to dashboard */}

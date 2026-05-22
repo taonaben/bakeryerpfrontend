@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Factory, ChevronLeft, ChevronRight, ChevronDown, LogOut } from 'lucide-react';
 import {
   navigationItems,
-  settingsItem,
+  userManagementItem,
   getNavigationForRole,
   getActiveModuleFromPath,
   getModuleSidebarConfig,
@@ -93,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, co
     : '??';
 
   const visibleNavItems = user ? getNavigationForRole(user.role) : [];
-  const canSeeSettings = user && settingsItem.roles.includes(user.role);
+  const canSeeUserManagement = user && userManagementItem.roles.includes(user.role);
 
   const isNavActive = (item: typeof navigationItems[0]) => {
     if (item.isActive) return item.isActive(location.pathname);
@@ -170,6 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, co
 
   const flyoutConfig = flyoutModuleId ? getModuleSidebarConfig(flyoutModuleId) : null;
   const flyoutNavItem = flyoutModuleId ? navigationItems.find((i) => i.id === flyoutModuleId) : null;
+  const UserManagementIcon = userManagementItem.icon;
   const flyoutVisibleChildren = flyoutConfig
     ? flyoutConfig.sections.flatMap((section) =>
         section.items.filter((child) => !child.roles || (user && child.roles.includes(user.role)))
@@ -308,22 +309,24 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, co
           );
         })}
 
-        {/* Settings */}
-        {canSeeSettings && (
+        {/* User management */}
+        {canSeeUserManagement && (
           <div
-            className={`nav-item settings-item ${isNavActive(settingsItem) ? 'active' : ''}`}
-            onClick={() => navigate(settingsItem.path)}
-            data-tooltip={isCollapsed ? settingsItem.label : undefined}
+            className={`nav-item user-management-item ${isNavActive(userManagementItem) ? 'active' : ''}`}
+            onClick={() => navigate(userManagementItem.path)}
+            data-tooltip={isCollapsed ? userManagementItem.label : undefined}
           >
-            <settingsItem.icon size={20} />
-            {!isCollapsed && <span>{settingsItem.label}</span>}
+            <UserManagementIcon size={20} />
+            {!isCollapsed && <span>{userManagementItem.label}</span>}
           </div>
         )}
 
         {/* User section */}
         <div className="sidebar-user-section">
-          <div
+          <button
+            type="button"
             className="sidebar-user-profile"
+            onClick={() => navigate('/profile')}
             data-tooltip={isCollapsed ? (user?.username || 'User') : undefined}
           >
             <div className="sidebar-avatar">{initials}</div>
@@ -333,7 +336,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, co
                 <span className="sidebar-user-role">{user?.role || 'No Role'}</span>
               </div>
             )}
-          </div>
+          </button>
           <button
             type="button"
             className="sidebar-logout-btn"
