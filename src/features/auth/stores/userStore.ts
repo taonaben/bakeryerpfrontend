@@ -33,16 +33,18 @@ export const useUserStore = create<AuthState>((set, get) => ({
    * Login Action
    */
   login: async (empCode: string, password: string) => {
+    const normalizedEmpCode = empCode.toUpperCase();
+
     // Validate format first
-    if (!authService.validateEmpCode(empCode)) {
-      set({ error: "Format error: Employee Code must be 'xxx-xxx'" });
+    if (!authService.validateEmpCode(normalizedEmpCode)) {
+      set({ error: "Format error: Employee Code must be 'XXX-XXX'" });
       return;
     }
 
     set({ loading: true, error: null });
 
     try {
-      const response = await authService.login({ emp_code: empCode, password });
+      const response = await authService.login({ emp_code: normalizedEmpCode, password });
 
       let userProfile = response.user;
       try {

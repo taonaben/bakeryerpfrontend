@@ -152,7 +152,7 @@ export const authService = {
    * Validate employee code format
    */
   validateEmpCode(empCode: string): boolean {
-    const codeRegex = /^[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}$/;
+    const codeRegex = /^[A-Z0-9]{3}-[A-Z0-9]{3}$/;
     return codeRegex.test(empCode);
   },
 };

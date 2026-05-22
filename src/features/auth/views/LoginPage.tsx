@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, User, Factory } from 'lucide-react';
+import { Lock, User } from 'lucide-react';
 import { useUserStore } from '../stores/userStore';
 import '../styles/LoginPage.css';
 import type { User as UserModel } from '../types/models';
@@ -24,6 +24,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     // Get auth state and actions from store
     const { login, loading, error, clearError, user, isAuthenticated } = useUserStore();
 
+    const formatEmpCode = (value: string) => {
+        const rawCode = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6);
+
+        if (rawCode.length <= 3) {
+            return rawCode;
+        }
+
+        return `${rawCode.slice(0, 3)}-${rawCode.slice(3)}`;
+    };
+
+    const handleEmpCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmpCode(formatEmpCode(e.target.value));
+    };
+
     /**
      * Effect: Redirect if already authenticated
      */
@@ -45,11 +59,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     /**
      * Handle form submission
      */
-    const handleLogin = async (e) => {
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         try {
-            await login(empCode, password);
+            await login(formatEmpCode(empCode), password);
             
             // Success - useEffect will handle redirect
             console.log('Login successful');
@@ -63,7 +77,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <Factory size={50} color="#566d7e" strokeWidth={1.5} />
+                    <img
+                        src="/favicon/android-chrome-192x192.png"
+                        alt="Bakery ERP logo"
+                        className="login-logo"
+                    />
                     <h2>Bakery ERP</h2>
                     <p>Bakery Management System</p>
                 </div>
@@ -73,17 +91,21 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     <div className="form-group">
                         <label>Employee Code</label>
                         <div className="input-wrapper">
-                            <User className="input-icon" size={18} />
                             <input 
                                 type="text"
-                                className="login-input"
-                                placeholder="e.g., abc-123"
+                                className="login-input emp-code-input"
+                                placeholder="ABC-123"
                                 value={empCode}
-                                onChange={(e) => setEmpCode(e.target.value)}
+                                onChange={handleEmpCodeChange}
                                 maxLength={7}
+                                pattern="[A-Z0-9]{3}-[A-Z0-9]{3}"
+                                autoCapitalize="characters"
+                                autoComplete="username"
+                                inputMode="text"
                                 required
                                 disabled={loading}
                             />
+                            <User className="input-icon" size={20} aria-hidden="true" />
                         </div>
                     </div>
 
@@ -91,7 +113,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     <div className="form-group">
                         <label>Password</label>
                         <div className="input-wrapper">
-                            <Lock className="input-icon" size={18} />
                             <input 
                                 type="password"
                                 className="login-input"
@@ -101,6 +122,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                                 required
                                 disabled={loading}
                             />
+                            <Lock className="input-icon" size={20} aria-hidden="true" />
                         </div>
                     </div>
 

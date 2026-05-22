@@ -185,7 +185,11 @@ const Sidebar: React.FC<SidebarProps> = ({ user, activeWarehouse, warehouses, co
       <div className="sidebar-logo">
         {!isCollapsed && (
           <>
-            <Factory size={20} className="sidebar-logo-icon" />
+            <img
+              src="/favicon/favicon-32x32.png"
+              alt="Bakery ERP logo"
+              className="sidebar-logo-icon"
+            />
             <span className="sidebar-app-name" onClick={() => navigate('/')}>
               {companyName ? `${companyName} ERP` : 'ERP'}
             </span>

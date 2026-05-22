@@ -30,7 +30,10 @@
 }
 
 .sidebar-logo-icon {
-  color: #3b82f6;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
   flex-shrink: 0;
 }
 
