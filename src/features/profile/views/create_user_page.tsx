@@ -123,7 +123,7 @@ const CreateUserPage: React.FC = () => {
   };
 
   return (
-    <div className="profile-page profile-page--module">
+    <div className="profile-page profile-page--module profile-page--form">
       <div className="profile-form-layout">
         <div className="profile-page-header profile-page-header--stacked">
           <div className="profile-page-header__left">

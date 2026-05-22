@@ -11,6 +11,12 @@
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.profile-page--form {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 32px;
+}
+
 .profile-sticky-stack {
   display: flex;
   flex-direction: column;
@@ -459,6 +465,7 @@
 .profile-form-layout {
   max-width: 860px;
   width: 100%;
+  padding-bottom: 24px;
 }
 
 .profile-back-link {
